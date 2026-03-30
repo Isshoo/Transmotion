@@ -1,0 +1,102 @@
+"""Authentication middleware and decorators"""
+
+from functools import wraps
+
+from flask import request
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+
+from app.config.extensions import db
+from app.layers.models.user import User, UserRole
+from app.utils.exceptions import ForbiddenError, UnauthorizedError
+
+
+def get_current_user():
+    try:
+        verify_jwt_in_request()
+        user_id = get_jwt_identity()
+        return db.session.get(User, user_id)
+    except Exception:
+        return None
+
+
+def jwt_required_custom(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        verify_jwt_in_request()
+        user_id = get_jwt_identity()
+
+        user = db.session.get(User, user_id)
+        if not user:
+            raise UnauthorizedError("Akun tidak ditemukan")
+
+        if not user.is_active:
+            raise ForbiddenError("Akun telah dinonaktifkan")
+
+        request.current_user = user
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        verify_jwt_in_request()
+        user_id = get_jwt_identity()
+
+        user = db.session.get(User, user_id)
+        if not user:
+            raise UnauthorizedError("Akun tidak ditemukan")
+
+        if not user.is_active:
+            raise ForbiddenError("Akun telah dinonaktifkan")
+
+        if user.role != UserRole.ADMIN:
+            raise ForbiddenError("Hanya admin yang dapat mengakses")
+
+        request.current_user = user
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
+def verified_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        verify_jwt_in_request()
+        user_id = get_jwt_identity()
+
+        user = db.session.get(User, user_id)
+        if not user:
+            raise UnauthorizedError("Akun tidak ditemukan")
+
+        if not user.is_active:
+            raise ForbiddenError("Akun telah dinonaktifkan")
+
+        if not user.is_verified:
+            raise ForbiddenError("Verifikasi email diperlukan")
+
+        request.current_user = user
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
+def optional_jwt(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            verify_jwt_in_request(optional=True)
+            user_id = get_jwt_identity()
+
+            if user_id:
+                user = db.session.get(User, user_id)
+                request.current_user = user if user and user.is_active else None
+            else:
+                request.current_user = None
+        except Exception:
+            request.current_user = None
+
+        return fn(*args, **kwargs)
+
+    return wrapper

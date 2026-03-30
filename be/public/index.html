@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transmotion | Backend API Service</title>
+    <meta
+      name="description"
+      content="Transmotion Backend API Service - High-performance motion analytics and data processing engine."
+    />
+
+    <!-- Google Fonts: Outfit for headings, Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #6366f1;
+        --secondary: #a855f7;
+        --accent: #ec4899;
+        --bg-dark: #020617;
+        --glass: rgba(15, 23, 42, 0.6);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glow-primary: rgba(99, 102, 241, 0.5);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        /* Fallback gradient if image doesn't load */
+        background-image:
+          radial-gradient(
+            at 0% 0%,
+            rgba(99, 102, 241, 0.15) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 0%,
+            rgba(236, 72, 153, 0.15) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 100%,
+            rgba(168, 85, 247, 0.15) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 0% 100%,
+            rgba(59, 130, 246, 0.15) 0px,
+            transparent 50%
+          ),
+          url("bg.png");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Animated ambient light */
+      .ambient-light {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          var(--glow-primary) 0%,
+          transparent 70%
+        );
+        filter: blur(80px);
+        opacity: 0.2;
+        z-index: 0;
+        pointer-events: none;
+        animation: moveLight 20s infinite alternate;
+      }
+
+      @keyframes moveLight {
+        0% {
+          transform: translate(-20%, -20%);
+        }
+        100% {
+          transform: translate(20%, 20%);
+        }
+      }
+
+      .container {
+        z-index: 1;
+        width: 100%;
+        max-width: 800px;
+        padding: 1.5rem;
+        text-align: center;
+      }
+
+      .glass-card {
+        background: var(--glass);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border);
+        border-radius: 2.5rem;
+        padding: 4rem 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Subtle scanner line effect */
+      .glass-card::before {
+        content: "";
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(99, 102, 241, 0.05),
+          transparent
+        );
+        animation: scan 8s linear infinite;
+      }
+
+      @keyframes scan {
+        0% {
+          top: -100%;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo-container {
+        margin-bottom: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h1 {
+        font-family: "Outfit", sans-serif;
+        font-size: 4rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        background: linear-gradient(
+          135deg,
+          #818cf8 0%,
+          #c084fc 50%,
+          #f472b6 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.25rem;
+        filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+      }
+
+      .subtitle {
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        font-weight: 400;
+        margin-bottom: 2rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.6rem 1.4rem;
+        background: rgba(34, 197, 94, 0.08);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        border-radius: 9999px;
+        color: #4ade80;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 2.5rem;
+        letter-spacing: 0.02em;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        background: #22c55e;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+        box-shadow: 0 0 12px #22c55e;
+        animation: pulse 2.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.9);
+          opacity: 0.6;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 1;
+          box-shadow: 0 0 20px #22c55e;
+        }
+        100% {
+          transform: scale(0.9);
+          opacity: 0.6;
+        }
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 3.5rem;
+      }
+
+      .stat-item {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .stat-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: var(--primary);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+      }
+
+      .stat-value {
+        font-weight: 600;
+        font-size: 1.25rem;
+        font-family: "Outfit", sans-serif;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 1.25rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 1rem 2.5rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: white;
+        box-shadow: 0 8px 25px -5px rgba(99, 102, 241, 0.4);
+        border: none;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px -5px rgba(99, 102, 241, 0.5);
+        filter: brightness(1.1);
+      }
+
+      .btn-outline {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        color: var(--text-main);
+      }
+
+      .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--text-muted);
+        transform: translateY(-3px);
+      }
+
+      footer {
+        margin-top: 4rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.02em;
+        opacity: 0.8;
+      }
+
+      /* Micro-interactions */
+      .glow-hover:hover {
+        filter: drop-shadow(0 0 15px var(--glow-primary));
+      }
+
+      @media (max-width: 640px) {
+        h1 {
+          font-size: 2.8rem;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+        .glass-card {
+          padding: 3rem 1.5rem;
+        }
+        .subtitle {
+          font-size: 1.1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div m-id="ambient-light" class="ambient-light"></div>
+
+    <div m-id="main-container" class="container">
+      <main class="glass-card">
+        <div class="logo-container">
+          <div class="status-badge">
+            <div class="status-dot"></div>
+            System Operational
+          </div>
+          <h1>Transmotion</h1>
+          <p class="subtitle">
+            Next-generation emotion teks classifier. Powering by Transformer's
+            models.
+          </p>
+        </div>
+
+        <div class="stats-grid">
+          <a href="/api" class="stat-item">
+            <span class="stat-label">API Status</span>
+            <span class="stat-value">Active</span>
+          </a>
+          <a href="/health" class="stat-item">
+            <span class="stat-label">Response</span>
+            <span class="stat-value">24ms</span>
+          </a>
+          <div class="stat-item">
+            <span class="stat-label">Network</span>
+            <span class="stat-value">Stable</span>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <a href="/api" class="btn btn-primary glow-hover">
+            Access API
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </a>
+          <a href="/health" class="btn btn-outline">System Metrics</a>
+        </div>
+      </main>
+
+      <footer>&copy; 2026 Transmotion by Isshoo.</footer>
+    </div>
+
+    <script>
+      // Smooth parallax effect for the ambient light and card
+      document.addEventListener("mousemove", (e) => {
+        const { clientX, clientY } = e;
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+
+        const moveX = (clientX - centerX) / centerX;
+        const moveY = (clientY - centerY) / centerY;
+
+        // Move ambient light
+        const light = document.querySelector(".ambient-light");
+        light.style.transform = `translate(${moveX * 50}px, ${moveY * 50}px)`;
+
+        // Subtle card tilt
+        const card = document.querySelector(".glass-card");
+        card.style.transform = `rotateY(${moveX * 2}deg) rotateX(${moveY * -2}deg) translateY(${Math.abs(moveX) * -5}px)`;
+
+        // Move background image slightly
+        document.body.style.backgroundPosition = `calc(50% + ${moveX * 15}px) calc(50% + ${moveY * 15}px)`;
+      });
+
+      // Dynamic interaction: Pulse metrics simulation
+      setInterval(() => {
+        const items = document.querySelectorAll(".stat-value");
+        if (Math.random() > 0.8) {
+          const responseTime = items[1];
+          const newTime = Math.floor(Math.random() * 10) + 18;
+          responseTime.textContent = `${newTime}ms`;
+        }
+      }, 3000);
+    </script>
+  </body>
+</html>
