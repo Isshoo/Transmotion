@@ -60,21 +60,19 @@ def get_all(
     return users, total
 
 
-def create(data):
+def create(name, email, password, role):
     # Check for unique constraints
-    existing = (
-        db.session.query(User).filter(User.email == data["email"].lower()).first()
-    )
+    existing = db.session.query(User).filter(User.email == email.lower()).first()
     if existing:
         raise ConflictError("Email sudah digunakan")
 
     user = User(
-        email=data["email"].lower(),
-        password_hash=hash_password(data["password"]),
-        name=data["name"],
-        role=UserRole(data["role"]),
-        is_verified=data.get("is_verified", True),
-        auth_provider=data.get("auth_provider", "local"),
+        email=email.lower(),
+        password_hash=hash_password(password),
+        name=name,
+        role=UserRole(role),
+        is_verified=True,
+        auth_provider="local",
     )
     db.session.add(user)
     db.session.commit()
@@ -93,6 +91,9 @@ def update(user, **kwargs):
         if existing:
             raise ConflictError("Email sudah terdaftar")
         kwargs["email"] = kwargs["email"].lower()
+
+    if "password" in kwargs and kwargs["password"]:
+        kwargs["password"] = hash_password(kwargs["password"])
 
     # Handle role conversion
     if "role" in kwargs and kwargs["role"]:

@@ -1,6 +1,22 @@
 """User validation schemas"""
 
-from marshmallow import Schema, fields, validate
+import re
+
+from marshmallow import Schema, ValidationError, fields, validate, validates
+
+_PASSWORD_MIN_LEN = 8
+_PASSWORD_REGEX = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$")
+
+
+def _validate_password_strength(value: str) -> None:
+    if value is None:
+        return
+    if len(value) < _PASSWORD_MIN_LEN:
+        raise ValidationError(f"Password minimal {_PASSWORD_MIN_LEN} karakter")
+    if not _PASSWORD_REGEX.match(value):
+        raise ValidationError(
+            "Password harus mengandung huruf besar, huruf kecil, dan angka"
+        )
 
 
 class UpdateUserSchema(Schema):
@@ -13,33 +29,23 @@ class UpdateUserSchema(Schema):
 
 class CreateUserSchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
-    email = fields.Email(error_messages={"invalid": "Format email tidak valid"})
-    name = fields.String(
-        validate=validate.Length(max=100, error="Nama lengkap maksimal 100 karakter")
+
+    email = fields.Email(
+        required=True,
+        error_messages={
+            "required": "Email harus diisi",
+            "invalid": "Format email tidak valid",
+        },
     )
     password = fields.String(
-        validate=validate.Length(
-            min=6, max=128, error="Password harus antara 6 sampai 128 karakter"
-        )
+        required=True,
+        load_only=True,
+        error_messages={"required": "Password harus diisi"},
     )
-    role = fields.String(
-        validate=validate.OneOf(
-            ["user", "admin"], error="Role harus berupa 'user' atau 'admin'"
-        )
-    )
-    is_verified = fields.Boolean(
-        error_messages={"invalid": "Format status verifikasi tidak valid"}
-    )
-    auth_provider = fields.String(
-        validate=validate.OneOf(["local"], error="Auth provider harus berupa 'email''")
-    )
-
-
-class UpdateUserAdminSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
-    email = fields.Email(error_messages={"invalid": "Format email tidak valid"})
     name = fields.String(
-        validate=validate.Length(max=100, error="Nama lengkap maksimal 100 karakter")
+        required=True,
+        validate=validate.Length(max=100, error="Nama maksimal 100 karakter"),
+        error_messages={"required": "Nama harus diisi"},
     )
     role = fields.String(
         validate=validate.OneOf(
@@ -52,6 +58,40 @@ class UpdateUserAdminSchema(Schema):
     is_active = fields.Boolean(
         error_messages={"invalid": "Format status aktif tidak valid"}
     )
+
+    @validates("password")
+    def validate_password(self, value, **kwargs):
+        _validate_password_strength(value)
+
+
+class UpdateUserAdminSchema(Schema):
+    error_messages = {"unknown": "Kolom tidak dikenal"}
+    email = fields.Email(
+        error_messages={
+            "invalid": "Format email tidak valid",
+        },
+    )
+    password = fields.String(
+        load_only=True,
+    )
+    name = fields.String(
+        validate=validate.Length(max=100, error="Nama maksimal 100 karakter"),
+    )
+    role = fields.String(
+        validate=validate.OneOf(
+            ["user", "admin"], error="Role harus berupa 'user' atau 'admin'"
+        )
+    )
+    is_verified = fields.Boolean(
+        error_messages={"invalid": "Format status verifikasi tidak valid"}
+    )
+    is_active = fields.Boolean(
+        error_messages={"invalid": "Format status aktif tidak valid"}
+    )
+
+    @validates("password")
+    def validate_password(self, value, **kwargs):
+        _validate_password_strength(value)
 
 
 class UserListQuerySchema(Schema):

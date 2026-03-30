@@ -1,6 +1,6 @@
-import api from "@/lib/axios";
+import api from "@/libs/axios";
 
-export const usersApi = {
+const usersApi = {
   getAll: (params) => api.get("/users", { params }),
   getById: (id) => api.get(`/users/${id}`),
   create: (data) => api.post("/users", data),
@@ -18,3 +18,5 @@ export const usersApi = {
 
   updateMe: (data) => api.put("/users/me", data),
 };
+
+export default usersApi;

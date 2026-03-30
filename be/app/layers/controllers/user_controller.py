@@ -110,7 +110,12 @@ def create_user():
             status_code=422,
         )
 
-    user = user_service.create(**data)
+    user = user_service.create(
+        name=data["name"],
+        email=data["email"],
+        password=data["password"],
+        role=data["role"],
+    )
     return success_response(data=user.to_dict(), message="Pengguna berhasil dibuat")
 
 

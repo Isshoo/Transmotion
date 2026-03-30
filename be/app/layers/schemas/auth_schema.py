@@ -36,8 +36,8 @@ class RegisterSchema(Schema):
     )
     name = fields.String(
         required=True,
-        validate=validate.Length(max=100, error="Nama lengkap maksimal 100 karakter"),
-        error_messages={"required": "Nama lengkap harus diisi"},
+        validate=validate.Length(max=100, error="Nama maksimal 100 karakter"),
+        error_messages={"required": "Nama harus diisi"},
     )
 
     @validates("password")

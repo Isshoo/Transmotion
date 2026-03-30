@@ -29,7 +29,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
 
   if (!isClient) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" />
       </div>
     );
@@ -38,7 +38,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
   // Sudah di browser, belum login
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-sm text-gray-400">Mengalihkan ke halaman login...</p>
       </div>
     );
@@ -47,7 +47,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
   // Sudah login, tapi role tidak cocok
   if (requiredRole && user?.role !== requiredRole) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-2">
         <p className="text-sm text-gray-400">
           Anda tidak memiliki akses ke halaman ini.
         </p>
