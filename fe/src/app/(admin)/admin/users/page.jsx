@@ -1,4 +1,4 @@
-import UserTable from "@/features/users/components/UserTable";
+import UserTable from "@/features/admin/users/components/UserTable";
 
 export const metadata = {
   title: "Manajemen User",

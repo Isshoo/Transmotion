@@ -34,6 +34,7 @@ const useUsersStore = create((set, get) => ({
   // ── Actions: Fetch ────────────────────────────────────────────
   fetchUsers: async () => {
     const {
+      users,
       page,
       perPage,
       search,
@@ -44,7 +45,9 @@ const useUsersStore = create((set, get) => ({
       sortOrder,
     } = get();
 
-    set({ isLoading: true, error: null });
+    if (users.length === 0) {
+      set({ isLoading: true, error: null });
+    }
 
     try {
       const params = {
