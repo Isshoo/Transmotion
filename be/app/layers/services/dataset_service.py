@@ -12,7 +12,7 @@ from app.utils.logger import logger
 
 # Folder penyimpanan dataset — sesuaikan dengan konfigurasi storage kamu
 DATASET_UPLOAD_DIR = os.path.join(
-    os.path.dirname(__file__), "..", "..", "..", "storage", "datasets"
+    os.path.dirname(__file__), "..", "..", "storage", "uploads", "datasets"
 )
 
 
@@ -81,7 +81,7 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
 
     # Baca header untuk tahu kolom yang tersedia
     try:
-        delimiter = "\t" if ext == ".tsv" else ","
+        delimiter = "\t" if ext == ".tsv" else ";"
         with open(file_path, "r", encoding="utf-8", errors="replace") as f:
             reader = csv.reader(f, delimiter=delimiter)
             columns = next(reader, [])
@@ -132,7 +132,7 @@ def preprocess(
 
     try:
         ext = os.path.splitext(dataset.file_path)[1].lower()
-        delimiter = "\t" if ext == ".tsv" else ","
+        delimiter = "\t" if ext == ".tsv" else ";"
 
         rows = []
         labels_seen = set()

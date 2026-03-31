@@ -2,12 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Settings,
+  Database,
+  BrainCircuit,
+  Cpu,
+} from "lucide-react";
 import { cn } from "@/libs/utils";
 import useAuthStore from "@/features/auth/store";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "Dataset", href: "/admin/datasets", icon: Database },
+  { label: "Training", href: "/admin/training", icon: BrainCircuit },
+  { label: "Model", href: "/admin/models", icon: Cpu },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

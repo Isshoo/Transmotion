@@ -15,7 +15,13 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         {user ? (
           <div className="flex items-center gap-2">
-            <span className="text-sm">{user.name}</span>
+            {user.role === "admin" ? (
+              <Link href="/admin" className="text-sm hover:underline">
+                Admin Panel
+              </Link>
+            ) : (
+              <span className="text-sm">{user.name}</span>
+            )}
             <button
               onClick={() => logout()}
               className="text-sm text-red-600 hover:underline"
