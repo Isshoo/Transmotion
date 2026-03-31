@@ -10,10 +10,8 @@ load_dotenv()
 
 def get_env(key, default=None, cast=str):
     value = os.getenv(key, default)
-
     if value is None:
         return None
-
     try:
         if cast is bool:
             return value.lower() in ("true", "1", "yes", "on")
@@ -82,11 +80,14 @@ class Config:
     CLOUDINARY_API_KEY = get_env("CLOUDINARY_API_KEY")
     CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
 
-    # Rate Limiting (default dev)
+    # Rate Limiting
     RATELIMIT_DEFAULT = get_env("RATELIMIT_DEFAULT", "60/minute")
     RATELIMIT_STORAGE_URI = get_env("RATELIMIT_STORAGE_URI", "memory://")
     RATELIMIT_STRATEGY = get_env("RATELIMIT_STRATEGY", "fixed-window")
     RATELIMIT_HEADERS_ENABLED = get_env("RATELIMIT_HEADERS_ENABLED", "True", bool)
+
+    # Colab Integration
+    COLAB_API_KEY = get_env("COLAB_API_KEY", "")
 
 
 class DevelopmentConfig(Config):
@@ -103,6 +104,7 @@ class ProductionConfig(Config):
     SECRET_KEY = get_required_env("SECRET_KEY")
     JWT_SECRET_KEY = get_required_env("JWT_SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = get_required_env("DATABASE_URL")
+    COLAB_API_KEY = get_required_env("COLAB_API_KEY")
 
     RATELIMIT_STORAGE_URI = get_env("RATELIMIT_STORAGE_URI", "redis://localhost:6379")
 

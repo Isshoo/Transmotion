@@ -46,8 +46,9 @@ waitress:
 db-init:
 	$(FLASK) db init
 
+# make db-migrate msg="Auto migration"
 db-migrate:
-	$(FLASK) db migrate -m "Auto migration"
+	$(FLASK) db migrate -m "$(msg)"
 
 db-upgrade:
 	$(FLASK) db upgrade
