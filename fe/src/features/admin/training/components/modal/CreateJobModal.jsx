@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { X, BrainCircuit, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
-import useTrainingStore from "../store";
+import useTrainingStore from "../../store";
 import datasetsApi from "@/features/admin/datasets/api";
-import SplitPreviewCard from "./SplitPreviewCard";
+import SplitPreviewCard from "../SplitPreviewCard";
 
 const MODEL_OPTIONS = [
   {

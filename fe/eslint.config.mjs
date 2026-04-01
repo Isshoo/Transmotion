@@ -27,6 +27,10 @@ const eslintConfig = defineConfig([
         },
       ],
 
+      // Hindari penggunaan variabel atau fungsi atau hal yang tidak di defined
+      "no-undef": "error",
+
+      // Hindari penggunaan useEffect tanpa dependency array
       "react-hooks/exhaustive-deps": "warn",
 
       // Next.js — pakai next/link bukan <a> biasa

@@ -2,96 +2,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Database,
-  Save,
-  CheckCircle,
-  AlertCircle,
-  Clock,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, Database, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import useDatasetStore from "../store";
 import RawDataTab from "./RawDataTab";
 import PreprocessedTab from "./PreprocessedTab";
-
-// ── Badge helpers ──────────────────────────────────────────────
-
-function PreprocessStatusBadge({ status }) {
-  const map = {
-    idle: {
-      label: "Belum diproses",
-      cls: "bg-gray-100 text-gray-600",
-      icon: Clock,
-    },
-    running: {
-      label: "Sedang memproses",
-      cls: "bg-yellow-100 text-yellow-700",
-      icon: Loader2,
-    },
-    completed: {
-      label: "Selesai",
-      cls: "bg-green-100 text-green-700",
-      icon: CheckCircle,
-    },
-    error: {
-      label: "Gagal",
-      cls: "bg-red-100 text-red-600",
-      icon: AlertCircle,
-    },
-  };
-  const { label, cls, icon: Icon } = map[status] ?? map.idle;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${cls}`}
-    >
-      <Icon size={12} className={status === "running" ? "animate-spin" : ""} />
-      {label}
-    </span>
-  );
-}
-
-// ── Distribusi kelas ───────────────────────────────────────────
-
-function ClassDistribution({ title, distribution, colorClass }) {
-  if (!distribution || Object.keys(distribution).length === 0) return null;
-  const total = Object.values(distribution).reduce((a, b) => a + b, 0);
-
-  return (
-    <div>
-      <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-        {title}
-      </p>
-      <div className="space-y-2">
-        {Object.entries(distribution)
-          .sort((a, b) => b[1] - a[1])
-          .map(([label, count]) => {
-            const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-            return (
-              <div key={label}>
-                <div className="mb-0.5 flex justify-between text-xs">
-                  <span className="font-medium text-gray-700">{label}</span>
-                  <span className="text-gray-500">
-                    {count.toLocaleString("id")} ({pct}%)
-                  </span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-gray-100">
-                  <div
-                    className={`h-2 rounded-full transition-all ${colorClass}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        <p className="pt-1 text-xs text-gray-400">
-          Total: {total.toLocaleString("id")} baris
-        </p>
-      </div>
-    </div>
-  );
-}
+import { PreprocessStatusBadge } from "./ui/Badge";
+import ClassDistribution from "./ClassDistribution";
 
 // ── Komponen utama ─────────────────────────────────────────────
 

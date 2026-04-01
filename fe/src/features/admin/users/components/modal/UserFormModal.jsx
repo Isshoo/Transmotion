@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useUsersStore from "../store";
+import useUsersStore from "../../store";
 
 const INITIAL_FORM = {
   name: "",

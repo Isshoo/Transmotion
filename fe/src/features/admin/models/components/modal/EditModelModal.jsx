@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import useModelStore from "../store";
+import useModelStore from "../../store";
 
 export default function EditModelModal() {
   const {

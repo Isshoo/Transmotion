@@ -10,7 +10,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import useDatasetStore from "../store";
+import useDatasetStore from "../../store";
 
 // ── Client-side CSV/TSV parser ─────────────────────────────────
 

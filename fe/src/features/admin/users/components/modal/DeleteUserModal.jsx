@@ -1,7 +1,7 @@
 // ── Modal Konfirmasi Hapus ─────────────────────────────────────
 
 import { Trash2 } from "lucide-react";
-import useUsersStore from "../store";
+import useUsersStore from "../../store";
 import { toast } from "sonner";
 
 export default function DeleteUserModal() {

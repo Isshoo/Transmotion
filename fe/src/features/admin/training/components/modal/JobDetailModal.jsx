@@ -10,7 +10,7 @@ import {
   AlertCircle,
   Ban,
 } from "lucide-react";
-import useTrainingStore from "../store";
+import useTrainingStore from "../../store";
 
 const STATUS_CONFIG = {
   queued: { label: "Menunggu", cls: "bg-gray-100 text-gray-600", icon: Clock },

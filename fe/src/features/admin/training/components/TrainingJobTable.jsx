@@ -6,137 +6,16 @@ import {
   BrainCircuit,
   ChevronLeft,
   ChevronRight,
-  Clock,
-  Loader2,
-  CheckCircle,
-  XCircle,
   Ban,
   Eye,
 } from "lucide-react";
-import { toast } from "sonner";
 import { formatDate } from "@/helpers/formatter";
 import useTrainingStore from "../store";
-import CreateJobModal from "./CreateJobModal";
-import JobDetailModal from "./JobDetailModal";
-
-const STATUS_CONFIG = {
-  queued: {
-    label: "Menunggu",
-    cls: "bg-gray-100 text-gray-600",
-    dot: "bg-gray-400",
-    icon: Clock,
-  },
-  running: {
-    label: "Berjalan",
-    cls: "bg-blue-100 text-blue-700",
-    dot: "bg-blue-500",
-    icon: Loader2,
-  },
-  completed: {
-    label: "Selesai",
-    cls: "bg-green-100 text-green-700",
-    dot: "bg-green-500",
-    icon: CheckCircle,
-  },
-  failed: {
-    label: "Gagal",
-    cls: "bg-red-100 text-red-600",
-    dot: "bg-red-500",
-    icon: XCircle,
-  },
-  cancelled: {
-    label: "Dibatalkan",
-    cls: "bg-gray-100 text-gray-400",
-    dot: "bg-gray-300",
-    icon: Ban,
-  },
-};
-
-function StatusBadge({ status }) {
-  const {
-    label,
-    cls,
-    icon: Icon,
-  } = STATUS_CONFIG[status] ?? STATUS_CONFIG.queued;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}
-    >
-      <Icon size={11} className={status === "running" ? "animate-spin" : ""} />
-      {label}
-    </span>
-  );
-}
-
-function ProgressBar({ progress, status }) {
-  if (status !== "running") return null;
-  return (
-    <div className="mt-1 flex items-center gap-2">
-      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
-        <div
-          className="h-1.5 rounded-full bg-blue-500 transition-all"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <span className="text-[10px] text-gray-400">{progress}%</span>
-    </div>
-  );
-}
-
-function CancelConfirmModal() {
-  const {
-    isCancelModalOpen,
-    cancelTarget,
-    isSubmitting,
-    closeCancelModal,
-    cancelJob,
-  } = useTrainingStore();
-  if (!isCancelModalOpen || !cancelTarget) return null;
-
-  const handleConfirm = async () => {
-    const result = await cancelJob(cancelTarget.id);
-    if (result.success) {
-      toast.success(result.message);
-      closeCancelModal();
-    } else toast.error(result.message);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-        <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-red-100">
-          <Ban size={20} className="text-red-600" />
-        </div>
-        <h2 className="mb-1 text-base font-semibold text-gray-800">
-          Batalkan Job?
-        </h2>
-        <p className="mb-5 text-sm text-gray-500">
-          Job{" "}
-          <span className="font-medium text-gray-700">
-            {cancelTarget.display_name}
-          </span>{" "}
-          akan dibatalkan.
-        </p>
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={closeCancelModal}
-            disabled={isSubmitting}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Tidak
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={isSubmitting}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-          >
-            {isSubmitting ? "Membatalkan..." : "Ya, Batalkan"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+import CreateJobModal from "./modal/CreateJobModal";
+import JobDetailModal from "./modal/JobDetailModal";
+import CancelConfirmModal from "./modal/CancelConfirmModal";
+import { ProgressBar } from "./ui/Bar";
+import { StatusBadge } from "./ui/Badge";
 
 export default function TrainingJobTable() {
   const {
