@@ -1,5 +1,6 @@
 "use client";
 
+import useAuthStore from "@/features/auth/store";
 import Link from "next/link";
 
 export default function GlobalError({ error, reset }) {

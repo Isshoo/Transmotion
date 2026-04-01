@@ -3,41 +3,58 @@ import datasetsApi from "./api";
 import { getErrorMessage } from "@/helpers/error";
 
 const useDatasetStore = create((set, get) => ({
-  // ── Data ──────────────────────────────────────────────────────
+  // ── List ───────────────────────────────────────────────────────
   datasets: [],
   total: 0,
   totalPages: 0,
-  selectedDataset: null,
-
-  // ── Pagination & Filter ───────────────────────────────────────
   page: 1,
   perPage: 10,
   search: "",
-  status: "",
-
-  // ── UI State ──────────────────────────────────────────────────
+  statusFilter: "",
   isLoading: false,
+
+  // ── Detail ─────────────────────────────────────────────────────
+  currentDataset: null,
+  isLoadingDetail: false,
+
+  // ── Raw tab ────────────────────────────────────────────────────
+  rawRows: [],
+  rawTotal: 0,
+  rawPage: 1,
+  rawPerPage: 10,
+  rawSearch: "",
+  rawFilterLabel: "",
+  isLoadingRaw: false,
+
+  // ── Preprocessed tab ───────────────────────────────────────────
+  preprocessedRows: [],
+  preprocessedTotal: 0,
+  preprocessedPage: 1,
+  preprocessedPerPage: 10,
+  preprocessedSearch: "",
+  preprocessedFilterLabel: "",
+  isLoadingPreprocessed: false,
+
+  // ── UI ─────────────────────────────────────────────────────────
   isSubmitting: false,
-  error: null,
-
-  // ── Modal State ───────────────────────────────────────────────
   isUploadModalOpen: false,
-  isPreprocessModalOpen: false,
   isDeleteModalOpen: false,
-  preprocessTarget: null,
+  isPreprocessModalOpen: false,
+  isAddRowModalOpen: false,
+  isEditRowModalOpen: false,
   deleteTarget: null,
+  editRowTarget: null,
 
-  // ── Actions: Fetch ────────────────────────────────────────────
+  // ── List actions ───────────────────────────────────────────────
   fetchDatasets: async () => {
-    const { page, perPage, search, status } = get();
-
-    set({ isLoading: true });
-
+    const { page, perPage, search, statusFilter } = get();
+    if (get().datasets.length === 0) {
+      set({ isLoading: true });
+    }
     try {
       const params = { page, per_page: perPage };
       if (search) params.search = search;
-      if (status) params.status = status;
-
+      if (statusFilter) params.status = statusFilter;
       const { data: res } = await datasetsApi.getAll(params);
       set({
         datasets: res.data,
@@ -45,29 +62,28 @@ const useDatasetStore = create((set, get) => ({
         totalPages: res.meta?.pagination?.total_pages ?? 1,
         isLoading: false,
       });
-    } catch (err) {
-      set({ error: getErrorMessage(err), isLoading: false });
+    } catch {
+      set({ isLoading: false });
     }
   },
 
-  // ── Actions: CRUD ─────────────────────────────────────────────
+  setPage: (page) => {
+    set({ page });
+    get().fetchDatasets();
+  },
+  setSearch: (search) => {
+    set({ search, page: 1 });
+    get().fetchDatasets();
+  },
+  setStatusFilter: (statusFilter) => {
+    set({ statusFilter, page: 1 });
+    get().fetchDatasets();
+  },
+
   uploadDataset: async (formData) => {
     set({ isSubmitting: true });
     try {
       const { data: res } = await datasetsApi.upload(formData);
-      await get().fetchDatasets();
-      return { success: true, message: res.message };
-    } catch (err) {
-      return { success: false, message: getErrorMessage(err) };
-    } finally {
-      set({ isSubmitting: false });
-    }
-  },
-
-  preprocessDataset: async (id, payload) => {
-    set({ isSubmitting: true });
-    try {
-      const { data: res } = await datasetsApi.preprocess(id, payload);
       await get().fetchDatasets();
       return { success: true, message: res.message, data: res.data };
     } catch (err) {
@@ -90,32 +106,195 @@ const useDatasetStore = create((set, get) => ({
     }
   },
 
-  // ── Actions: Filter & Pagination ──────────────────────────────
-  setPage: (page) => {
-    set({ page });
-    get().fetchDatasets();
-  },
-  setSearch: (search) => {
-    set({ search, page: 1 });
-    get().fetchDatasets();
-  },
-  setStatus: (status) => {
-    set({ status, page: 1 });
-    get().fetchDatasets();
+  // ── Detail actions ─────────────────────────────────────────────
+  fetchDataset: async (id) => {
+    set({ isLoadingDetail: true });
+    try {
+      const { data: res } = await datasetsApi.getById(id);
+      set({ currentDataset: res.data, isLoadingDetail: false });
+      return res.data;
+    } catch (err) {
+      return { success: false, message: getErrorMessage(err) };
+    } finally {
+      set({ isLoadingDetail: false });
+    }
   },
 
-  // ── Actions: Modal ────────────────────────────────────────────
+  setColumns: async (id, textColumn, labelColumn) => {
+    set({ isSubmitting: true });
+    try {
+      const { data: res } = await datasetsApi.setColumns(id, {
+        text_column: textColumn,
+        label_column: labelColumn,
+      });
+      set({ currentDataset: res.data });
+      return { success: true, message: res.message };
+    } catch (err) {
+      return { success: false, message: getErrorMessage(err) };
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
+
+  // ── Raw data actions ───────────────────────────────────────────
+  fetchRawData: async (id) => {
+    const { rawPage, rawPerPage, rawSearch, rawFilterLabel } = get();
+    if (get().rawRows.length === 0) {
+      set({ isLoadingRaw: true });
+    }
+    try {
+      const params = { page: rawPage, per_page: rawPerPage };
+      if (rawSearch) params.search = rawSearch;
+      if (rawFilterLabel) params.filter_label = rawFilterLabel;
+      const { data: res } = await datasetsApi.getRawData(id, params);
+      set({
+        rawRows: res.data,
+        rawTotal: res.meta?.pagination?.total ?? 0,
+        isLoadingRaw: false,
+      });
+    } catch {
+      set({ isLoadingRaw: false });
+    }
+  },
+
+  setRawPage: (id, page) => {
+    set({ rawPage: page });
+    get().fetchRawData(id);
+  },
+  setRawSearch: (id, search) => {
+    set({ rawSearch: search, rawPage: 1 });
+    get().fetchRawData(id);
+  },
+  setRawFilterLabel: (id, label) => {
+    set({ rawFilterLabel: label, rawPage: 1 });
+    get().fetchRawData(id);
+  },
+
+  // ── Preprocessing actions ──────────────────────────────────────
+  startPreprocessing: async (id) => {
+    set({ isSubmitting: true });
+    try {
+      const { data: res } = await datasetsApi.startPreprocessing(id);
+      set({ currentDataset: res.data });
+      return { success: true, message: res.message };
+    } catch (err) {
+      return { success: false, message: getErrorMessage(err) };
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
+
+  // Dipanggil oleh polling
+  refreshDataset: async (id) => {
+    try {
+      const { data: res } = await datasetsApi.getById(id);
+      set({ currentDataset: res.data });
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+
+  // ── Preprocessed data actions ──────────────────────────────────
+  fetchPreprocessedData: async (id) => {
+    const {
+      preprocessedPage,
+      preprocessedPerPage,
+      preprocessedSearch,
+      preprocessedFilterLabel,
+    } = get();
+    if (get().preprocessedRows.length === 0) {
+      set({ isLoadingPreprocessed: true });
+    }
+    try {
+      const params = { page: preprocessedPage, per_page: preprocessedPerPage };
+      if (preprocessedSearch) params.search = preprocessedSearch;
+      if (preprocessedFilterLabel)
+        params.filter_label = preprocessedFilterLabel;
+      const { data: res } = await datasetsApi.getPreprocessedData(id, params);
+      set({
+        preprocessedRows: res.data,
+        preprocessedTotal: res.meta?.pagination?.total ?? 0,
+        isLoadingPreprocessed: false,
+      });
+    } catch {
+      set({ isLoadingPreprocessed: false });
+    }
+  },
+
+  setPreprocessedPage: (id, page) => {
+    set({ preprocessedPage: page });
+    get().fetchPreprocessedData(id);
+  },
+  setPreprocessedSearch: (id, search) => {
+    set({ preprocessedSearch: search, preprocessedPage: 1 });
+    get().fetchPreprocessedData(id);
+  },
+  setPreprocessedFilterLabel: (id, label) => {
+    set({ preprocessedFilterLabel: label, preprocessedPage: 1 });
+    get().fetchPreprocessedData(id);
+  },
+
+  addPreprocessedRow: async (id, data) => {
+    set({ isSubmitting: true });
+    try {
+      const { data: res } = await datasetsApi.addPreprocessedRow(id, data);
+      await get().fetchPreprocessedData(id);
+      await get().refreshDataset(id);
+      return { success: true, message: res.message };
+    } catch (err) {
+      return { success: false, message: getErrorMessage(err) };
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
+
+  updatePreprocessedRow: async (id, rowId, data) => {
+    set({ isSubmitting: true });
+    try {
+      const { data: res } = await datasetsApi.updatePreprocessedRow(
+        id,
+        rowId,
+        data
+      );
+      await get().fetchPreprocessedData(id);
+      await get().refreshDataset(id);
+      return { success: true, message: res.message };
+    } catch (err) {
+      return { success: false, message: getErrorMessage(err) };
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
+
+  deletePreprocessedRow: async (id, rowId) => {
+    set({ isSubmitting: true });
+    try {
+      const { data: res } = await datasetsApi.deletePreprocessedRow(id, rowId);
+      await get().fetchPreprocessedData(id);
+      await get().refreshDataset(id);
+      return { success: true, message: res.message };
+    } catch (err) {
+      return { success: false, message: getErrorMessage(err) };
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
+
+  // ── Modal actions ──────────────────────────────────────────────
   openUploadModal: () => set({ isUploadModalOpen: true }),
   closeUploadModal: () => set({ isUploadModalOpen: false }),
-
-  openPreprocessModal: (dataset) =>
-    set({ preprocessTarget: dataset, isPreprocessModalOpen: true }),
-  closePreprocessModal: () =>
-    set({ preprocessTarget: null, isPreprocessModalOpen: false }),
-
   openDeleteModal: (dataset) =>
     set({ deleteTarget: dataset, isDeleteModalOpen: true }),
   closeDeleteModal: () => set({ deleteTarget: null, isDeleteModalOpen: false }),
+  openPreprocessModal: () => set({ isPreprocessModalOpen: true }),
+  closePreprocessModal: () => set({ isPreprocessModalOpen: false }),
+  openAddRowModal: () => set({ isAddRowModalOpen: true }),
+  closeAddRowModal: () => set({ isAddRowModalOpen: false }),
+  openEditRowModal: (row) =>
+    set({ editRowTarget: row, isEditRowModalOpen: true }),
+  closeEditRowModal: () =>
+    set({ editRowTarget: null, isEditRowModalOpen: false }),
 }));
 
 export default useDatasetStore;

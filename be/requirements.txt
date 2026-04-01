@@ -16,3 +16,6 @@ waitress==3.0.2
 resend==2.23.0
 redis==7.4.0
 ruff==0.15.8
+pandas==3.0.2
+numpy==2.4.4
+

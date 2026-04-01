@@ -31,5 +31,5 @@ for tweet in paginator.flatten():
     )
 
 df = pd.DataFrame(all_tweets)
-df.to_csv("tweets_pendidikan.csv", index=False, encoding="utf-8-sig")
+df.to_csv("tweets_pendidikan.csv", sep=";", index=False, encoding="utf-8-sig")
 print(f"✅ {len(df)} tweet tersimpan")

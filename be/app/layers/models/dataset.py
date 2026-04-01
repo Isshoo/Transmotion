@@ -11,10 +11,16 @@ from app.config.extensions import db
 
 
 class DatasetStatus(PyEnum):
-    UPLOADED = "uploaded"
-    PREPROCESSING = "preprocessing"
-    READY = "ready"
+    UPLOADED = "uploaded"  # baru diupload, kolom belum dikonfigurasi
+    READY = "ready"  # kolom sudah diatur, siap dipakai training
     ERROR = "error"
+
+
+class PreprocessingStatus(PyEnum):
+    IDLE = "idle"  # belum pernah dipreprocess
+    RUNNING = "running"  # sedang preprocessing
+    COMPLETED = "completed"  # selesai
+    ERROR = "error"  # gagal
 
 
 class Dataset(db.Model):
@@ -24,25 +30,36 @@ class Dataset(db.Model):
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(Text, nullable=True)
 
-    # File info
+    # File raw (setelah cleaning dasar saat upload)
     file_path = db.Column(db.String(500), nullable=False)
     file_name = db.Column(db.String(255), nullable=False)
-    file_size = db.Column(db.BigInteger, nullable=True)  # bytes
+    file_size = db.Column(db.BigInteger, nullable=True)
 
-    # Dataset metadata (diisi setelah preprocessing)
-    num_samples = db.Column(db.Integer, nullable=True)
-    num_labels = db.Column(db.Integer, nullable=True)
-    labels = db.Column(JSON, nullable=True)  # ["positif", "negatif", ...]
-    text_column = db.Column(db.String(100), nullable=True)  # nama kolom teks
-    label_column = db.Column(db.String(100), nullable=True)  # nama kolom label
-    columns = db.Column(JSON, nullable=True)  # semua kolom yang ada di file
+    # Skema
+    columns = db.Column(JSON, nullable=True)  # nama semua kolom
+    num_rows_raw = db.Column(
+        db.Integer, nullable=True
+    )  # jumlah baris setelah cleaning upload
 
-    # Split info (diisi setelah preprocessing)
-    train_size = db.Column(db.Integer, nullable=True)
-    val_size = db.Column(db.Integer, nullable=True)
-    test_size = db.Column(db.Integer, nullable=True)
+    # Pengaturan kolom (diatur user setelah upload)
+    text_column = db.Column(db.String(100), nullable=True)
+    label_column = db.Column(db.String(100), nullable=True)
 
-    # Status
+    # Distribusi kelas
+    class_distribution_raw = db.Column(JSON, nullable=True)
+    # contoh: {"positif": 300, "negatif": 200, "netral": 100}
+    class_distribution_preprocessed = db.Column(JSON, nullable=True)
+
+    # Preprocessing
+    preprocessing_status = db.Column(
+        Enum(PreprocessingStatus),
+        default=PreprocessingStatus.IDLE,
+        nullable=False,
+    )
+    preprocessing_error = db.Column(Text, nullable=True)
+    num_rows_preprocessed = db.Column(db.Integer, nullable=True)
+
+    # Status keseluruhan
     status = db.Column(
         Enum(DatasetStatus),
         default=DatasetStatus.UPLOADED,
@@ -50,7 +67,7 @@ class Dataset(db.Model):
     )
     error_message = db.Column(Text, nullable=True)
 
-    # Relations
+    # Relasi
     uploaded_by = db.Column(
         db.String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
@@ -68,13 +85,22 @@ class Dataset(db.Model):
     )
 
     # Relationships
+    uploader = db.relationship("User", foreign_keys=[uploaded_by])
     training_jobs = db.relationship(
         "TrainingJob", back_populates="dataset", lazy="dynamic"
     )
-    uploader = db.relationship("User", foreign_keys=[uploaded_by])
+    preprocessed_rows = db.relationship(
+        "PreprocessedRow",
+        back_populates="dataset",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self):
         return f"<Dataset {self.name}>"
+
+    def columns_configured(self):
+        return bool(self.text_column and self.label_column)
 
     def to_dict(self, include_jobs=False):
         data = {
@@ -83,15 +109,16 @@ class Dataset(db.Model):
             "description": self.description,
             "file_name": self.file_name,
             "file_size": self.file_size,
-            "num_samples": self.num_samples,
-            "num_labels": self.num_labels,
-            "labels": self.labels,
+            "columns": self.columns,
+            "num_rows_raw": self.num_rows_raw,
             "text_column": self.text_column,
             "label_column": self.label_column,
-            "columns": self.columns,
-            "train_size": self.train_size,
-            "val_size": self.val_size,
-            "test_size": self.test_size,
+            "class_distribution_raw": self.class_distribution_raw,
+            "class_distribution_preprocessed": self.class_distribution_preprocessed,
+            "num_rows_preprocessed": self.num_rows_preprocessed,
+            "preprocessing_status": self.preprocessing_status.value,
+            "preprocessing_error": self.preprocessing_error,
+            "columns_configured": self.columns_configured(),
             "status": self.status.value,
             "error_message": self.error_message,
             "uploaded_by": self.uploaded_by,

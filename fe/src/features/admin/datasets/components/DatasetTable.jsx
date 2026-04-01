@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Plus,
   Trash2,
-  Settings2,
   X,
   ChevronLeft,
   ChevronRight,
@@ -15,20 +15,23 @@ import { toast } from "sonner";
 import useDatasetStore from "../store";
 import { formatDate } from "@/helpers/formatter";
 import DatasetUploadModal from "./DatasetUploadModal";
-import DatasetPreprocessModal from "./DatasetPreprocessModal";
-
-// ── Badge helpers ──────────────────────────────────────────────
 
 const STATUS_STYLE = {
   uploaded: "bg-gray-100 text-gray-600",
-  preprocessing: "bg-yellow-100 text-yellow-700",
   ready: "bg-green-100 text-green-700",
   error: "bg-red-100 text-red-600",
 };
-const STATUS_LABEL = {
-  uploaded: "Uploaded",
-  preprocessing: "Processing",
-  ready: "Siap",
+const STATUS_LABEL = { uploaded: "Uploaded", ready: "Siap", error: "Error" };
+const PREPROCESS_STYLE = {
+  idle: "bg-gray-100 text-gray-500",
+  running: "bg-yellow-100 text-yellow-700",
+  completed: "bg-blue-100 text-blue-700",
+  error: "bg-red-100 text-red-600",
+};
+const PREPROCESS_LABEL = {
+  idle: "Belum diproses",
+  running: "Memproses...",
+  completed: "Siap training",
   error: "Error",
 };
 
@@ -42,13 +45,21 @@ function StatusBadge({ status }) {
   );
 }
 
-function SizeLabel({ bytes }) {
-  if (!bytes) return <span className="text-gray-400">—</span>;
-  if (bytes < 1024 * 1024) return <span>{(bytes / 1024).toFixed(1)} KB</span>;
-  return <span>{(bytes / 1024 / 1024).toFixed(1)} MB</span>;
+function PreprocessBadge({ status }) {
+  return (
+    <span
+      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${PREPROCESS_STYLE[status] ?? "bg-gray-100 text-gray-500"}`}
+    >
+      {PREPROCESS_LABEL[status] ?? status}
+    </span>
+  );
 }
 
-// ── Modal hapus ────────────────────────────────────────────────
+function SizeLabel({ bytes }) {
+  if (!bytes) return <span className="text-gray-400">—</span>;
+  if (bytes < 1024 * 1024) return <>{(bytes / 1024).toFixed(1)} KB</>;
+  return <>{(bytes / 1024 / 1024).toFixed(1)} MB</>;
+}
 
 function DeleteConfirmModal() {
   const {
@@ -80,7 +91,7 @@ function DeleteConfirmModal() {
         <p className="mb-5 text-sm text-gray-500">
           Dataset{" "}
           <span className="font-medium text-gray-700">{deleteTarget.name}</span>{" "}
-          akan dihapus permanen beserta filenya.
+          akan dihapus permanen beserta semua data preprocessed-nya.
         </p>
         <div className="flex justify-end gap-3">
           <button
@@ -103,9 +114,8 @@ function DeleteConfirmModal() {
   );
 }
 
-// ── Komponen Utama ─────────────────────────────────────────────
-
 export default function DatasetTable() {
+  const router = useRouter();
   const {
     datasets,
     total,
@@ -113,14 +123,13 @@ export default function DatasetTable() {
     page,
     perPage,
     search,
-    status,
+    statusFilter,
     isLoading,
     fetchDatasets,
     setPage,
     setSearch,
-    setStatus,
+    setStatusFilter,
     openUploadModal,
-    openPreprocessModal,
     openDeleteModal,
   } = useDatasetStore();
 
@@ -189,13 +198,12 @@ export default function DatasetTable() {
           )}
         </div>
         <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
           className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
         >
           <option value="">Semua Status</option>
           <option value="uploaded">Uploaded</option>
-          <option value="preprocessing">Processing</option>
           <option value="ready">Siap</option>
           <option value="error">Error</option>
         </select>
@@ -208,16 +216,16 @@ export default function DatasetTable() {
             <thead>
               <tr className="border-b bg-gray-50">
                 {[
-                  "Nama",
-                  "Sampel",
-                  "Label",
-                  "Ukuran File",
-                  "Status",
+                  "Nama Dataset",
+                  "Baris (Raw)",
+                  "Baris (Preprocessed)",
+                  "Ukuran",
+                  "Status Preprocessing",
                   "Diupload",
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase"
+                    className="px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-gray-500 uppercase"
                   >
                     {h}
                   </th>
@@ -240,7 +248,7 @@ export default function DatasetTable() {
                       </td>
                     ))}
                     <td className="px-4 py-3">
-                      <div className="ml-auto h-7 w-16 rounded bg-gray-100" />
+                      <div className="ml-auto h-7 w-8 rounded bg-gray-100" />
                     </td>
                   </tr>
                 ))
@@ -263,52 +271,35 @@ export default function DatasetTable() {
                 datasets.map((ds) => (
                   <tr
                     key={ds.id}
-                    className="transition-colors hover:bg-gray-50"
+                    className="cursor-pointer transition-colors hover:bg-blue-50"
+                    onClick={() => router.push(`/admin/datasets/${ds.id}`)}
                   >
                     <td className="px-4 py-3">
                       <p className="leading-tight font-medium text-gray-800">
                         {ds.name}
                       </p>
-                      {ds.description && (
-                        <p className="max-w-[200px] truncate text-xs text-gray-400">
-                          {ds.description}
+                      <p className="text-xs text-gray-400">{ds.file_name}</p>
+                      {ds.columns_configured && (
+                        <p className="mt-0.5 text-xs text-blue-500">
+                          Teks: {ds.text_column} · Label: {ds.label_column}
                         </p>
                       )}
-                      <p className="text-xs text-gray-400">{ds.file_name}</p>
                     </td>
                     <td className="px-4 py-3 text-gray-600">
-                      {ds.num_samples !== null ? (
-                        ds.num_samples.toLocaleString("id")
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {ds.labels?.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {ds.labels.slice(0, 3).map((l) => (
-                            <span
-                              key={l}
-                              className="rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700"
-                            >
-                              {l}
-                            </span>
-                          ))}
-                          {ds.labels.length > 3 && (
-                            <span className="text-xs text-gray-400">
-                              +{ds.labels.length - 3}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
+                      {ds.num_rows_raw !== null
+                        ? ds.num_rows_raw.toLocaleString("id")
+                        : "—"}
                     </td>
                     <td className="px-4 py-3 text-gray-600">
+                      {ds.num_rows_preprocessed !== null
+                        ? ds.num_rows_preprocessed.toLocaleString("id")
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-600">
                       <SizeLabel bytes={ds.file_size} />
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge status={ds.status} />
+                      <PreprocessBadge status={ds.preprocessing_status} />
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">
                       {ds.created_at
@@ -316,25 +307,16 @@ export default function DatasetTable() {
                         : "—"}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        {/* Preprocess — hanya untuk uploaded/error */}
-                        {["uploaded", "error", "ready"].includes(ds.status) && (
-                          <button
-                            onClick={() => openPreprocessModal(ds)}
-                            title="Preprocessing"
-                            className="rounded-md p-1.5 text-gray-400 transition hover:bg-blue-50 hover:text-blue-600"
-                          >
-                            <Settings2 size={15} />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => openDeleteModal(ds)}
-                          title="Hapus"
-                          className="rounded-md p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(ds);
+                        }}
+                        title="Hapus"
+                        className="rounded-md p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                      >
+                        <Trash2 size={15} />
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -343,7 +325,6 @@ export default function DatasetTable() {
           </table>
         </div>
 
-        {/* Pagination */}
         {!isLoading && total > 0 && (
           <div className="flex items-center justify-between border-t bg-white px-4 py-3">
             <p className="text-xs text-gray-500">
@@ -358,7 +339,7 @@ export default function DatasetTable() {
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page <= 1}
-                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
               >
                 <ChevronLeft size={14} />
               </button>
@@ -368,7 +349,7 @@ export default function DatasetTable() {
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page >= totalPages}
-                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
               >
                 <ChevronRight size={14} />
               </button>
@@ -377,9 +358,7 @@ export default function DatasetTable() {
         )}
       </div>
 
-      {/* Modals */}
       <DatasetUploadModal />
-      <DatasetPreprocessModal />
       <DeleteConfirmModal />
     </div>
   );

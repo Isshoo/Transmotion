@@ -1,30 +1,63 @@
-"""Dataset service — business logic untuk manajemen dataset"""
+"""Dataset service — business logic dataset management"""
 
-import csv
 import os
+import re
+import unicodedata
+import uuid as _uuid
+from collections import Counter
+from threading import Thread
 
+import pandas as pd
 from sqlalchemy import asc, desc, or_
 
 from app.config.extensions import db
-from app.layers.models.dataset import Dataset, DatasetStatus
+from app.layers.models.dataset import Dataset, DatasetStatus, PreprocessingStatus
+from app.layers.models.preprocessed_row import PreprocessedRow
 from app.utils.exceptions import BadRequestError, NotFoundError
 from app.utils.logger import logger
 
-# Folder penyimpanan dataset — sesuaikan dengan konfigurasi storage kamu
-DATASET_UPLOAD_DIR = os.path.join(
+DATASET_DIR = os.path.join(
     os.path.dirname(__file__), "..", "..", "storage", "uploads", "datasets"
 )
+MIN_ROWS = 100
+MIN_COLS = 2
 
 
 def _ensure_dir(path: str):
     os.makedirs(path, exist_ok=True)
 
 
+# ── Preprocessing teks ─────────────────────────────────────────────────────────
+
+
+def preprocess_text(text: str) -> str:
+    """
+    Bersihkan teks dari noise:
+    URL, email, mention, hashtag (#word → word), HTML tag, whitespace berlebih.
+    Tidak lowercase — biarkan user yang tentukan saat training.
+    """
+    if not isinstance(text, str):
+        text = str(text) if text is not None else ""
+
+    text = unicodedata.normalize("NFKC", text)
+    text = re.sub(r"https?://\S+|www\.\S+", " ", text)  # URL
+    text = re.sub(r"\S+@\S+\.\S+", " ", text)  # email
+    text = re.sub(r"@[\w_]+", " ", text)  # @mention
+    text = re.sub(r"#([\w]+)", r"\1", text)  # #hashtag → hashtag
+    text = re.sub(r"<[^>]+>", " ", text)  # HTML tag
+    text = re.sub(r"[\r\n\t]+", " ", text)  # newline/tab
+    text = re.sub(r"\s+", " ", text).strip()  # whitespace
+    return text
+
+
+# ── CRUD Dataset ───────────────────────────────────────────────────────────────
+
+
 def get_by_id(dataset_id: str) -> Dataset:
-    dataset = db.session.get(Dataset, dataset_id)
-    if not dataset:
+    ds = db.session.get(Dataset, dataset_id)
+    if not ds:
         raise NotFoundError("Dataset tidak ditemukan")
-    return dataset
+    return ds
 
 
 def get_all(
@@ -42,25 +75,29 @@ def get_all(
         query = query.filter(
             or_(Dataset.name.ilike(term), Dataset.description.ilike(term))
         )
-
     if status:
         query = query.filter(Dataset.status == DatasetStatus(status))
 
     total = query.count()
-
-    sort_col = getattr(Dataset, sort_by, Dataset.created_at)
-    sort_fn = desc if sort_order == "desc" else asc
-    query = query.order_by(sort_fn(sort_col))
-
-    offset = (page - 1) * per_page
-    datasets = query.offset(offset).limit(per_page).all()
+    col = getattr(Dataset, sort_by, Dataset.created_at)
+    fn = desc if sort_order == "desc" else asc
+    datasets = (
+        query.order_by(fn(col)).offset((page - 1) * per_page).limit(per_page).all()
+    )
 
     return datasets, total
 
 
 def upload(file, name: str, description: str | None, user_id: str | None) -> Dataset:
-    """Simpan file CSV/TSV yang diupload dan buat record Dataset."""
-    _ensure_dir(DATASET_UPLOAD_DIR)
+    """
+    1. Simpan file sementara
+    2. Baca dengan pandas, validasi min rows & cols
+    3. Cleaning dasar: hapus baris kosong total & duplikat persis
+    4. Validasi ulang setelah cleaning
+    5. Tulis ulang file yang sudah bersih
+    6. Simpan record Dataset ke DB
+    """
+    _ensure_dir(DATASET_DIR)
 
     filename = file.filename
     if not filename:
@@ -70,130 +107,439 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
     if ext not in (".csv", ".tsv", ".txt"):
         raise BadRequestError("Format file harus CSV, TSV, atau TXT")
 
-    # Buat nama file unik
-    import uuid as _uuid
-
     unique_name = f"{_uuid.uuid4().hex}{ext}"
-    file_path = os.path.join(DATASET_UPLOAD_DIR, unique_name)
-
+    file_path = os.path.join(DATASET_DIR, unique_name)
     file.save(file_path)
-    file_size = os.path.getsize(file_path)
-
-    # Baca header untuk tahu kolom yang tersedia
-    try:
-        delimiter = "\t" if ext == ".tsv" else ";"
-        with open(file_path, "r", encoding="utf-8", errors="replace") as f:
-            reader = csv.reader(f, delimiter=delimiter)
-            columns = next(reader, [])
-    except Exception:
-        columns = []
-
-    dataset = Dataset(
-        name=name,
-        description=description,
-        file_path=file_path,
-        file_name=filename,
-        file_size=file_size,
-        columns=columns,
-        status=DatasetStatus.UPLOADED,
-        uploaded_by=user_id,
-    )
-    db.session.add(dataset)
-    db.session.commit()
-
-    logger.info(f"Dataset uploaded: {dataset.id} ({filename})")
-    return dataset
-
-
-def preprocess(
-    dataset_id: str,
-    text_column: str,
-    label_column: str,
-    test_size: float = 0.1,
-    val_size: float = 0.1,
-) -> Dataset:
-    """
-    Baca file, validasi kolom, hitung statistik, dan simpan metadata.
-    Tidak benar-benar split file — hanya simpan info untuk dipakai Colab nanti.
-    """
-    dataset = get_by_id(dataset_id)
-
-    if dataset.status == DatasetStatus.PREPROCESSING:
-        raise BadRequestError("Dataset sedang dalam proses preprocessing")
-
-    # Validasi kolom
-    if dataset.columns and text_column not in dataset.columns:
-        raise BadRequestError(f"Kolom '{text_column}' tidak ditemukan di dataset")
-    if dataset.columns and label_column not in dataset.columns:
-        raise BadRequestError(f"Kolom '{label_column}' tidak ditemukan di dataset")
-
-    dataset.status = DatasetStatus.PREPROCESSING
-    db.session.commit()
 
     try:
-        ext = os.path.splitext(dataset.file_path)[1].lower()
         delimiter = "\t" if ext == ".tsv" else ";"
 
-        rows = []
-        labels_seen = set()
+        # Baca dengan fallback encoding
+        try:
+            df = pd.read_csv(
+                file_path,
+                delimiter=delimiter,
+                encoding="utf-8",
+                on_bad_lines="skip",
+                dtype=str,
+            )
+        except UnicodeDecodeError:
+            df = pd.read_csv(
+                file_path,
+                delimiter=delimiter,
+                encoding="latin-1",
+                on_bad_lines="skip",
+                dtype=str,
+            )
 
-        with open(dataset.file_path, "r", encoding="utf-8", errors="replace") as f:
-            reader = csv.DictReader(f, delimiter=delimiter)
-            for row in reader:
-                text_val = row.get(text_column, "").strip()
-                label_val = row.get(label_column, "").strip()
-                if text_val and label_val:
-                    rows.append(row)
-                    labels_seen.add(label_val)
+        # Strip spasi di nama kolom
+        df.columns = [str(c).strip() for c in df.columns]
 
-        if len(rows) < 10:
-            raise BadRequestError("Dataset terlalu kecil, minimal 10 baris valid")
+        # Validasi sebelum cleaning
+        if len(df.columns) < MIN_COLS:
+            raise BadRequestError(
+                f"Dataset harus memiliki minimal {MIN_COLS} kolom "
+                f"(ditemukan {len(df.columns)} kolom)"
+            )
+        if len(df) < MIN_ROWS:
+            raise BadRequestError(
+                f"Dataset harus memiliki minimal {MIN_ROWS} baris "
+                f"(ditemukan {len(df)} baris)"
+            )
 
-        num_samples = len(rows)
-        labels_list = sorted(labels_seen)
+        # Cleaning dasar
+        df = df.dropna(how="all")  # hapus baris yang semuanya kosong/NaN
+        df = df.drop_duplicates()  # hapus baris duplikat persis
+        df = df.reset_index(drop=True)
 
-        # Hitung ukuran split (simpan sebagai info saja)
-        test_n = max(1, int(num_samples * test_size))
-        val_n = max(1, int(num_samples * val_size))
-        train_n = num_samples - test_n - val_n
+        # Validasi setelah cleaning
+        if len(df) < MIN_ROWS:
+            raise BadRequestError(
+                f"Setelah menghapus baris kosong dan duplikat, tersisa {len(df)} baris. "
+                f"Minimal {MIN_ROWS} baris diperlukan."
+            )
 
-        dataset.text_column = text_column
-        dataset.label_column = label_column
-        dataset.num_samples = num_samples
-        dataset.num_labels = len(labels_list)
-        dataset.labels = labels_list
-        dataset.train_size = train_n
-        dataset.val_size = val_n
-        dataset.test_size = test_n
-        dataset.status = DatasetStatus.READY
-        dataset.error_message = None
+        # Tulis ulang file yang sudah dibersihkan
+        df.to_csv(file_path, sep=delimiter, index=False, encoding="utf-8")
+        file_size = os.path.getsize(file_path)
+        columns = list(df.columns)
+
+        dataset = Dataset(
+            name=name,
+            description=description,
+            file_path=file_path,
+            file_name=filename,
+            file_size=file_size,
+            columns=columns,
+            num_rows_raw=len(df),
+            status=DatasetStatus.UPLOADED,
+            preprocessing_status=PreprocessingStatus.IDLE,
+            uploaded_by=user_id,
+        )
+        db.session.add(dataset)
         db.session.commit()
 
         logger.info(
-            f"Dataset preprocessed: {dataset_id} — {num_samples} samples, {len(labels_list)} labels"
+            f"Dataset uploaded: {dataset.id} — {len(df)} rows, {len(columns)} cols"
         )
         return dataset
 
     except BadRequestError:
-        dataset.status = DatasetStatus.ERROR
-        dataset.error_message = "Kolom tidak valid atau data tidak cukup"
-        db.session.commit()
+        if os.path.exists(file_path):
+            os.remove(file_path)
         raise
     except Exception as e:
-        dataset.status = DatasetStatus.ERROR
-        dataset.error_message = str(e)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        logger.error(f"Upload error: {e}")
+        raise BadRequestError(f"Gagal memproses file: {e}") from None
+
+
+def set_columns(dataset_id: str, text_column: str, label_column: str) -> Dataset:
+    """Set kolom teks & label, hitung distribusi kelas dari raw data."""
+    dataset = get_by_id(dataset_id)
+
+    if text_column not in (dataset.columns or []):
+        raise BadRequestError(f"Kolom '{text_column}' tidak ada dalam dataset")
+    if label_column not in (dataset.columns or []):
+        raise BadRequestError(f"Kolom '{label_column}' tidak ada dalam dataset")
+    if text_column == label_column:
+        raise BadRequestError("Kolom teks dan label harus berbeda")
+
+    # Hitung distribusi kelas dari raw data
+    try:
+        delimiter = "\t" if dataset.file_path.endswith(".tsv") else ";"
+        df = pd.read_csv(
+            dataset.file_path, delimiter=delimiter, encoding="utf-8", dtype=str
+        )
+        valid = df[[text_column, label_column]].dropna()
+        valid = valid[valid[text_column].str.strip() != ""]
+        valid = valid[valid[label_column].str.strip() != ""]
+        dist_raw = valid[label_column].str.strip().value_counts().to_dict()
+        dist_raw = {k: int(v) for k, v in dist_raw.items()}
+    except Exception as e:
+        logger.error(f"Failed to compute class distribution: {e}")
+        dist_raw = None
+
+    dataset.text_column = text_column
+    dataset.label_column = label_column
+    dataset.class_distribution_raw = dist_raw
+    dataset.status = DatasetStatus.READY
+    db.session.commit()
+
+    logger.info(
+        f"Columns set for {dataset_id}: text={text_column}, label={label_column}"
+    )
+    return dataset
+
+
+# ── Raw data ───────────────────────────────────────────────────────────────────
+
+
+def get_raw_data(
+    dataset_id: str,
+    page=1,
+    per_page=50,
+    search=None,
+    filter_label=None,
+):
+    """Baca raw data dari file CSV dengan pagination & filter."""
+    dataset = get_by_id(dataset_id)
+
+    try:
+        delimiter = "\t" if dataset.file_path.endswith(".tsv") else ";"
+        df = pd.read_csv(
+            dataset.file_path, delimiter=delimiter, encoding="utf-8", dtype=str
+        )
+    except Exception as e:
+        raise BadRequestError(f"Gagal membaca file dataset: {e}") from None
+
+    # Filter search (di kolom teks atau semua kolom)
+    if search:
+        if dataset.text_column and dataset.text_column in df.columns:
+            mask = (
+                df[dataset.text_column]
+                .fillna("")
+                .str.contains(search, case=False, na=False)
+            )
+        else:
+            mask = (
+                df.fillna("")
+                .apply(lambda col: col.str.contains(search, case=False, na=False))
+                .any(axis=1)
+            )
+        df = df[mask]
+
+    # Filter label
+    if filter_label and dataset.label_column and dataset.label_column in df.columns:
+        df = df[df[dataset.label_column].fillna("").str.strip() == filter_label]
+
+    total = len(df)
+    start = (page - 1) * per_page
+    page_df = df.iloc[start : start + per_page]
+
+    # NaN → None untuk JSON dan descending order
+    rows = page_df.where(pd.notna(page_df), None).to_dict(orient="records")
+    rows.reverse()
+
+    return rows, total
+
+
+# ── Preprocessing ──────────────────────────────────────────────────────────────
+
+
+def start_preprocessing(dataset_id: str, app) -> Dataset:
+    """Trigger preprocessing di background thread."""
+    dataset = get_by_id(dataset_id)
+
+    if not dataset.columns_configured():
+        raise BadRequestError(
+            "Kolom teks dan label harus diatur terlebih dahulu sebelum preprocessing"
+        )
+    if dataset.preprocessing_status == PreprocessingStatus.RUNNING:
+        raise BadRequestError("Preprocessing sedang berjalan")
+
+    dataset.preprocessing_status = PreprocessingStatus.RUNNING
+    dataset.preprocessing_error = None
+    db.session.commit()
+
+    def run():
+        with app.app_context():
+            _do_preprocess(dataset_id)
+
+    Thread(target=run, daemon=True).start()
+    logger.info(f"Preprocessing started for dataset {dataset_id}")
+    return dataset
+
+
+def _do_preprocess(dataset_id: str):
+    """
+    Baca raw data → preprocessing teks → hapus kosong & duplikat →
+    simpan ke tabel preprocessed_rows.
+    """
+    try:
+        dataset = db.session.get(Dataset, dataset_id)
+        if not dataset:
+            return
+
+        delimiter = "\t" if dataset.file_path.endswith(".tsv") else ";"
+        df = pd.read_csv(
+            dataset.file_path, delimiter=delimiter, encoding="utf-8", dtype=str
+        )
+
+        text_col = dataset.text_column
+        label_col = dataset.label_column
+
+        # Hapus preprocessed rows lama (jika preprocessing ulang)
+        db.session.query(PreprocessedRow).filter_by(dataset_id=dataset_id).delete()
+        db.session.flush()
+
+        rows_to_insert = []
+        seen: set[tuple] = set()  # (preprocessed_text_lower, label_lower)
+
+        for idx, row in df.iterrows():
+            raw_text = str(row.get(text_col, "")).strip()
+            label = str(row.get(label_col, "")).strip()
+
+            # Skip baris tidak valid
+            if not raw_text or raw_text == "nan" or not label or label == "nan":
+                continue
+
+            preprocessed = preprocess_text(raw_text)
+
+            # Skip jika hasil preprocessing kosong
+            if not preprocessed:
+                continue
+
+            # Skip duplikat (preprocessed + label sama)
+            key = (preprocessed.lower(), label.lower())
+            if key in seen:
+                continue
+            seen.add(key)
+
+            rows_to_insert.append(
+                PreprocessedRow(
+                    dataset_id=dataset_id,
+                    raw_text=raw_text,
+                    preprocessed_text=preprocessed,
+                    label=label,
+                    row_index=int(idx),
+                )
+            )
+
+        # Batch insert
+        db.session.bulk_save_objects(rows_to_insert)
+
+        # Update statistik
+        dist_preprocessed = dict(Counter(r.label for r in rows_to_insert))
+        dataset.num_rows_preprocessed = len(rows_to_insert)
+        dataset.class_distribution_preprocessed = dist_preprocessed
+        dataset.preprocessing_status = PreprocessingStatus.COMPLETED
         db.session.commit()
-        logger.error(f"Preprocessing error for dataset {dataset_id}: {e}")
-        raise BadRequestError(f"Gagal memproses dataset: {e}") from None
+
+        logger.info(
+            f"Preprocessing completed for {dataset_id}: {len(rows_to_insert)} rows"
+        )
+
+    except Exception as e:
+        logger.error(f"Preprocessing failed for {dataset_id}: {e}")
+        try:
+            dataset = db.session.get(Dataset, dataset_id)
+            if dataset:
+                dataset.preprocessing_status = PreprocessingStatus.ERROR
+                dataset.preprocessing_error = str(e)
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+
+# ── CRUD Preprocessed Rows ─────────────────────────────────────────────────────
+
+
+def get_preprocessed_data(
+    dataset_id: str,
+    page=1,
+    per_page=50,
+    search=None,
+    filter_label=None,
+):
+    get_by_id(dataset_id)  # validasi exists
+
+    query = db.session.query(PreprocessedRow).filter_by(dataset_id=dataset_id)
+
+    if search:
+        term = f"%{search}%"
+        query = query.filter(
+            or_(
+                PreprocessedRow.preprocessed_text.ilike(term),
+                PreprocessedRow.raw_text.ilike(term),
+            )
+        )
+    if filter_label:
+        query = query.filter(PreprocessedRow.label == filter_label)
+
+    total = query.count()
+    rows = (
+        query.order_by(PreprocessedRow.row_index.desc())
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+        .all()
+    )
+    return rows, total
+
+
+def add_preprocessed_row(
+    dataset_id: str, raw_text: str, preprocessed_text: str, label: str
+) -> PreprocessedRow:
+    dataset = get_by_id(dataset_id)
+
+    # Validasi label
+    valid_labels = set((dataset.class_distribution_preprocessed or {}).keys())
+    if valid_labels and label not in valid_labels:
+        raise BadRequestError(
+            f"Label '{label}' tidak valid. Label yang tersedia: {', '.join(valid_labels)}"
+        )
+
+    # Cek duplikat
+    existing = (
+        db.session.query(PreprocessedRow)
+        .filter_by(
+            dataset_id=dataset_id,
+            preprocessed_text=preprocessed_text.strip(),
+            label=label,
+        )
+        .first()
+    )
+    if existing:
+        raise BadRequestError("Data dengan teks dan label yang sama sudah ada")
+
+    cleaned = preprocessed_text.strip()
+    if not cleaned:
+        raise BadRequestError("Teks terpreproses tidak boleh kosong")
+
+    row = PreprocessedRow(
+        dataset_id=dataset_id,
+        raw_text=raw_text.strip(),
+        preprocessed_text=cleaned,
+        label=label,
+    )
+    db.session.add(row)
+
+    # Update statistik
+    dataset.num_rows_preprocessed = (dataset.num_rows_preprocessed or 0) + 1
+    dist = dict(dataset.class_distribution_preprocessed or {})
+    dist[label] = dist.get(label, 0) + 1
+    dataset.class_distribution_preprocessed = dist
+
+    db.session.commit()
+    return row
+
+
+def update_preprocessed_row(
+    dataset_id: str,
+    row_id: int,
+    preprocessed_text: str = None,
+    label: str = None,
+) -> PreprocessedRow:
+    dataset = get_by_id(dataset_id)
+    row = db.session.get(PreprocessedRow, row_id)
+
+    if not row or row.dataset_id != dataset_id:
+        raise NotFoundError("Data tidak ditemukan")
+
+    old_label = row.label
+
+    if preprocessed_text is not None:
+        cleaned = preprocessed_text.strip()
+        if not cleaned:
+            raise BadRequestError("Teks terpreproses tidak boleh kosong")
+        row.preprocessed_text = cleaned
+
+    if label is not None and label != old_label:
+        valid_labels = set((dataset.class_distribution_preprocessed or {}).keys())
+        if valid_labels and label not in valid_labels:
+            raise BadRequestError(f"Label '{label}' tidak valid")
+
+        # Update distribusi
+        dist = dict(dataset.class_distribution_preprocessed or {})
+        dist[old_label] = max(0, dist.get(old_label, 1) - 1)
+        if dist[old_label] == 0:
+            del dist[old_label]
+        dist[label] = dist.get(label, 0) + 1
+        dataset.class_distribution_preprocessed = dist
+        row.label = label
+
+    db.session.commit()
+    return row
+
+
+def delete_preprocessed_row(dataset_id: str, row_id: int):
+    dataset = get_by_id(dataset_id)
+    row = db.session.get(PreprocessedRow, row_id)
+
+    if not row or row.dataset_id != dataset_id:
+        raise NotFoundError("Data tidak ditemukan")
+
+    label = row.label
+    db.session.delete(row)
+
+    # Update statistik
+    dataset.num_rows_preprocessed = max(0, (dataset.num_rows_preprocessed or 1) - 1)
+    dist = dict(dataset.class_distribution_preprocessed or {})
+    dist[label] = max(0, dist.get(label, 1) - 1)
+    if dist[label] == 0:
+        del dist[label]
+    dataset.class_distribution_preprocessed = dist
+
+    db.session.commit()
 
 
 def delete(dataset_id: str):
     dataset = get_by_id(dataset_id)
 
-    # Cek apakah ada training job yang aktif
     from app.layers.models.training_job import JobStatus, TrainingJob
 
-    active_jobs = (
+    active = (
         db.session.query(TrainingJob)
         .filter(
             TrainingJob.dataset_id == dataset_id,
@@ -201,12 +547,11 @@ def delete(dataset_id: str):
         )
         .count()
     )
-    if active_jobs > 0:
+    if active > 0:
         raise BadRequestError(
             "Dataset tidak bisa dihapus karena sedang digunakan oleh training job yang aktif"
         )
 
-    # Hapus file
     if dataset.file_path and os.path.exists(dataset.file_path):
         try:
             os.remove(dataset.file_path)

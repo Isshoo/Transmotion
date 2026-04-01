@@ -27,6 +27,8 @@ const eslintConfig = defineConfig([
         },
       ],
 
+      "react-hooks/exhaustive-deps": "warn",
+
       // Next.js — pakai next/link bukan <a> biasa
       "@next/next/no-html-link-for-pages": "error",
 
