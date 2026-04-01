@@ -5,7 +5,6 @@ from marshmallow import Schema, fields, validate
 
 class UpdateTrainedModelSchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
-
     name = fields.String(validate=validate.Length(min=1, max=255))
     description = fields.String(validate=validate.Length(max=1000))
     is_active = fields.Boolean()
@@ -14,7 +13,6 @@ class UpdateTrainedModelSchema(Schema):
 
 class ModelListQuerySchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
-
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
     model_type = fields.String(validate=validate.OneOf(["mbert", "xlmr"]))
@@ -25,18 +23,16 @@ class ModelListQuerySchema(Schema):
         validate=validate.OneOf(["created_at", "accuracy", "f1_score", "name"]),
     )
     sort_order = fields.String(
-        load_default="desc", validate=validate.OneOf(["asc", "desc"])
+        load_default="desc",
+        validate=validate.OneOf(["asc", "desc"]),
     )
 
 
 class ClassifyTextSchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
-
     text = fields.String(
         required=True,
-        validate=validate.Length(
-            min=1, max=5000, error="Teks harus antara 1-5000 karakter"
-        ),
+        validate=validate.Length(min=1, max=5000),
         error_messages={"required": "Teks harus diisi"},
     )
     model_id = fields.String(
@@ -47,7 +43,7 @@ class ClassifyTextSchema(Schema):
 
 class PredictionListQuerySchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
-
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
     model_id = fields.String()
+    user_id = fields.String()  # hanya untuk admin

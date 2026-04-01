@@ -1,5 +1,7 @@
 """TrainedModel & Prediction service"""
 
+import os
+
 from sqlalchemy import asc, desc
 
 from app.config.extensions import db
@@ -8,7 +10,75 @@ from app.layers.models.trained_model import TrainedModel
 from app.utils.exceptions import BadRequestError, NotFoundError
 from app.utils.logger import logger
 
-# ── Trained Model ─────────────────────────────────────────────────────────────
+# ── Model cache (hindari reload tiap request) ──────────────────────────────────
+# Key: model_id, Value: (tokenizer, hf_model, label_map)
+_model_cache: dict = {}
+_MAX_CACHE = 3  # maksimal 3 model di RAM sekaligus
+
+
+def _evict_cache_if_needed():
+    if len(_model_cache) >= _MAX_CACHE:
+        oldest_key = next(iter(_model_cache))
+        del _model_cache[oldest_key]
+        logger.info(f"Model cache evicted: {oldest_key}")
+
+
+def _load_model(model_record: TrainedModel):
+    """
+    Load tokenizer + model ke memori.
+    Coba load dari file .pt dulu, jika gagal load base model saja (untuk testing).
+    """
+    import torch
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+    model_id = model_record.id
+
+    if model_id in _model_cache:
+        return _model_cache[model_id]
+
+    if model_record.model_type == "mbert":
+        base = model_record.base_model_name or "bert-base-multilingual-cased"
+    else:
+        base = model_record.base_model_name or "xlm-roberta-base"
+
+    num_labels = model_record.num_labels or len(model_record.label_map or {}) or 2
+
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(base)
+        hf_model = AutoModelForSequenceClassification.from_pretrained(
+            base, num_labels=num_labels
+        )
+
+        # Load fine-tuned weights jika file tersedia
+        if model_record.file_path and os.path.exists(model_record.file_path):
+            state_dict = torch.load(
+                model_record.file_path, map_location="cpu", weights_only=True
+            )
+            hf_model.load_state_dict(state_dict)
+            logger.info(f"Loaded fine-tuned weights for model {model_id}")
+        else:
+            logger.warning(
+                f"Model file not found for {model_id}, using base weights only"
+            )
+
+        hf_model.eval()
+
+        _evict_cache_if_needed()
+        _model_cache[model_id] = (tokenizer, hf_model)
+        return tokenizer, hf_model
+
+    except Exception as e:
+        logger.error(f"Failed to load model {model_id}: {e}")
+        raise BadRequestError(f"Gagal memuat model: {e}") from None
+
+
+def invalidate_model_cache(model_id: str):
+    """Panggil ini saat model diupdate/dihapus."""
+    if model_id in _model_cache:
+        del _model_cache[model_id]
+
+
+# ── Trained Model CRUD ─────────────────────────────────────────────────────────
 
 
 def get_model_by_id(model_id: str) -> TrainedModel:
@@ -42,14 +112,12 @@ def get_all_models(
     sort_fn = desc if sort_order == "desc" else asc
     query = query.order_by(sort_fn(sort_col))
 
-    offset = (page - 1) * per_page
-    models = query.offset(offset).limit(per_page).all()
-
+    models = query.offset((page - 1) * per_page).limit(per_page).all()
     return models, total
 
 
 def get_active_models():
-    """Untuk dropdown di halaman klasifikasi."""
+    """Untuk dropdown klasifikasi — hanya model aktif & publik."""
     return (
         db.session.query(TrainedModel)
         .filter(TrainedModel.is_active, TrainedModel.is_public)
@@ -65,65 +133,39 @@ def update_model(model_id: str, **kwargs) -> TrainedModel:
         if key in allowed and value is not None:
             setattr(model, key, value)
     db.session.commit()
+    invalidate_model_cache(model_id)
     return model
 
 
 def delete_model(model_id: str):
-    import os
-
     model = get_model_by_id(model_id)
 
-    # Hapus file
     if model.file_path and os.path.exists(model.file_path):
         try:
             os.remove(model.file_path)
         except Exception as e:
-            logger.warning(f"Failed to delete model file {model.file_path}: {e}")
+            logger.warning(f"Failed to delete model file: {e}")
 
+    invalidate_model_cache(model_id)
     db.session.delete(model)
     db.session.commit()
     logger.info(f"Model deleted: {model_id}")
 
 
-# ── Prediction ────────────────────────────────────────────────────────────────
+# ── Classification ─────────────────────────────────────────────────────────────
 
 
 def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
-    """
-    Jalankan inferensi teks menggunakan model yang dipilih.
-    Model dimuat dari file .pt — cocok untuk deployment ringan.
-    """
     import torch
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
     model_record = get_model_by_id(model_id)
 
     if not model_record.is_active:
         raise BadRequestError("Model tidak aktif")
-    if not model_record.file_path:
-        raise BadRequestError("File model tidak tersedia")
+
+    tokenizer, hf_model = _load_model(model_record)
 
     try:
-        # Tentukan base model berdasarkan tipe
-        if model_record.base_model_name:
-            base = model_record.base_model_name
-        elif model_record.model_type == "mbert":
-            base = "bert-base-multilingual-cased"
-        else:
-            base = "xlm-roberta-base"
-
-        # Load tokenizer dan model
-        tokenizer = AutoTokenizer.from_pretrained(base)
-        hf_model = AutoModelForSequenceClassification.from_pretrained(
-            base, num_labels=model_record.num_labels or 2
-        )
-
-        # Load weights dari file yang disimpan
-        state_dict = torch.load(model_record.file_path, map_location="cpu")
-        hf_model.load_state_dict(state_dict)
-        hf_model.eval()
-
-        # Tokenisasi
         inputs = tokenizer(
             text,
             return_tensors="pt",
@@ -136,7 +178,6 @@ def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
             outputs = hf_model(**inputs)
             probs = torch.softmax(outputs.logits, dim=1)[0]
 
-        # Map label
         label_map = model_record.label_map or {}
         all_scores = {
             label_map.get(str(i), str(i)): round(float(p), 4)
@@ -166,11 +207,16 @@ def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
     except (BadRequestError, NotFoundError):
         raise
     except Exception as e:
-        logger.error(f"Classification error: {e}")
-        raise BadRequestError(f"Gagal melakukan klasifikasi: {str(e)}") from None
+        logger.error(f"Classification error for model {model_id}: {e}")
+        raise BadRequestError(f"Gagal melakukan klasifikasi: {e}") from None
 
 
-def get_predictions(page=1, per_page=20, model_id=None, user_id=None):
+def get_predictions(
+    page=1,
+    per_page=20,
+    model_id=None,
+    user_id=None,
+):
     query = db.session.query(Prediction)
 
     if model_id:
@@ -179,9 +225,33 @@ def get_predictions(page=1, per_page=20, model_id=None, user_id=None):
         query = query.filter(Prediction.user_id == user_id)
 
     total = query.count()
-    query = query.order_by(desc(Prediction.created_at))
-
-    offset = (page - 1) * per_page
-    predictions = query.offset(offset).limit(per_page).all()
-
+    predictions = (
+        query.order_by(desc(Prediction.created_at))
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+        .all()
+    )
     return predictions, total
+
+
+def get_prediction_stats(model_id: str) -> dict:
+    """Statistik prediksi untuk halaman detail model."""
+    from sqlalchemy import func
+
+    total = (
+        db.session.query(func.count(Prediction.id))
+        .filter(Prediction.model_id == model_id)
+        .scalar()
+    ) or 0
+
+    per_label = (
+        db.session.query(Prediction.predicted_label, func.count(Prediction.id))
+        .filter(Prediction.model_id == model_id)
+        .group_by(Prediction.predicted_label)
+        .all()
+    )
+
+    return {
+        "total_predictions": total,
+        "per_label": {label: count for label, count in per_label},
+    }
