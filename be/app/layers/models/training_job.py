@@ -27,31 +27,32 @@ class TrainingJob(db.Model):
     __tablename__ = "training_jobs"
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    job_name = db.Column(db.String(255), nullable=True)
 
     # Config
     model_type = db.Column(Enum(ModelType), nullable=False)
     hyperparams = db.Column(JSON, nullable=False, default=dict)
-    # hyperparams contoh:
+
+    # Split info — disimpan saat job dibuat
     # {
-    #   "learning_rate": 2e-5,
-    #   "epochs": 3,
-    #   "batch_size": 16,
-    #   "max_length": 128,
-    #   "warmup_steps": 0,
-    #   "weight_decay": 0.01
+    #   "test_size": 0.2,
+    #   "total": 800,
+    #   "train_total": 640, "test_total": 160,
+    #   "train_per_class": {"positif": 320, "negatif": 320},
+    #   "test_per_class":  {"positif": 80,  "negatif": 80},
     # }
+    split_info = db.Column(JSON, nullable=True)
 
     # Status & progress
     status = db.Column(
         Enum(JobStatus), default=JobStatus.QUEUED, nullable=False, index=True
     )
-    progress = db.Column(db.Integer, default=0)  # 0-100 (%)
+    progress = db.Column(db.Integer, default=0)
     current_epoch = db.Column(db.Integer, default=0)
     total_epochs = db.Column(db.Integer, default=0)
 
-    # Metrics per epoch — list of dicts
+    # Metrics per epoch
     epoch_logs = db.Column(JSON, nullable=True, default=list)
-    # contoh: [{"epoch": 1, "train_loss": 0.45, "val_loss": 0.38, "val_accuracy": 0.87}]
 
     # Hasil akhir
     final_accuracy = db.Column(db.Float, nullable=True)
@@ -59,7 +60,6 @@ class TrainingJob(db.Model):
     final_precision = db.Column(db.Float, nullable=True)
     final_recall = db.Column(db.Float, nullable=True)
 
-    # Error info
     error_message = db.Column(Text, nullable=True)
 
     # Timestamps
@@ -77,7 +77,6 @@ class TrainingJob(db.Model):
         nullable=False,
     )
 
-    # Colab session identifier (opsional, untuk tracking)
     colab_session_id = db.Column(db.String(255), nullable=True)
 
     # Foreign keys
@@ -104,11 +103,21 @@ class TrainingJob(db.Model):
             return int((self.finished_at - self.started_at).total_seconds())
         return None
 
+    def display_name(self):
+        if self.job_name:
+            return self.job_name
+        model = self.model_type.value.upper()
+        ds = self.dataset.name if self.dataset else "?"
+        return f"{model} — {ds}"
+
     def to_dict(self, include_model=False):
         data = {
             "id": self.id,
+            "job_name": self.job_name,
+            "display_name": self.display_name(),
             "model_type": self.model_type.value,
             "hyperparams": self.hyperparams,
+            "split_info": self.split_info,
             "status": self.status.value,
             "progress": self.progress,
             "current_epoch": self.current_epoch,

@@ -12,31 +12,37 @@ class CreateTrainingJobSchema(Schema):
     )
     model_type = fields.String(
         required=True,
-        validate=validate.OneOf(
-            ["mbert", "xlmr"], error="Tipe model harus 'mbert' atau 'xlmr'"
-        ),
+        validate=validate.OneOf(["mbert", "xlmr"]),
         error_messages={"required": "Tipe model harus dipilih"},
     )
+    job_name = fields.String(
+        validate=validate.Length(min=1, max=255),
+        load_default=None,
+    )
+
+    # Train/test split
+    test_size = fields.Float(
+        required=True,
+        validate=validate.Range(min=0.05, max=0.4),
+        error_messages={"required": "Ukuran test set harus diisi"},
+    )
+
     # Hyperparameters
     learning_rate = fields.Float(
         load_default=2e-5,
-        validate=validate.Range(
-            min=1e-6, max=1e-3, error="Learning rate harus antara 1e-6 dan 1e-3"
-        ),
+        validate=validate.Range(min=1e-6, max=1e-3),
     )
     epochs = fields.Integer(
         load_default=3,
-        validate=validate.Range(min=1, max=20, error="Epochs harus antara 1-20"),
+        validate=validate.Range(min=1, max=20),
     )
     batch_size = fields.Integer(
         load_default=16,
-        validate=validate.OneOf([8, 16, 32], error="Batch size harus 8, 16, atau 32"),
+        validate=validate.OneOf([8, 16, 32]),
     )
     max_length = fields.Integer(
         load_default=128,
-        validate=validate.OneOf(
-            [64, 128, 256, 512], error="Max length harus 64, 128, 256, atau 512"
-        ),
+        validate=validate.OneOf([64, 128, 256, 512]),
     )
     warmup_steps = fields.Integer(
         load_default=0,
@@ -48,17 +54,26 @@ class CreateTrainingJobSchema(Schema):
     )
 
 
+class SplitPreviewSchema(Schema):
+    """Untuk endpoint preview split sebelum buat job."""
+
+    error_messages = {"unknown": "Kolom tidak dikenal"}
+
+    dataset_id = fields.String(required=True)
+    test_size = fields.Float(
+        required=True,
+        validate=validate.Range(min=0.05, max=0.4),
+    )
+
+
 class UpdateJobProgressSchema(Schema):
-    """Dipakai oleh Colab untuk update progress"""
+    """Dipakai Colab untuk update progress per epoch."""
 
     error_messages = {"unknown": "Kolom tidak dikenal"}
 
     current_epoch = fields.Integer(required=True)
     total_epochs = fields.Integer(required=True)
-    progress = fields.Integer(
-        required=True,
-        validate=validate.Range(min=0, max=100),
-    )
+    progress = fields.Integer(required=True, validate=validate.Range(min=0, max=100))
     train_loss = fields.Float(load_default=None)
     val_loss = fields.Float(load_default=None)
     val_accuracy = fields.Float(load_default=None)
@@ -67,7 +82,7 @@ class UpdateJobProgressSchema(Schema):
 
 
 class CompleteJobSchema(Schema):
-    """Dipakai oleh Colab saat training selesai"""
+    """Dipakai Colab saat training selesai."""
 
     error_messages = {"unknown": "Kolom tidak dikenal"}
 
@@ -76,8 +91,7 @@ class CompleteJobSchema(Schema):
     f1_score = fields.Float(required=True)
     precision = fields.Float(load_default=None)
     recall = fields.Float(load_default=None)
-    label_map = fields.Dict(required=True)
-    # label_map: {"0": "negatif", "1": "positif"}
+    label_map = fields.Str(required=True)  # JSON string dari form-data
     base_model_name = fields.String(load_default=None)
     colab_session_id = fields.String(load_default=None)
 
@@ -89,7 +103,7 @@ class JobListQuerySchema(Schema):
     per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
     status = fields.String(
         validate=validate.OneOf(
-            ["queued", "running", "completed", "failed", "cancelled"],
+            ["queued", "running", "completed", "failed", "cancelled"]
         )
     )
     model_type = fields.String(validate=validate.OneOf(["mbert", "xlmr"]))

@@ -12,14 +12,7 @@ training_job_bp = Blueprint("training_jobs", __name__, url_prefix="/api/training
 colab_bp = Blueprint("colab", __name__, url_prefix="/api/colab")
 
 
-# ── Middleware khusus Colab (pakai API key, bukan JWT) ─────────────────────────
 def colab_api_key_required(fn):
-    """
-    Colab tidak punya JWT. Kita pakai secret API key yang di-set di .env:
-    COLAB_API_KEY=your-secret-key
-    Header: X-Colab-Key: your-secret-key
-    """
-
     @wraps(fn)
     def wrapper(*args, **kwargs):
         api_key = request.headers.get("X-Colab-Key", "")
@@ -31,7 +24,7 @@ def colab_api_key_required(fn):
     return wrapper
 
 
-# ── User/Admin routes ──────────────────────────────────────────────────────────
+# ── User/Admin ─────────────────────────────────────────────────
 
 
 @training_job_bp.route("", methods=["GET"])
@@ -46,6 +39,12 @@ def get_job(job_id):
     return training_job_controller.get_job(job_id)
 
 
+@training_job_bp.route("/split-preview", methods=["POST"])
+@admin_required
+def split_preview():
+    return training_job_controller.split_preview()
+
+
 @training_job_bp.route("", methods=["POST"])
 @admin_required
 def create_job():
@@ -58,7 +57,7 @@ def cancel_job(job_id):
     return training_job_controller.cancel_job(job_id)
 
 
-# ── Colab-only routes ──────────────────────────────────────────────────────────
+# ── Colab only ─────────────────────────────────────────────────
 
 
 @colab_bp.route("/jobs/next", methods=["GET"])

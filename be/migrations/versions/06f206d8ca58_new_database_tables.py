@@ -1,8 +1,8 @@
-"""new database
+"""new database tables
 
-Revision ID: fb39711141f3
+Revision ID: 06f206d8ca58
 Revises: 
-Create Date: 2026-04-01 15:56:52.476024
+Create Date: 2026-04-01 18:51:02.155551
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'fb39711141f3'
+revision = '06f206d8ca58'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -83,8 +83,10 @@ def upgrade():
 
     op.create_table('training_jobs',
     sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('job_name', sa.String(length=255), nullable=True),
     sa.Column('model_type', sa.Enum('MBERT', 'XLMR', name='modeltype'), nullable=False),
     sa.Column('hyperparams', postgresql.JSON(astext_type=sa.Text()), nullable=False),
+    sa.Column('split_info', postgresql.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('status', sa.Enum('QUEUED', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED', name='jobstatus'), nullable=False),
     sa.Column('progress', sa.Integer(), nullable=True),
     sa.Column('current_epoch', sa.Integer(), nullable=True),
