@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Database, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -9,6 +9,8 @@ import RawDataTab from "./RawDataTab";
 import PreprocessedTab from "./PreprocessedTab";
 import { PreprocessStatusBadge } from "./ui/Badge";
 import ClassDistribution from "./ClassDistribution";
+
+import { useSSE } from "@/hooks/useSSE";
 
 // ── Komponen utama ─────────────────────────────────────────────
 
@@ -21,19 +23,16 @@ export default function DatasetDetail() {
     isSubmitting,
     fetchDataset,
     setColumns,
-    refreshDataset,
   } = useDatasetStore();
 
   const [activeTab, setActiveTab] = useState("raw");
   const [textCol, setTextCol] = useState("");
   const [labelCol, setLabelCol] = useState("");
   const [colChanged, setColChanged] = useState(false);
-  const pollingRef = useRef(null);
 
   // Fetch dataset on mount
   useEffect(() => {
     fetchDataset(datasetId);
-    return () => clearInterval(pollingRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [datasetId]);
 
@@ -47,25 +46,36 @@ export default function DatasetDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDataset?.id]);
 
-  // Polling saat preprocessing running
-  useEffect(() => {
-    clearInterval(pollingRef.current);
-    if (currentDataset?.preprocessing_status === "running") {
-      pollingRef.current = setInterval(async () => {
-        const updated = await refreshDataset(datasetId);
-        if (updated?.preprocessing_status !== "running") {
-          clearInterval(pollingRef.current);
-          if (updated?.preprocessing_status === "completed") {
-            toast.success("Preprocessing selesai!");
-          } else if (updated?.preprocessing_status === "error") {
-            toast.error("Preprocessing gagal: " + updated.preprocessing_error);
-          }
+  // ── SSE: replace polling preprocessing ────────────────────────────────────
+  const isPreprocessingRunning =
+    currentDataset?.preprocessing_status === "running";
+
+  useSSE(
+    // Hanya subscribe saat preprocessing sedang berjalan
+    isPreprocessingRunning ? `/api/sse/datasets/${datasetId}` : null,
+    {
+      enabled: isPreprocessingRunning,
+      onMessage: (data, eventType) => {
+        if (
+          eventType === "update" ||
+          eventType === "complete" ||
+          eventType === "error_event"
+        ) {
+          // Update store dengan data terbaru dari SSE
+          useDatasetStore.setState({ currentDataset: data });
         }
-      }, 3000);
+        if (eventType === "complete") {
+          toast.success("Preprocessing selesai!");
+        }
+        if (eventType === "error_event") {
+          toast.error(
+            "Preprocessing gagal: " + (data?.preprocessing_error ?? "")
+          );
+        }
+      },
     }
-    return () => clearInterval(pollingRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDataset?.preprocessing_status]);
+  );
+  // ── end SSE ────────────────────────────────────────────────────────────────
 
   const handleSaveColumns = async () => {
     if (!textCol || !labelCol) {

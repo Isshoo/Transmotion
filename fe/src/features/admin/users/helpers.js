@@ -1,6 +1,6 @@
 // ── Helper: generate range halaman dengan ellipsis ─────────────
 
-export default function buildPageRange(current, total) {
+export function buildPageRange(current, total) {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
 
   const pages = new Set([1, total, current]);

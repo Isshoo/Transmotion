@@ -22,8 +22,8 @@ import DeleteUserModal from "./modal/DeleteUserModal";
 import Avatar from "./ui/Avatar";
 import { RoleBadge, StatusBadge, VerifiedBadge } from "./ui/Badge";
 import { ActionButton, PaginationButton } from "./ui/Button";
-import buildPageRange from "../helpers/buildPageRange";
 import UserTableSkeleton from "./UserTableSkeleton";
+import { buildPageRange } from "../helpers";
 
 export default function UserTable() {
   const {

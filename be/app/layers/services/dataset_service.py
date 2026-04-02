@@ -13,6 +13,7 @@ from sqlalchemy import asc, desc, or_
 from app.config.extensions import db
 from app.layers.models.dataset import Dataset, DatasetStatus, PreprocessingStatus
 from app.layers.models.preprocessed_row import PreprocessedRow
+from app.layers.services.sse_service import sse_manager
 from app.utils.exceptions import BadRequestError, NotFoundError
 from app.utils.logger import logger
 
@@ -302,6 +303,7 @@ def start_preprocessing(dataset_id: str, app) -> Dataset:
     dataset.preprocessing_status = PreprocessingStatus.RUNNING
     dataset.preprocessing_error = None
     db.session.commit()
+    sse_manager.publish(f"dataset:{dataset_id}", dataset.to_dict(), event="update")
 
     def run():
         with app.app_context():
@@ -313,10 +315,6 @@ def start_preprocessing(dataset_id: str, app) -> Dataset:
 
 
 def _do_preprocess(dataset_id: str):
-    """
-    Baca raw data → preprocessing teks → hapus kosong & duplikat →
-    simpan ke tabel preprocessed_rows.
-    """
     try:
         dataset = db.session.get(Dataset, dataset_id)
         if not dataset:
@@ -330,28 +328,23 @@ def _do_preprocess(dataset_id: str):
         text_col = dataset.text_column
         label_col = dataset.label_column
 
-        # Hapus preprocessed rows lama (jika preprocessing ulang)
         db.session.query(PreprocessedRow).filter_by(dataset_id=dataset_id).delete()
         db.session.flush()
 
         rows_to_insert = []
-        seen: set[tuple] = set()  # (preprocessed_text_lower, label_lower)
+        seen: set[tuple] = set()
 
         for idx, row in df.iterrows():
             raw_text = str(row.get(text_col, "")).strip()
             label = str(row.get(label_col, "")).strip()
 
-            # Skip baris tidak valid
             if not raw_text or raw_text == "nan" or not label or label == "nan":
                 continue
 
             preprocessed = preprocess_text(raw_text)
-
-            # Skip jika hasil preprocessing kosong
             if not preprocessed:
                 continue
 
-            # Skip duplikat (preprocessed + label sama)
             key = (preprocessed.lower(), label.lower())
             if key in seen:
                 continue
@@ -367,18 +360,23 @@ def _do_preprocess(dataset_id: str):
                 )
             )
 
-        # Batch insert
         db.session.bulk_save_objects(rows_to_insert)
 
-        # Update statistik
         dist_preprocessed = dict(Counter(r.label for r in rows_to_insert))
         dataset.num_rows_preprocessed = len(rows_to_insert)
         dataset.class_distribution_preprocessed = dist_preprocessed
         dataset.preprocessing_status = PreprocessingStatus.COMPLETED
         db.session.commit()
 
+        # ── Broadcast selesai ──────────────────────────────────
+        sse_manager.publish(
+            f"dataset:{dataset_id}",
+            dataset.to_dict(),
+            event="complete",
+        )
+
         logger.info(
-            f"Preprocessing completed for {dataset_id}: {len(rows_to_insert)} rows"
+            f"Preprocessing completed: {dataset_id} — {len(rows_to_insert)} rows"
         )
 
     except Exception as e:
@@ -389,6 +387,12 @@ def _do_preprocess(dataset_id: str):
                 dataset.preprocessing_status = PreprocessingStatus.ERROR
                 dataset.preprocessing_error = str(e)
                 db.session.commit()
+                # ── Broadcast error ────────────────────────────
+                sse_manager.publish(
+                    f"dataset:{dataset_id}",
+                    dataset.to_dict(),
+                    event="error_event",
+                )
         except Exception:
             db.session.rollback()
 
