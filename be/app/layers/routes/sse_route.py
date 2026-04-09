@@ -217,13 +217,14 @@ def stream_jobs_list():
 @sse_auth_required
 def stream_colab_status():
     """
-    Stream status koneksi Colab untuk admin UI.
-    Ping setiap 20 detik dengan status terkini.
+    Stream status Colab.
+    - Langsung kirim status terkini saat connect (bukan hanya saat ada event)
+    - Kirim ulang status terkini setiap ping timeout
     """
-
     def generate():
         from app.layers.services import colab_service
 
+        # Kirim status terkini saat pertama connect
         yield sse_manager._format(colab_service.get_status(), "init")
 
         channel = "colab:status"
@@ -234,9 +235,10 @@ def stream_colab_status():
                     msg = q.get(timeout=PING_TIMEOUT)
                     yield msg
                 except queue.Empty:
-                    # Kirim status Colab terkini sebagai ping berkala
-                    status = colab_service.get_status()
-                    yield sse_manager._format(status, "ping")
+                    # Saat timeout, kirim status terkini (bukan ping kosong)
+                    # Ini memastikan badge selalu sinkron meski tidak ada event
+                    current_status = colab_service.get_status()
+                    yield sse_manager._format(current_status, "ping")
         finally:
             sse_manager.unsubscribe(channel, q)
 

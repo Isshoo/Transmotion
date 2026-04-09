@@ -244,14 +244,17 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
     )
     os.makedirs(model_dir, exist_ok=True)
 
-    model_path = None
+    model_path = data.get("file_path") or None
     file_size = None
 
     if model_file and model_file.filename:
         ext = os.path.splitext(model_file.filename)[1] or ".pt"
-        model_path = os.path.join(model_dir, f"{_uuid.uuid4().hex}{ext}")
-        model_file.save(model_path)
-        file_size = os.path.getsize(model_path)
+        local_path = os.path.join(model_dir, f"{_uuid.uuid4().hex}{ext}")
+        model_file.save(local_path)
+        file_size = os.path.getsize(local_path)
+        # Jika tidak ada file_path dari Drive, pakai local path
+        if not model_path:
+            model_path = local_path
 
     label_map = data.get("label_map")
     if isinstance(label_map, str):

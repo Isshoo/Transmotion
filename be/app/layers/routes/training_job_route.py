@@ -114,6 +114,16 @@ def colab_get_next_job():
     return colab_controller.colab_get_next_job()
 
 
+@colab_bp.route("/datasets/<dataset_id>/preprocessed", methods=["GET"])
+@_colab_key_required
+def colab_get_preprocessed_data(dataset_id):
+    """
+    Endpoint khusus Colab untuk mengambil preprocessed data.
+    Menggunakan X-Colab-Key, bukan JWT.
+    """
+    from app.layers.controllers import dataset_controller
+    return dataset_controller.get_preprocessed_data(dataset_id)
+
 @colab_bp.route("/jobs/<job_id>/running", methods=["POST"])
 @_colab_key_required
 def colab_mark_running(job_id):

@@ -26,8 +26,16 @@ _lock = threading.Lock()
 SESSION_TIMEOUT_SECONDS = 300  # 5 menit
 
 
+def _broadcast_status():
+    """Broadcast status terkini ke semua subscriber SSE."""
+    try:
+        from app.layers.services.sse_service import sse_manager
+        sse_manager.publish("colab:status", get_status(), event="update")
+    except Exception:
+        pass  # Jangan crash jika SSE belum ready
+
+
 def register(url: str, session_id: str) -> dict:
-    """Simpan URL Colab yang baru register."""
     with _lock:
         _colab_sessions[session_id] = {
             "url": url.rstrip("/"),
@@ -36,15 +44,16 @@ def register(url: str, session_id: str) -> dict:
             "last_ping": time.time(),
         }
     logger.info(f"Colab registered: session={session_id} url={url}")
+    _broadcast_status()  # ← tambahkan
     return _colab_sessions[session_id]
 
 
 def unregister(session_id: str):
-    """Hapus session saat Colab shutdown."""
     with _lock:
         if session_id in _colab_sessions:
             del _colab_sessions[session_id]
             logger.info(f"Colab unregistered: session={session_id}")
+    _broadcast_status()  # ← tambahkan
 
 
 def ping(session_id: str):
