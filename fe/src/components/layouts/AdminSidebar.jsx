@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/libs/utils";
 import useAuthStore from "@/features/auth/store";
+import { ColabStatusBadge } from "@/features/admin/training/components/ui/Badge";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -48,6 +49,9 @@ export default function AdminSidebar() {
           </Link>
         ))}
       </nav>
+      <div className="px-4 py-2">
+        <ColabStatusBadge />
+      </div>
       <div className="border-t p-4">
         <button
           onClick={() => logout()}

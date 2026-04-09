@@ -31,7 +31,7 @@ class ColumnSettingsSchema(Schema):
 class RawDataQuerySchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
-    per_page = fields.Integer(load_default=50, validate=validate.Range(min=1, max=200))
+    per_page = fields.Integer(load_default=50, validate=validate.Range(min=1, max=1000))
     search = fields.String(load_default=None)
     filter_label = fields.String(load_default=None)
 
@@ -39,7 +39,7 @@ class RawDataQuerySchema(Schema):
 class PreprocessedQuerySchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
-    per_page = fields.Integer(load_default=50, validate=validate.Range(min=1, max=200))
+    per_page = fields.Integer(load_default=50, validate=validate.Range(min=1, max=1000))
     search = fields.String(load_default=None)
     filter_label = fields.String(load_default=None)
 

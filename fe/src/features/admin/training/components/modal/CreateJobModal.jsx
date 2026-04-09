@@ -25,7 +25,7 @@ const DEFAULT_HYPERPARAMS = {
   epochs: 3,
   batch_size: 16,
   max_length: 128,
-  warmup_steps: 0,
+  warmup_steps: 0.1,
   weight_decay: 0.01,
 };
 

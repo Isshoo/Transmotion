@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import {
   Plus,
   BrainCircuit,
@@ -16,6 +16,7 @@ import JobDetailModal from "./modal/JobDetailModal";
 import CancelConfirmModal from "./modal/CancelConfirmModal";
 import { ProgressBar } from "./ui/Bar";
 import { StatusBadge } from "./ui/Badge";
+import { useSSE } from "@/hooks/useSSE";
 
 export default function TrainingJobTable() {
   const {
@@ -35,25 +36,46 @@ export default function TrainingJobTable() {
     openCancelModal,
   } = useTrainingStore();
 
-  // Auto-refresh saat ada job yang running/queued
-  const autoRefreshRef = useRef(null);
-
   useEffect(() => {
     fetchJobs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    clearInterval(autoRefreshRef.current);
-    const hasActive = jobs.some((j) =>
-      ["queued", "running"].includes(j.status)
-    );
-    if (hasActive) {
-      autoRefreshRef.current = setInterval(() => fetchJobs(), 300000);
-    }
-    return () => clearInterval(autoRefreshRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobs]);
+  // ── SSE: replace auto-refresh interval ────────────────────────────────────
+  useSSE("/api/sse/training-jobs", {
+    onMessage: (data, eventType) => {
+      if (eventType === "init") {
+        // State awal: update jobs yang ada di list
+        const incoming = data.jobs || [];
+        if (incoming.length > 0) {
+          useTrainingStore.setState((state) => {
+            const updated = [...state.jobs];
+            incoming.forEach((newJob) => {
+              const idx = updated.findIndex((j) => j.id === newJob.id);
+              if (idx >= 0) updated[idx] = newJob;
+            });
+            return { jobs: updated };
+          });
+        }
+      }
+
+      if (eventType === "update") {
+        // Update satu job di list
+        useTrainingStore.setState((state) => {
+          const exists = state.jobs.some((j) => j.id === data.id);
+          if (exists) {
+            return {
+              jobs: state.jobs.map((j) => (j.id === data.id ? data : j)),
+            };
+          }
+          // Job baru (baru saja dibuat) — tambahkan ke awal dan fetch ulang untuk total
+          fetchJobs();
+          return {};
+        });
+      }
+    },
+  });
+  // ── end SSE ────────────────────────────────────────────────────────────────
 
   const from = total === 0 ? 0 : (page - 1) * 15 + 1;
   const to = Math.min(page * 15, total);

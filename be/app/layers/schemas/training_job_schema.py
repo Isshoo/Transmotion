@@ -44,9 +44,9 @@ class CreateTrainingJobSchema(Schema):
         load_default=128,
         validate=validate.OneOf([64, 128, 256, 512]),
     )
-    warmup_steps = fields.Integer(
-        load_default=0,
-        validate=validate.Range(min=0, max=1000),
+    warmup_steps = fields.Float(
+        load_default=0.1,
+        validate=validate.Range(min=0, max=1),
     )
     weight_decay = fields.Float(
         load_default=0.01,
@@ -82,18 +82,16 @@ class UpdateJobProgressSchema(Schema):
 
 
 class CompleteJobSchema(Schema):
-    """Dipakai Colab saat training selesai."""
-
     error_messages = {"unknown": "Kolom tidak dikenal"}
-
     model_name = fields.String(required=True)
     accuracy = fields.Float(required=True)
     f1_score = fields.Float(required=True)
     precision = fields.Float(load_default=None)
     recall = fields.Float(load_default=None)
-    label_map = fields.Str(required=True)  # JSON string dari form-data
+    label_map = fields.Str(required=True)
     base_model_name = fields.String(load_default=None)
     colab_session_id = fields.String(load_default=None)
+    file_path = fields.String(load_default=None)
 
 
 class JobListQuerySchema(Schema):

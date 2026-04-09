@@ -9,10 +9,10 @@ from app.config.extensions import db
 from app.layers.models.dataset import Dataset, PreprocessingStatus
 from app.layers.models.trained_model import TrainedModel
 from app.layers.models.training_job import JobStatus, ModelType, TrainingJob
+from app.layers.services.sse_service import sse_manager
 from app.utils.exceptions import BadRequestError, NotFoundError
 from app.utils.logger import logger
 
-# Minimal data per kelas di train set agar training bermakna
 MIN_SAMPLES_PER_CLASS = 10
 MIN_TOTAL_TRAIN = 50
 
@@ -26,33 +26,22 @@ def get_by_id(job_id: str) -> TrainingJob:
 
 def get_all(page=1, per_page=20, status=None, model_type=None, sort_order="desc"):
     query = db.session.query(TrainingJob)
-
     if status:
         query = query.filter(TrainingJob.status == JobStatus(status))
     if model_type:
         query = query.filter(TrainingJob.model_type == ModelType(model_type))
-
     total = query.count()
     query = query.order_by(desc(TrainingJob.created_at))
-
     jobs = query.offset((page - 1) * per_page).limit(per_page).all()
     return jobs, total
 
 
 def compute_split_preview(dataset_id: str, test_size: float) -> dict:
-    """
-    Hitung preview train/test split dari preprocessed dataset.
-    Menggunakan stratified split agar distribusi kelas proporsional.
-    """
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
         raise NotFoundError("Dataset tidak ditemukan")
-
     if dataset.preprocessing_status != PreprocessingStatus.COMPLETED:
-        raise BadRequestError(
-            "Dataset belum memiliki data preprocessed. "
-            "Lakukan preprocessing terlebih dahulu."
-        )
+        raise BadRequestError("Dataset belum memiliki data preprocessed")
 
     total = dataset.num_rows_preprocessed or 0
     if total == 0:
@@ -62,26 +51,19 @@ def compute_split_preview(dataset_id: str, test_size: float) -> dict:
     if not dist:
         raise BadRequestError("Informasi distribusi kelas tidak tersedia")
 
-    # Hitung split per kelas (stratified)
-    train_per_class = {}
-    test_per_class = {}
-    errors = []
-
+    train_per_class, test_per_class, errors = {}, {}, []
     for label, count in dist.items():
         test_n = max(1, math.floor(count * test_size))
         train_n = count - test_n
         train_per_class[label] = train_n
         test_per_class[label] = test_n
-
         if train_n < MIN_SAMPLES_PER_CLASS:
             errors.append(
-                f"Kelas '{label}': hanya {train_n} data di train set "
-                f"(minimal {MIN_SAMPLES_PER_CLASS})"
+                f"Kelas '{label}': hanya {train_n} data di train set (minimal {MIN_SAMPLES_PER_CLASS})"
             )
 
     train_total = sum(train_per_class.values())
     test_total = sum(test_per_class.values())
-
     if train_total < MIN_TOTAL_TRAIN:
         errors.append(
             f"Total train set hanya {train_total} data (minimal {MIN_TOTAL_TRAIN})"
@@ -111,32 +93,24 @@ def create(
     job_name: str | None,
     user_id: str | None,
 ) -> TrainingJob:
-    # Validasi dataset
+    from flask import current_app
+
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
         raise NotFoundError("Dataset tidak ditemukan")
-
     if dataset.preprocessing_status != PreprocessingStatus.COMPLETED:
-        raise BadRequestError(
-            "Dataset harus sudah melalui preprocessing sebelum bisa digunakan training"
-        )
-
+        raise BadRequestError("Dataset harus sudah melalui preprocessing")
     if not dataset.columns_configured():
-        raise BadRequestError("Kolom teks dan label dataset belum dikonfigurasi")
+        raise BadRequestError("Kolom teks dan label belum dikonfigurasi")
 
-    # Hitung split preview (sekaligus validasi)
     split_info = compute_split_preview(dataset_id, test_size)
-
     if not split_info["is_valid"]:
         raise BadRequestError(
-            "Data tidak cukup untuk pelatihan: "
-            + "; ".join(split_info["validation_errors"])
+            "Data tidak cukup: " + "; ".join(split_info["validation_errors"])
         )
 
-    # Default job name
     if not job_name:
-        mt = model_type.upper()
-        job_name = f"{mt} — {dataset.name}"
+        job_name = f"{model_type.upper()} — {dataset.name}"
 
     job = TrainingJob(
         job_name=job_name,
@@ -151,52 +125,80 @@ def create(
     db.session.add(job)
     db.session.commit()
 
-    logger.info(
-        f"Training job created: {job.id} ({model_type}) on dataset {dataset_id}"
-    )
+    logger.info(f"Training job created: {job.id}")
+
+    # ── Broadcast ke list view SSE ─────────────────────────────
+    _broadcast_job(job)
+
+    # ── Coba panggil Colab langsung ────────────────────────────
+    from app.layers.services import colab_service
+
+    api_key = current_app.config.get("COLAB_API_KEY", "")
+    if colab_service.is_available():
+        job_data = job.to_dict()
+        job_data["dataset_file_path"] = dataset.file_path
+        job_data["dataset_text_column"] = dataset.text_column
+        job_data["dataset_label_column"] = dataset.label_column
+        job_data["dataset_labels"] = dataset.class_distribution_preprocessed or {}
+
+        success = colab_service.call_train(job_data, api_key)
+        if not success:
+            logger.warning(f"Colab tidak merespons, job {job.id[:8]} tetap queued")
+    else:
+        logger.info("Colab tidak terdaftar — job akan menunggu Colab online")
+
     return job
 
 
 def cancel(job_id: str) -> TrainingJob:
     job = get_by_id(job_id)
-
     if job.status not in (JobStatus.QUEUED, JobStatus.RUNNING):
-        raise BadRequestError(
-            f"Job tidak bisa dibatalkan, status saat ini: {job.status.value}"
-        )
+        raise BadRequestError(f"Job tidak bisa dibatalkan: status {job.status.value}")
 
     job.status = JobStatus.CANCELLED
     job.finished_at = datetime.now(timezone.utc)
     db.session.commit()
 
-    logger.info(f"Training job cancelled: {job_id}")
+    _broadcast_job(job)
+    logger.info(f"Job cancelled: {job_id}")
     return job
 
 
-# ── Colab endpoints ────────────────────────────────────────────────────────────
+# ── Colab push endpoints ───────────────────────────────────────────────────────
 
 
 def get_next_queued_job() -> TrainingJob | None:
-    """Colab polling — ambil job berikutnya."""
+    """Fallback: Colab masih bisa polling jika tidak ada ngrok."""
     job = (
         db.session.query(TrainingJob)
         .filter(TrainingJob.status == JobStatus.QUEUED)
         .order_by(TrainingJob.created_at.asc())
         .first()
     )
-
     if job:
         job.status = JobStatus.RUNNING
         job.started_at = datetime.now(timezone.utc)
         db.session.commit()
-        logger.info(f"Job {job.id} picked up by Colab")
+        _broadcast_job(job)
+        logger.info(f"Job {job.id} picked up via polling")
+    return job
 
+
+def mark_running(job_id: str, colab_session_id: str = None) -> TrainingJob:
+    """Colab konfirmasi job sudah mulai diproses."""
+    job = get_by_id(job_id)
+    if job.status == JobStatus.QUEUED:
+        job.status = JobStatus.RUNNING
+        job.started_at = datetime.now(timezone.utc)
+        if colab_session_id:
+            job.colab_session_id = colab_session_id
+        db.session.commit()
+        _broadcast_job(job)
     return job
 
 
 def update_progress(job_id: str, data: dict) -> TrainingJob:
     job = get_by_id(job_id)
-
     if job.status != JobStatus.RUNNING:
         raise BadRequestError("Job tidak dalam status running")
 
@@ -220,8 +222,11 @@ def update_progress(job_id: str, data: dict) -> TrainingJob:
     job.epoch_logs = epoch_logs
     db.session.commit()
 
+    # ── Broadcast progress via SSE ─────────────────────────────
+    _broadcast_job(job)
+
     logger.info(
-        f"Job {job_id} progress: epoch {data['current_epoch']}/{data['total_epochs']} "
+        f"Job {job_id[:8]} epoch {data['current_epoch']}/{data['total_epochs']} "
         f"({data['progress']}%)"
     )
     return job
@@ -234,26 +239,23 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
 
     job = get_by_id(job_id)
 
-    if job.status != JobStatus.RUNNING:
-        raise BadRequestError("Job tidak dalam status running")
-
-    # Simpan file model
     model_dir = os.path.join(
-        os.path.dirname(__file__), "..", "..", "..", "storage", "models"
+        os.path.dirname(__file__), "..", "..", "storage", "uploads", "models"
     )
     os.makedirs(model_dir, exist_ok=True)
 
-    model_path = None
+    model_path = data.get("file_path") or None
     file_size = None
 
     if model_file and model_file.filename:
         ext = os.path.splitext(model_file.filename)[1] or ".pt"
-        model_filename = f"{_uuid.uuid4().hex}{ext}"
-        model_path = os.path.join(model_dir, model_filename)
-        model_file.save(model_path)
-        file_size = os.path.getsize(model_path)
+        local_path = os.path.join(model_dir, f"{_uuid.uuid4().hex}{ext}")
+        model_file.save(local_path)
+        file_size = os.path.getsize(local_path)
+        # Jika tidak ada file_path dari Drive, pakai local path
+        if not model_path:
+            model_path = local_path
 
-    # Parse label_map
     label_map = data.get("label_map")
     if isinstance(label_map, str):
         try:
@@ -287,11 +289,16 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
     job.final_f1 = data.get("f1_score")
     job.final_precision = data.get("precision")
     job.final_recall = data.get("recall")
-
     if data.get("colab_session_id"):
         job.colab_session_id = data["colab_session_id"]
 
     db.session.commit()
+
+    # ── Broadcast complete via SSE ─────────────────────────────
+    job_dict = job.to_dict(include_model=True)
+    sse_manager.publish(f"job:{job_id}", job_dict, event="complete")
+    sse_manager.publish("jobs:list", job_dict, event="update")
+
     logger.info(f"Job {job_id} completed. Model {trained_model.id} saved.")
     return trained_model
 
@@ -302,5 +309,21 @@ def fail_job(job_id: str, error_message: str) -> TrainingJob:
     job.error_message = error_message
     job.finished_at = datetime.now(timezone.utc)
     db.session.commit()
+
+    # ── Broadcast fail via SSE ─────────────────────────────────
+    job_dict = job.to_dict()
+    sse_manager.publish(f"job:{job_id}", job_dict, event="error_event")
+    sse_manager.publish("jobs:list", job_dict, event="update")
+
     logger.error(f"Job {job_id} failed: {error_message}")
     return job
+
+
+# ── Internal helper ────────────────────────────────────────────────────────────
+
+
+def _broadcast_job(job: TrainingJob):
+    """Broadcast update ke SSE channel job detail dan list."""
+    job_dict = job.to_dict()
+    sse_manager.publish(f"job:{job.id}", job_dict, event="update")
+    sse_manager.publish("jobs:list", job_dict, event="update")
