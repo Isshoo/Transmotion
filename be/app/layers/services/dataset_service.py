@@ -37,17 +37,17 @@ def preprocess_text(text: str) -> str:
     URL, email, mention, hashtag (#word → word), HTML tag, whitespace berlebih.
     Tidak lowercase — biarkan user yang tentukan saat training.
     """
-    if not isinstance(text, str):
-        text = str(text) if text is not None else ""
+    # if not isinstance(text, str):
+    #     text = str(text) if text is not None else ""
 
-    text = unicodedata.normalize("NFKC", text)
-    text = re.sub(r"https?://\S+|www\.\S+", " ", text)  # URL
-    text = re.sub(r"\S+@\S+\.\S+", " ", text)  # email
-    text = re.sub(r"@[\w_]+", " ", text)  # @mention
-    text = re.sub(r"#([\w]+)", r"\1", text)  # #hashtag → hashtag
-    text = re.sub(r"<[^>]+>", " ", text)  # HTML tag
-    text = re.sub(r"[\r\n\t]+", " ", text)  # newline/tab
-    text = re.sub(r"\s+", " ", text).strip()  # whitespace
+    # text = unicodedata.normalize("NFKC", text)
+    # text = re.sub(r"https?://\S+|www\.\S+", " ", text)  # URL
+    # text = re.sub(r"\S+@\S+\.\S+", " ", text)  # email
+    # text = re.sub(r"@[\w_]+", " ", text)  # @mention
+    # text = re.sub(r"#([\w]+)", r"\1", text)  # #hashtag → hashtag
+    # text = re.sub(r"<[^>]+>", " ", text)  # HTML tag
+    # text = re.sub(r"[\r\n\t]+", " ", text)  # newline/tab
+    # text = re.sub(r"\s+", " ", text).strip()  # whitespace
     return text
 
 

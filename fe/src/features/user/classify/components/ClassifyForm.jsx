@@ -105,6 +105,11 @@ export default function ClassifyForm() {
                         {model.num_labels} kelas: {model.labels?.join(", ")}
                       </span>
                     </div>
+                    {model.is_drive_model && selectedModelId === model.id && (
+                      <p className="mt-1 text-[11px] text-amber-600">
+                        ⚠ Model ini memerlukan Colab aktif untuk inference
+                      </p>
+                    )}
                   </button>
                 ))}
               </div>

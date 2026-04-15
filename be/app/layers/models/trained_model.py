@@ -70,6 +70,10 @@ class TrainedModel(db.Model):
     def __repr__(self):
         return f"<TrainedModel {self.name}>"
 
+    def is_drive_model(self) -> bool:
+        """Model tersimpan di Google Drive, butuh Colab untuk inference."""
+        return bool(self.file_path and self.file_path.startswith("/content/drive/"))
+
     def to_dict(self, include_job=False):
         data = {
             "id": self.id,
@@ -91,6 +95,7 @@ class TrainedModel(db.Model):
             "prediction_count": self.predictions.count(),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "is_drive_model": self.is_drive_model(),
         }
         if include_job and self.job:
             data["job"] = {

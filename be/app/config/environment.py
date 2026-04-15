@@ -81,7 +81,7 @@ class Config:
     CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
 
     # Rate Limiting
-    RATELIMIT_DEFAULT = get_env("RATELIMIT_DEFAULT", "60/minute")
+    RATELIMIT_DEFAULT = get_env("RATELIMIT_DEFAULT", "120/minute")
     RATELIMIT_STORAGE_URI = get_env("RATELIMIT_STORAGE_URI", "memory://")
     RATELIMIT_STRATEGY = get_env("RATELIMIT_STRATEGY", "fixed-window")
     RATELIMIT_HEADERS_ENABLED = get_env("RATELIMIT_HEADERS_ENABLED", "True", bool)

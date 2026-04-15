@@ -156,59 +156,154 @@ def delete_model(model_id: str):
 
 
 def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
-    import torch
+    """
+    Klasifikasi teks.
+    Jika model ada di Drive (file_path berisi /content/drive/...),
+    forward ke Colab inference endpoint.
+    Jika model ada lokal, jalankan langsung.
+    """
+    from flask import current_app
+    from app.layers.services import colab_service
 
     model_record = get_model_by_id(model_id)
 
     if not model_record.is_active:
         raise BadRequestError("Model tidak aktif")
+    if not model_record.file_path:
+        raise BadRequestError("File model tidak tersedia")
 
-    tokenizer, hf_model = _load_model(model_record)
+    file_path = model_record.file_path
+
+    # Tentukan apakah model ada di Drive atau lokal
+    is_drive_path = file_path.startswith("/content/drive/")
+
+    if is_drive_path:
+        result = _classify_via_colab(model_record, text, current_app)
+    else:
+        result = _classify_local(model_record, text)
+
+    prediction = Prediction(
+        input_text=text,
+        predicted_label=result["predicted_label"],
+        predicted_index=result["predicted_index"],
+        confidence=result["confidence"],
+        all_scores=result["all_scores"],
+        model_id=model_id,
+        user_id=user_id,
+    )
+    db.session.add(prediction)
+    db.session.commit()
+
+    logger.info(
+        f"Prediction: model={model_id[:8]} "
+        f"label={result['predicted_label']} "
+        f"conf={result['confidence']}"
+    )
+    return prediction
+
+
+def _classify_via_colab(model_record, text: str, app) -> dict:
+    """Forward inference ke Colab server."""
+    import requests as http_requests
+    from app.layers.services import colab_service
+
+    session = colab_service.get_active_session()
+    if not session:
+        raise BadRequestError(
+            "Colab tidak aktif. Model ini tersimpan di Google Drive dan "
+            "memerlukan Colab untuk inference. Hidupkan Colab terlebih dahulu."
+        )
+
+    api_key = app.config.get("COLAB_API_KEY", "")
+    url = f"{session['url']}/predict"
 
     try:
-        inputs = tokenizer(
-            text,
-            return_tensors="pt",
-            truncation=True,
-            max_length=512,
-            padding=True,
+        res = http_requests.post(
+            url,
+            json={
+                "model_id": model_record.id,
+                "file_path": model_record.file_path,
+                "base_model_name": model_record.base_model_name,
+                "num_labels": model_record.num_labels,
+                "label_map": model_record.label_map,
+                "text": text,
+            },
+            headers={"X-Backend-Key": api_key},
+
+            timeout=120,
         )
+        res.raise_for_status()
+        data = res.json()
 
-        with torch.no_grad():
-            outputs = hf_model(**inputs)
-            probs = torch.softmax(outputs.logits, dim=1)[0]
+        logger.info(f"Colab response: {data}")
+        print(f"Colab response: {data}")
 
-        label_map = model_record.label_map or {}
-        all_scores = {
-            label_map.get(str(i), str(i)): round(float(p), 4)
-            for i, p in enumerate(probs)
-        }
-        predicted_index = int(probs.argmax())
-        predicted_label = label_map.get(str(predicted_index), str(predicted_index))
-        confidence = round(float(probs[predicted_index]), 4)
+        if not data.get("success"):
+            raise BadRequestError(f"Colab inference gagal: {data.get('error')}")
 
-        prediction = Prediction(
-            input_text=text,
-            predicted_label=predicted_label,
-            predicted_index=predicted_index,
-            confidence=confidence,
-            all_scores=all_scores,
-            model_id=model_id,
-            user_id=user_id,
+        return data["data"]
+
+    except http_requests.exceptions.Timeout:
+        raise BadRequestError("Inference timeout. Coba lagi — model mungkin sedang dimuat pertama kali.")
+    except http_requests.exceptions.RequestException as e:
+        raise BadRequestError(f"Gagal menghubungi Colab: {e}")
+
+
+def _classify_local(model_record, text: str) -> dict:
+    """
+    Load dan jalankan inference dari file lokal.
+    Dipakai jika file_path menunjuk ke storage lokal.
+    """
+    import torch
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+    model_id = model_record.id
+
+    if model_id not in _model_cache:
+        if not os.path.exists(model_record.file_path):
+            raise BadRequestError(f"File model tidak ditemukan: {model_record.file_path}")
+
+        base = model_record.base_model_name or (
+            "bert-base-multilingual-cased"
+            if model_record.model_type == "mbert"
+            else "xlm-roberta-base"
         )
-        db.session.add(prediction)
-        db.session.commit()
+        num_labels = model_record.num_labels or len(model_record.label_map or {}) or 2
 
-        logger.info(
-            f"Prediction: model={model_id} label={predicted_label} conf={confidence}"
+        tokenizer = AutoTokenizer.from_pretrained(base)
+        hf_model = AutoModelForSequenceClassification.from_pretrained(
+            base, num_labels=num_labels
         )
-        return prediction
+        state_dict = torch.load(
+            model_record.file_path, map_location="cpu", weights_only=True
+        )
+        hf_model.load_state_dict(state_dict, strict=False)
+        hf_model.eval()
 
-    except (BadRequestError, NotFoundError):
-        raise
-    except Exception as e:
-        logger.error(f"Classification error for model {model_id}: {e}")
-        raise BadRequestError(f"Gagal melakukan klasifikasi: {e}") from None
+        _evict_cache_if_needed()
+        _model_cache[model_id] = (tokenizer, hf_model)
+
+    tokenizer, hf_model = _model_cache[model_id]
+
+    inputs = tokenizer(
+        text, return_tensors="pt",
+        truncation=True, max_length=512, padding=True,
+    )
+    with torch.no_grad():
+        probs = torch.softmax(hf_model(**inputs).logits, dim=1)[0]
+
+    label_map = model_record.label_map or {}
+    all_scores = {
+        label_map.get(str(i), str(i)): round(float(p), 4)
+        for i, p in enumerate(probs)
+    }
+    predicted_index = int(probs.argmax())
+    return {
+        "predicted_label": label_map.get(str(predicted_index), str(predicted_index)),
+        "predicted_index": predicted_index,
+        "confidence": round(float(probs[predicted_index]), 4),
+        "all_scores": all_scores,
+    }
 
 
 def get_predictions(
