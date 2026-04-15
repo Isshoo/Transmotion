@@ -71,6 +71,7 @@ export default function DatasetUploadModal() {
     setPreview(null);
     setPreviewError(null);
     setErrors({});
+    if (fileInputRef.current) fileInputRef.current.value = "";
     closeUploadModal();
   };
 
@@ -224,6 +225,7 @@ export default function DatasetUploadModal() {
                       setFile(null);
                       setPreview(null);
                       setPreviewError(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
                     }}
                     className="rounded-lg p-1 text-gray-400 hover:bg-white hover:text-gray-600"
                   >

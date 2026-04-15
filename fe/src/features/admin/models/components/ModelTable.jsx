@@ -25,6 +25,7 @@ export default function ModelTable() {
     total,
     totalPages,
     page,
+    perPage,
     modelTypeFilter,
     isActiveFilter,
     sortBy,
@@ -45,8 +46,8 @@ export default function ModelTable() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const from = total === 0 ? 0 : (page - 1) * 15 + 1;
-  const to = Math.min(page * 15, total);
+  const from = total === 0 ? 0 : (page - 1) * perPage + 1;
+  const to = Math.min(page * perPage, total);
 
   const handleToggleActive = async (model) => {
     const result = await updateModel(model.id, { is_active: !model.is_active });

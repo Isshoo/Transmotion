@@ -34,7 +34,10 @@ export default function JobDetailModal() {
         toast.success("Training selesai!");
       }
       if (eventType === "error_event") {
-        useTrainingStore.setState({ currentJob: data });
+        useTrainingStore.setState((state) => ({
+          currentJob: data,
+          jobs: state.jobs.map((j) => (j.id === data.id ? data : j)),
+        }));
         toast.error("Training gagal: " + (data?.error_message ?? ""));
       }
     },
