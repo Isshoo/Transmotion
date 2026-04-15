@@ -38,8 +38,10 @@ const useClassifyStore = create((set, get) => ({
     }
   },
 
-  setSelectedModelId: (id) =>
-    set({ selectedModelId: id, result: null, error: null }),
+  setSelectedModelId: (id) => {
+    set({ selectedModelId: id, result: null, error: null });
+    get().fetchHistory();
+  },
   setInputText: (text) => set({ inputText: text, result: null, error: null }),
 
   // ── Classify ───────────────────────────────────────────────────

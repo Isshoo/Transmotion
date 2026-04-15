@@ -20,12 +20,6 @@ export default function HomePage() {
         >
           <Zap size={16} /> Coba Klasifikasi
         </Link>
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-        >
-          Masuk
-        </Link>
       </div>
 
       {/* Feature cards */}
