@@ -39,7 +39,8 @@ export default function AdminSidebar() {
             href={href}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-              pathname === href
+              pathname === href ||
+                (href !== "/admin" && pathname.startsWith(href))
                 ? "bg-blue-50 font-medium text-blue-700"
                 : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
             )}
