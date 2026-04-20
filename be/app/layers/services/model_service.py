@@ -1,6 +1,7 @@
 """TrainedModel & Prediction service"""
 
 import os
+import threading
 
 from sqlalchemy import asc, desc
 
@@ -13,14 +14,23 @@ from app.utils.logger import logger
 # ── Model cache (hindari reload tiap request) ──────────────────────────────────
 # Key: model_id, Value: (tokenizer, hf_model, label_map)
 _model_cache: dict = {}
+_model_cache_lock = threading.RLock()
 _MAX_CACHE = 3  # maksimal 3 model di RAM sekaligus
 
 
 def _evict_cache_if_needed():
-    if len(_model_cache) >= _MAX_CACHE:
-        oldest_key = next(iter(_model_cache))
-        del _model_cache[oldest_key]
-        logger.info(f"Model cache evicted: {oldest_key}")
+    with _model_cache_lock:
+        if len(_model_cache) >= _MAX_CACHE:
+            oldest_key = next(iter(_model_cache))
+            del _model_cache[oldest_key]
+            logger.info(f"Model cache evicted: {oldest_key}")
+
+
+def invalidate_model_cache(model_id: str):
+    """Panggil ini saat model diupdate/dihapus."""
+    with _model_cache_lock:
+        if model_id in _model_cache:
+            del _model_cache[model_id]
 
 
 def _load_model(model_record: TrainedModel):
@@ -72,12 +82,6 @@ def _load_model(model_record: TrainedModel):
         raise BadRequestError(f"Gagal memuat model: {e}") from None
 
 
-def invalidate_model_cache(model_id: str):
-    """Panggil ini saat model diupdate/dihapus."""
-    if model_id in _model_cache:
-        del _model_cache[model_id]
-
-
 # ── Trained Model CRUD ─────────────────────────────────────────────────────────
 
 
@@ -108,7 +112,15 @@ def get_all_models(
 
     total = query.count()
 
-    sort_col = getattr(TrainedModel, sort_by, TrainedModel.created_at)
+    sortable_columns = {
+        "created_at": TrainedModel.created_at,
+        "updated_at": TrainedModel.updated_at,
+        "name": TrainedModel.name,
+        "model_type": TrainedModel.model_type,
+        "is_active": TrainedModel.is_active,
+        "is_public": TrainedModel.is_public,
+    }
+    sort_col = sortable_columns.get(sort_by, TrainedModel.created_at)
     sort_fn = desc if sort_order == "desc" else asc
     query = query.order_by(sort_fn(sort_col))
 
@@ -163,7 +175,6 @@ def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
     Jika model ada lokal, jalankan langsung.
     """
     from flask import current_app
-    from app.layers.services import colab_service
 
     model_record = get_model_by_id(model_id)
 
@@ -205,6 +216,7 @@ def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
 def _classify_via_colab(model_record, text: str, app) -> dict:
     """Forward inference ke Colab server."""
     import requests as http_requests
+
     from app.layers.services import colab_service
 
     session = colab_service.get_active_session()
@@ -229,14 +241,16 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
                 "text": text,
             },
             headers={"X-Backend-Key": api_key},
-
             timeout=120,
         )
         res.raise_for_status()
         data = res.json()
 
-        logger.info(f"Colab response: {data}")
-        print(f"Colab response: {data}")
+        logger.info(
+            "Colab inference completed: model=%s success=%s",
+            model_record.id,
+            data.get("success"),
+        )
 
         if not data.get("success"):
             raise BadRequestError(f"Colab inference gagal: {data.get('error')}")
@@ -244,7 +258,9 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
         return data["data"]
 
     except http_requests.exceptions.Timeout:
-        raise BadRequestError("Inference timeout. Coba lagi — model mungkin sedang dimuat pertama kali.")
+        raise BadRequestError(
+            "Inference timeout. Coba lagi — model mungkin sedang dimuat pertama kali."
+        )
     except http_requests.exceptions.RequestException as e:
         raise BadRequestError(f"Gagal menghubungi Colab: {e}")
 
@@ -261,7 +277,9 @@ def _classify_local(model_record, text: str) -> dict:
 
     if model_id not in _model_cache:
         if not os.path.exists(model_record.file_path):
-            raise BadRequestError(f"File model tidak ditemukan: {model_record.file_path}")
+            raise BadRequestError(
+                f"File model tidak ditemukan: {model_record.file_path}"
+            )
 
         base = model_record.base_model_name or (
             "bert-base-multilingual-cased"
@@ -277,7 +295,7 @@ def _classify_local(model_record, text: str) -> dict:
         state_dict = torch.load(
             model_record.file_path, map_location="cpu", weights_only=True
         )
-        hf_model.load_state_dict(state_dict, strict=False)
+        hf_model.load_state_dict(state_dict)
         hf_model.eval()
 
         _evict_cache_if_needed()
@@ -286,16 +304,18 @@ def _classify_local(model_record, text: str) -> dict:
     tokenizer, hf_model = _model_cache[model_id]
 
     inputs = tokenizer(
-        text, return_tensors="pt",
-        truncation=True, max_length=512, padding=True,
+        text,
+        return_tensors="pt",
+        truncation=True,
+        max_length=512,
+        padding=True,
     )
     with torch.no_grad():
         probs = torch.softmax(hf_model(**inputs).logits, dim=1)[0]
 
     label_map = model_record.label_map or {}
     all_scores = {
-        label_map.get(str(i), str(i)): round(float(p), 4)
-        for i, p in enumerate(probs)
+        label_map.get(str(i), str(i)): round(float(p), 4) for i, p in enumerate(probs)
     }
     predicted_index = int(probs.argmax())
     return {

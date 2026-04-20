@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   BrainCircuit,
   Eye,
@@ -41,6 +41,8 @@ export default function ModelTable() {
     updateModel,
   } = useModelStore();
 
+  const [pendingToggleId, setPendingToggleId] = useState(null);
+
   useEffect(() => {
     fetchModels();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,9 +52,17 @@ export default function ModelTable() {
   const to = Math.min(page * perPage, total);
 
   const handleToggleActive = async (model) => {
-    const result = await updateModel(model.id, { is_active: !model.is_active });
-    if (result.success) toast.success(result.message);
-    else toast.error(result.message);
+    if (pendingToggleId === model.id) return;
+    setPendingToggleId(model.id);
+    try {
+      const result = await updateModel(model.id, {
+        is_active: !model.is_active,
+      });
+      if (result.success) toast.success(result.message);
+      else toast.error(result.message);
+    } finally {
+      setPendingToggleId((current) => (current === model.id ? null : current));
+    }
   };
 
   return (
@@ -231,6 +241,7 @@ export default function ModelTable() {
                         </button>
                         <button
                           onClick={() => handleToggleActive(model)}
+                          disabled={pendingToggleId === model.id}
                           title={model.is_active ? "Nonaktifkan" : "Aktifkan"}
                           className={`rounded-md p-1.5 transition ${model.is_active ? "text-gray-400 hover:bg-orange-50 hover:text-orange-500" : "text-gray-400 hover:bg-green-50 hover:text-green-600"}`}
                         >

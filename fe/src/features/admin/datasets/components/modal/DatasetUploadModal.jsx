@@ -89,7 +89,13 @@ export default function DatasetUploadModal() {
   const validate = () => {
     const e = {};
     if (!name.trim()) e.name = "Nama dataset harus diisi";
+    else if (name.trim().length > 255) {
+      e.name = "Nama dataset maksimal 255 karakter";
+    }
     if (!file) e.file = "File harus dipilih";
+    if (description.trim().length > 1000) {
+      e.description = "Deskripsi maksimal 1000 karakter";
+    }
     if (previewError) e.file = previewError;
     return e;
   };
@@ -107,12 +113,16 @@ export default function DatasetUploadModal() {
     if (description.trim()) formData.append("description", description.trim());
     formData.append("file", file);
 
-    const result = await uploadDataset(formData);
-    if (result.success) {
-      toast.success(result.message);
-      handleClose();
-    } else {
-      toast.error(result.message);
+    try {
+      const result = await uploadDataset(formData);
+      if (result.success) {
+        toast.success(result.message);
+        handleClose();
+      } else {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error("Upload gagal. Silakan coba lagi.");
     }
   };
 
@@ -128,6 +138,7 @@ export default function DatasetUploadModal() {
           </h2>
           <button
             onClick={handleClose}
+            aria-label="Tutup modal upload dataset"
             className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
           >
             <X size={18} />
@@ -178,6 +189,8 @@ export default function DatasetUploadModal() {
             </label>
             {!file ? (
               <div
+                role="button"
+                tabIndex={0}
                 onDragOver={(e) => {
                   e.preventDefault();
                   setDragOver(true);
@@ -185,6 +198,12 @@ export default function DatasetUploadModal() {
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
                 className={`cursor-pointer rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${dragOver ? "border-blue-500 bg-blue-50" : errors.file ? "border-red-400 bg-red-50" : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"}`}
               >
                 <UploadCloud size={30} className="mx-auto mb-2 text-gray-400" />

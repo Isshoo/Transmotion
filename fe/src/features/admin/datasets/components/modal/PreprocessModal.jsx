@@ -80,7 +80,7 @@ export default function PreprocessModal({ dataset, onClose }) {
             <p className="font-medium text-gray-700">
               Proses yang akan dijalankan:
             </p>
-            <ul className="list-inside list-disc space-y-0.5 text-gray-500">
+            <ul className="list-inside list-disc space-y-0.5 text-left text-gray-500">
               <li>Hapus URL, email, mention (@), hashtag (#), tag HTML</li>
               <li>Normalisasi whitespace berlebih</li>
               <li>Hapus baris yang hasilnya kosong setelah preprocessing</li>

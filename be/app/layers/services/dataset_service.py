@@ -261,12 +261,12 @@ def get_raw_data(
             mask = (
                 df[dataset.text_column]
                 .fillna("")
-                .str.contains(search, case=False, na=False)
+                .str.contains(search, case=False, na=False, regex=False)
             )
         else:
             mask = (
                 df.fillna("")
-                .apply(lambda col: col.str.contains(search, case=False, na=False))
+                .apply(lambda col: col.str.contains(search, case=False, na=False, regex=False))
                 .any(axis=1)
             )
         df = df[mask]
@@ -276,12 +276,12 @@ def get_raw_data(
         df = df[df[dataset.label_column].fillna("").str.strip() == filter_label]
 
     total = len(df)
+    df = df.iloc[::-1].reset_index(drop=True)
     start = (page - 1) * per_page
     page_df = df.iloc[start : start + per_page]
 
     # NaN → None untuk JSON dan descending order
     rows = page_df.where(pd.notna(page_df), None).to_dict(orient="records")
-    rows.reverse()
 
     return rows, total
 
@@ -297,12 +297,25 @@ def start_preprocessing(dataset_id: str, app) -> Dataset:
         raise BadRequestError(
             "Kolom teks dan label harus diatur terlebih dahulu sebelum preprocessing"
         )
-    if dataset.preprocessing_status == PreprocessingStatus.RUNNING:
-        raise BadRequestError("Preprocessing sedang berjalan")
 
-    dataset.preprocessing_status = PreprocessingStatus.RUNNING
-    dataset.preprocessing_error = None
+    updated = (
+        db.session.query(Dataset)
+        .filter(
+            Dataset.id == dataset_id,
+            Dataset.preprocessing_status != PreprocessingStatus.RUNNING,
+        )
+        .update(
+            {
+                Dataset.preprocessing_status: PreprocessingStatus.RUNNING,
+                Dataset.preprocessing_error: None,
+            },
+            synchronize_session=False,
+        )
+    )
+    if updated == 0:
+        raise BadRequestError("Preprocessing sedang berjalan")
     db.session.commit()
+    dataset = get_by_id(dataset_id)
     sse_manager.publish(f"dataset:{dataset_id}", dataset.to_dict(), event="update")
 
     def run():
@@ -382,6 +395,7 @@ def _do_preprocess(dataset_id: str):
     except Exception as e:
         logger.error(f"Preprocessing failed for {dataset_id}: {e}")
         try:
+            db.session.rollback()
             dataset = db.session.get(Dataset, dataset_id)
             if dataset:
                 dataset.preprocessing_status = PreprocessingStatus.ERROR
@@ -497,6 +511,19 @@ def update_preprocessed_row(
         cleaned = preprocessed_text.strip()
         if not cleaned:
             raise BadRequestError("Teks terpreproses tidak boleh kosong")
+        effective_label = label if (label is not None) else old_label
+        dup = (
+            db.session.query(PreprocessedRow)
+            .filter(
+                PreprocessedRow.dataset_id == dataset_id,
+                PreprocessedRow.id != row_id,
+                PreprocessedRow.preprocessed_text == cleaned,
+                PreprocessedRow.label == effective_label,
+            )
+            .first()
+        )
+        if dup:
+            raise BadRequestError("Data dengan teks dan label yang sama sudah ada")
         row.preprocessed_text = cleaned
 
     if label is not None and label != old_label:
