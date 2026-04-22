@@ -32,3 +32,21 @@ export function ProgressBar({ progress, status }) {
     </div>
   );
 }
+
+export function MetricBar({ label, value, color }) {
+  const pct = value !== null ? (value * 100).toFixed(2) : 0;
+  return (
+    <div>
+      <div className="mb-1 flex justify-between text-xs">
+        <span className="text-gray-600">{label}</span>
+        <span className="font-semibold text-gray-800">{pct}%</span>
+      </div>
+      <div className="h-2 w-full rounded-full bg-gray-100">
+        <div
+          className={`h-2 rounded-full transition-all ${color}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}

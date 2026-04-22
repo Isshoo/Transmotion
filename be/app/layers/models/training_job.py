@@ -54,6 +54,12 @@ class TrainingJob(db.Model):
     # Metrics per epoch
     epoch_logs = db.Column(JSON, nullable=True, default=list)
 
+    # Confusion matrix dan metrics per-class
+    confusion_matrix = db.Column(JSON, nullable=True)
+    per_class_metrics = db.Column(JSON, nullable=True)
+    macro_avg = db.Column(JSON, nullable=True)
+    weighted_avg = db.Column(JSON, nullable=True)
+
     # Hasil akhir
     final_accuracy = db.Column(db.Float, nullable=True)
     final_f1 = db.Column(db.Float, nullable=True)
@@ -127,6 +133,10 @@ class TrainingJob(db.Model):
             "final_f1": self.final_f1,
             "final_precision": self.final_precision,
             "final_recall": self.final_recall,
+            "confusion_matrix": self.confusion_matrix,
+            "per_class_metrics": self.per_class_metrics,
+            "macro_avg": self.macro_avg,
+            "weighted_avg": self.weighted_avg,
             "error_message": self.error_message,
             "duration_seconds": self.duration_seconds(),
             "colab_session_id": self.colab_session_id,

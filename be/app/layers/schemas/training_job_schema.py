@@ -92,6 +92,10 @@ class CompleteJobSchema(Schema):
     base_model_name = fields.String(load_default=None)
     colab_session_id = fields.String(load_default=None)
     file_path = fields.String(load_default=None)
+    confusion_matrix = fields.Str(load_default=None)
+    per_class_metrics = fields.Str(load_default=None)
+    macro_avg = fields.Str(load_default=None)
+    weighted_avg = fields.Str(load_default=None)
 
 
 class JobListQuerySchema(Schema):

@@ -150,13 +150,40 @@ def update_model(model_id: str, **kwargs) -> TrainedModel:
 
 
 def delete_model(model_id: str):
+    from flask import current_app
+
+    from app.layers.services import colab_service
+
     model = get_model_by_id(model_id)
 
+    # Jika model ada di Drive, minta Colab hapus foldernya
+    if model.file_path and model.file_path.startswith("/content/drive/"):
+        session = colab_service.get_active_session()
+        if session:
+            api_key = current_app.config.get("COLAB_API_KEY", "")
+            try:
+                import requests as http_requests
+
+                http_requests.post(
+                    f"{session['url']}/models/delete",
+                    json={"file_path": model.file_path},
+                    headers={"X-Backend-Key": api_key},
+                    timeout=30,
+                )
+                logger.info(f"Drive folder deletion requested: {model.file_path}")
+            except Exception as e:
+                logger.warning(f"Failed to delete Drive folder: {e}")
+        else:
+            logger.warning(
+                f"Colab offline — Drive folder not deleted: {model.file_path}"
+            )
+
+    # Hapus file lokal jika ada (classifier weights)
     if model.file_path and os.path.exists(model.file_path):
         try:
             os.remove(model.file_path)
         except Exception as e:
-            logger.warning(f"Failed to delete model file: {e}")
+            logger.warning(f"Failed to delete local file: {e}")
 
     invalidate_model_cache(model_id)
     db.session.delete(model)

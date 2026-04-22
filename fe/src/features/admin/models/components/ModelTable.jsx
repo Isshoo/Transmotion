@@ -18,6 +18,7 @@ import ModelDetailModal from "./modal/ModelDetailModal";
 import EditModelModal from "./modal/EditModelModal";
 import DeleteConfirmModal from "./modal/EditConfirmModal";
 import { MetricPill } from "./ui/Pill";
+import Link from "next/link";
 
 export default function ModelTable() {
   const {
@@ -225,13 +226,13 @@ export default function ModelTable() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openDetailModal(model)}
+                        <Link
+                          href={`/admin/models/${model.id}`}
                           title="Detail"
                           className="rounded-md p-1.5 text-gray-400 transition hover:bg-blue-50 hover:text-blue-600"
                         >
                           <Eye size={14} />
-                        </button>
+                        </Link>
                         <button
                           onClick={() => openEditModal(model)}
                           title="Edit"

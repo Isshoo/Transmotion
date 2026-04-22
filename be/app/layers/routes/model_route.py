@@ -47,6 +47,18 @@ def delete_model(model_id):
     return model_controller.delete_model(model_id)
 
 
+@model_bp.route("/evaluation/datasets", methods=["GET"])
+@jwt_required_custom
+def get_evaluation_datasets():
+    return model_controller.get_evaluation_datasets()
+
+
+@model_bp.route("/evaluation/compare", methods=["GET"])
+@jwt_required_custom
+def get_evaluation_compare():
+    return model_controller.get_evaluation_compare()
+
+
 # ── Classification routes ──────────────────────────────────────────────────────
 
 
@@ -55,6 +67,12 @@ def delete_model(model_id):
 def classify():
     """Klasifikasi teks — bisa diakses tanpa login (opsional)."""
     return model_controller.classify()
+
+
+@prediction_bp.route("/classify/batch", methods=["POST"])
+@optional_jwt
+def classify_batch():
+    return model_controller.classify_batch()
 
 
 @prediction_bp.route("", methods=["GET"])

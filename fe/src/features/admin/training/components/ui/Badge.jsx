@@ -133,3 +133,43 @@ export function DetailStatusBadge({ status }) {
     </span>
   );
 }
+
+const STATUS_CONFIG = {
+  queued: {
+    label: "Menunggu Colab",
+    cls: "bg-gray-100 text-gray-600",
+    icon: Clock,
+  },
+  running: {
+    label: "Sedang Training",
+    cls: "bg-blue-100 text-blue-700",
+    icon: Loader2,
+  },
+  completed: {
+    label: "Selesai",
+    cls: "bg-green-100 text-green-700",
+    icon: CheckCircle,
+  },
+  failed: { label: "Gagal", cls: "bg-red-100 text-red-600", icon: XCircle },
+  cancelled: {
+    label: "Dibatalkan",
+    cls: "bg-gray-100 text-gray-500",
+    icon: Ban,
+  },
+};
+
+export function TrainingStatusBadge({ status }) {
+  const {
+    label,
+    cls,
+    icon: Icon,
+  } = STATUS_CONFIG[status] ?? STATUS_CONFIG.queued;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${cls}`}
+    >
+      <Icon size={14} className={status === "running" ? "animate-spin" : ""} />
+      {label}
+    </span>
+  );
+}

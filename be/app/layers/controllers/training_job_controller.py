@@ -3,6 +3,7 @@
 from flask import request
 from marshmallow import ValidationError
 
+from app.config.extensions import db
 from app.layers.schemas.training_job_schema import (
     CompleteJobSchema,
     CreateTrainingJobSchema,
@@ -49,6 +50,39 @@ def get_job(job_id):
     return success_response(
         data=job.to_dict(include_model=True),
         message="Detail job berhasil diambil",
+    )
+
+
+def get_active_job():
+    """
+    Ambil:
+    - Job yang sedang queued/running (prioritas utama)
+    - Jika tidak ada, ambil job terakhir yang completed/failed
+    """
+    from sqlalchemy import desc
+
+    from app.layers.models.training_job import JobStatus, TrainingJob
+
+    # Cari job aktif
+    active = (
+        db.session.query(TrainingJob)
+        .filter(TrainingJob.status.in_([JobStatus.QUEUED, JobStatus.RUNNING]))
+        .order_by(TrainingJob.created_at.desc())
+        .first()
+    )
+    if active:
+        return success_response(
+            data=active.to_dict(include_model=True),
+            message="Job aktif ditemukan",
+        )
+
+    # Cari job terakhir
+    latest = (
+        db.session.query(TrainingJob).order_by(desc(TrainingJob.created_at)).first()
+    )
+    return success_response(
+        data=latest.to_dict(include_model=True) if latest else None,
+        message="Job terakhir",
     )
 
 

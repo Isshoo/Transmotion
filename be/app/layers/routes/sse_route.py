@@ -166,6 +166,56 @@ def stream_job(job_id):
     return _make_sse_response(generate)
 
 
+@sse_bp.route("/training-active")
+@sse_auth_required
+def stream_active_job():
+    """
+    Stream untuk halaman training.
+    Otomatis follow job yang aktif.
+    """
+
+    def generate():
+        from sqlalchemy import desc
+
+        from app.layers.models.training_job import JobStatus, TrainingJob
+
+        # Kirim state awal
+        active = (
+            db.session.query(TrainingJob)
+            .filter(TrainingJob.status.in_([JobStatus.QUEUED, JobStatus.RUNNING]))
+            .order_by(TrainingJob.created_at.desc())
+            .first()
+        )
+        latest = active or (
+            db.session.query(TrainingJob).order_by(desc(TrainingJob.created_at)).first()
+        )
+
+        yield sse_manager._format(
+            latest.to_dict(include_model=True) if latest else {}, "init"
+        )
+
+        if latest and latest.status in (
+            JobStatus.COMPLETED,
+            JobStatus.FAILED,
+            JobStatus.CANCELLED,
+        ):
+            return
+
+        channel = "jobs:list"
+        q = sse_manager.subscribe(channel)
+        try:
+            while True:
+                try:
+                    msg = q.get(timeout=PING_TIMEOUT)
+                    yield msg
+                except queue.Empty:
+                    yield sse_manager.ping()
+        finally:
+            sse_manager.unsubscribe(channel, q)
+
+    return _make_sse_response(generate)
+
+
 # ── Training jobs list stream ──────────────────────────────────────────────────
 
 
@@ -221,6 +271,7 @@ def stream_colab_status():
     - Langsung kirim status terkini saat connect (bukan hanya saat ada event)
     - Kirim ulang status terkini setiap ping timeout
     """
+
     def generate():
         from app.layers.services import colab_service
 

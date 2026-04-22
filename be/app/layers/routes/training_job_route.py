@@ -59,6 +59,13 @@ def get_job(job_id):
     return training_job_controller.get_job(job_id)
 
 
+@training_job_bp.route("/active", methods=["GET"])
+@jwt_required_custom
+def get_active_job():
+    """Ambil job yang sedang aktif (queued/running) atau terakhir selesai."""
+    return training_job_controller.get_active_job()
+
+
 @training_job_bp.route("/split-preview", methods=["POST"])
 @admin_required
 def split_preview():
@@ -122,7 +129,9 @@ def colab_get_preprocessed_data(dataset_id):
     Menggunakan X-Colab-Key, bukan JWT.
     """
     from app.layers.controllers import dataset_controller
+
     return dataset_controller.get_preprocessed_data(dataset_id)
+
 
 @colab_bp.route("/jobs/<job_id>/running", methods=["POST"])
 @_colab_key_required

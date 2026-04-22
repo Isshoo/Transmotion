@@ -263,6 +263,22 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
         except Exception:
             label_map = {}
 
+    # Parse JSON fields evaluasi
+    def parse_json_field(val):
+        if not val:
+            return None
+        if isinstance(val, (dict, list)):
+            return val
+        try:
+            return json.loads(val)
+        except Exception:
+            return None
+
+    confusion_matrix = parse_json_field(data.get("confusion_matrix"))
+    per_class_metrics = parse_json_field(data.get("per_class_metrics"))
+    macro_avg = parse_json_field(data.get("macro_avg"))
+    weighted_avg = parse_json_field(data.get("weighted_avg"))
+
     trained_model = TrainedModel(
         name=data.get("model_name", f"Model dari job {job_id[:8]}"),
         model_type=job.model_type.value,
@@ -289,6 +305,10 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
     job.final_f1 = data.get("f1_score")
     job.final_precision = data.get("precision")
     job.final_recall = data.get("recall")
+    job.confusion_matrix = confusion_matrix
+    job.per_class_metrics = per_class_metrics
+    job.macro_avg = macro_avg
+    job.weighted_avg = weighted_avg
     if data.get("colab_session_id"):
         job.colab_session_id = data["colab_session_id"]
 

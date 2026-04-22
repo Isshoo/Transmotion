@@ -9,6 +9,8 @@ import {
   Database,
   BrainCircuit,
   Cpu,
+  FlaskConical,
+  BarChart2,
 } from "lucide-react";
 import { cn } from "@/libs/utils";
 import useAuthStore from "@/features/auth/store";
@@ -19,6 +21,8 @@ const navItems = [
   { label: "Dataset", href: "/admin/datasets", icon: Database },
   { label: "Training", href: "/admin/training", icon: BrainCircuit },
   { label: "Model", href: "/admin/models", icon: Cpu },
+  { label: "Testing", href: "/admin/testing", icon: FlaskConical },
+  { label: "Evaluasi", href: "/admin/evaluation", icon: BarChart2 },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

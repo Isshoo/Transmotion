@@ -1,11 +1,11 @@
-import TrainingJobTable from "@/features/admin/training/components/TrainingJobTable";
+import TrainingPageComponent from "@/features/admin/training/components/TrainingPage";
 
-export const metadata = { title: "Training Job" };
+export const metadata = { title: "Training Model" };
 
 export default function TrainingPage() {
   return (
     <div className="space-y-6">
-      <TrainingJobTable />
+      <TrainingPageComponent />
     </div>
   );
 }

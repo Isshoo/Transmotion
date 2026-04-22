@@ -1,112 +1,147 @@
 import { create } from "zustand";
 import trainingApi from "./api";
+import datasetsApi from "@/features/admin/datasets/api";
 import { getErrorMessage } from "@/helpers/error";
 
 const useTrainingStore = create((set, get) => ({
-  // ── List ───────────────────────────────────────────────────────
-  jobs: [],
-  total: 0,
-  totalPages: 0,
-  page: 1,
-  perPage: 15,
-  statusFilter: "",
-  modelTypeFilter: "",
-  isLoading: false,
+  // ── View state ─────────────────────────────────────────────
+  // "form" | "progress" | "result"
+  view: "form",
 
-  // ── Detail ─────────────────────────────────────────────────────
-  currentJob: null,
-  isLoadingDetail: false,
+  // ── Form ───────────────────────────────────────────────────
+  datasets: [],
+  isLoadingDatasets: false,
+  selectedDatasetId: "",
+  testSize: 0.2,
+  modelType: "mbert",
+  jobName: "",
+  hyperparams: {
+    learning_rate: 2e-5,
+    epochs: 3,
+    batch_size: 16,
+    max_length: 256,
+    warmup_steps: 0.1,
+    weight_decay: 0.01,
+  },
 
-  // ── Split preview ──────────────────────────────────────────────
+  // ── Split preview ──────────────────────────────────────────
   splitPreview: null,
   isLoadingPreview: false,
 
-  // ── UI ─────────────────────────────────────────────────────────
+  // ── Active job (progress / result) ─────────────────────────
+  activeJob: null,
+  isLoadingActive: false,
+
+  // ── UI ─────────────────────────────────────────────────────
   isSubmitting: false,
-  isCreateModalOpen: false,
-  isDetailModalOpen: false,
-  isCancelModalOpen: false,
-  cancelTarget: null,
 
-  // ── List actions ───────────────────────────────────────────────
-  fetchJobs: async () => {
-    const { page, perPage, statusFilter, modelTypeFilter } = get();
-    if (get().jobs.length === 0) {
-      set({ isLoading: true });
-    }
+  // ── Init: cek apakah ada job aktif saat masuk halaman ──────
+  init: async () => {
+    // Selalu reset form ke default
+    set({
+      view: "form",
+      selectedDatasetId: "",
+      testSize: 0.2,
+      modelType: "mbert",
+      jobName: "",
+      splitPreview: null,
+      hyperparams: {
+        learning_rate: 2e-5,
+        epochs: 3,
+        batch_size: 16,
+        max_length: 256,
+        warmup_steps: 0.1,
+        weight_decay: 0.01,
+      },
+    });
+
+    // Load datasets
+    get().fetchDatasets();
+
+    // Cek apakah ada job yang sedang berjalan
     try {
-      const params = { page, per_page: perPage };
-      if (statusFilter) params.status = statusFilter;
-      if (modelTypeFilter) params.model_type = modelTypeFilter;
-      const { data: res } = await trainingApi.getAll(params);
-      set({
-        jobs: res.data,
-        total: res.meta?.pagination?.total ?? 0,
-        totalPages: res.meta?.pagination?.total_pages ?? 1,
-        isLoading: false,
+      const { data: res } = await trainingApi.getActive();
+      const job = res.data;
+      if (job && ["queued", "running"].includes(job.status)) {
+        set({ activeJob: job, view: "progress" });
+      } else if (job && job.status === "completed") {
+        // Ada job selesai — tampilkan result tapi tetap bisa reset
+        // (opsional: comment baris ini jika tidak mau tampilkan result lama)
+        // set({ activeJob: job, view: "result" });
+      }
+    } catch {
+      // Tidak ada job aktif, tetap di form
+    }
+  },
+
+  resetToForm: () => {
+    set({
+      view: "form",
+      activeJob: null,
+      selectedDatasetId: "",
+      testSize: 0.2,
+      modelType: "mbert",
+      jobName: "",
+      splitPreview: null,
+      hyperparams: {
+        learning_rate: 2e-5,
+        epochs: 3,
+        batch_size: 16,
+        max_length: 256,
+        warmup_steps: 0.1,
+        weight_decay: 0.01,
+      },
+    });
+  },
+
+  // ── Datasets ───────────────────────────────────────────────
+  fetchDatasets: async () => {
+    set({ isLoadingDatasets: true });
+    try {
+      const { data: res } = await datasetsApi.getAll({
+        per_page: 100,
+        sort_by: "created_at",
+        sort_order: "desc",
       });
+      const ready = (res.data ?? []).filter(
+        (d) =>
+          d.preprocessing_status === "completed" &&
+          (d.num_rows_preprocessed ?? 0) > 0
+      );
+      set({ datasets: ready, isLoadingDatasets: false });
     } catch {
-      set({ isLoading: false });
+      set({ isLoadingDatasets: false });
     }
   },
 
-  setPage: (page) => {
-    set({ page });
-    get().fetchJobs();
-  },
-  setStatusFilter: (statusFilter) => {
-    set({ statusFilter, page: 1 });
-    get().fetchJobs();
-  },
-  setModelTypeFilter: (modelTypeFilter) => {
-    set({ modelTypeFilter, page: 1 });
-    get().fetchJobs();
+  // ── Form setters ───────────────────────────────────────────
+  setSelectedDatasetId: (id) => {
+    set({ selectedDatasetId: id, splitPreview: null });
+    if (id) get().fetchSplitPreview(id, get().testSize);
   },
 
-  // ── Detail actions ─────────────────────────────────────────────
-  fetchJob: async (id) => {
-    set({ isLoadingDetail: true });
-    try {
-      const { data: res } = await trainingApi.getById(id);
-      set({ currentJob: res.data, isLoadingDetail: false });
-      return res.data;
-    } catch {
-      set({ isLoadingDetail: false });
-      return null;
-    }
+  setTestSize: (v) => {
+    set({ testSize: v });
+    const { selectedDatasetId } = get();
+    if (selectedDatasetId) get().fetchSplitPreview(selectedDatasetId, v);
   },
 
-  refreshJob: async (id) => {
-    try {
-      const { data: res } = await trainingApi.getById(id);
-      set({ currentJob: res.data });
-      // Update juga di list
-      set((state) => ({
-        jobs: state.jobs.map((j) => (j.id === id ? res.data : j)),
-      }));
-      return res.data;
-    } catch {
-      return null;
-    }
-  },
+  setModelType: (v) => set({ modelType: v }),
+  setJobName: (v) => set({ jobName: v }),
+  setHyperparam: (key, value) =>
+    set((state) => ({
+      hyperparams: { ...state.hyperparams, [key]: value },
+    })),
 
-  // ── Split preview ──────────────────────────────────────────────
+  // ── Split preview ──────────────────────────────────────────
   fetchSplitPreview: async (datasetId, testSize) => {
-    if (!datasetId || !testSize) {
-      set({ splitPreview: null });
-      return null;
-    }
-    const { splitPreview } = get();
-    if (splitPreview === null) {
-      set({ isLoadingPreview: true });
-    }
+    set({ isLoadingPreview: true });
     try {
       const { data: res } = await trainingApi.splitPreview({
         dataset_id: datasetId,
         test_size: testSize,
       });
       set({ splitPreview: res.data, isLoadingPreview: false });
-      return res.data;
     } catch (err) {
       set({
         splitPreview: {
@@ -115,46 +150,58 @@ const useTrainingStore = create((set, get) => ({
         },
         isLoadingPreview: false,
       });
-      return null;
     }
   },
 
-  clearSplitPreview: () => set({ splitPreview: null }),
+  // ── Submit ─────────────────────────────────────────────────
+  createJob: async () => {
+    const { selectedDatasetId, testSize, modelType, jobName, hyperparams } =
+      get();
 
-  // ── CRUD ───────────────────────────────────────────────────────
-  createJob: async (payload) => {
     set({ isSubmitting: true });
     try {
-      const { data: res } = await trainingApi.create(payload);
-      await get().fetchJobs();
-      return { success: true, message: res.message, data: res.data };
+      const { data: res } = await trainingApi.create({
+        dataset_id: selectedDatasetId,
+        model_type: modelType,
+        test_size: testSize,
+        job_name: jobName.trim() || undefined,
+        ...hyperparams,
+      });
+      set({
+        activeJob: res.data,
+        view: "progress",
+        isSubmitting: false,
+      });
+      return { success: true };
     } catch (err) {
-      return { success: false, message: getErrorMessage(err) };
-    } finally {
       set({ isSubmitting: false });
+      return { success: false, message: getErrorMessage(err) };
     }
   },
 
-  cancelJob: async (id) => {
+  // ── SSE update ─────────────────────────────────────────────
+  setActiveJob: (job) => {
+    if (!job) return;
+    set({ activeJob: job });
+    if (job.status === "completed" || job.status === "failed") {
+      set({ view: "result" });
+    }
+  },
+
+  // ── Cancel ─────────────────────────────────────────────────
+  cancelJob: async () => {
+    const { activeJob } = get();
+    if (!activeJob) return;
     set({ isSubmitting: true });
     try {
-      const { data: res } = await trainingApi.cancel(id);
-      await get().fetchJobs();
+      const { data: res } = await trainingApi.cancel(activeJob.id);
+      set({ activeJob: res.data, view: "result", isSubmitting: false });
       return { success: true, message: res.message };
     } catch (err) {
-      return { success: false, message: getErrorMessage(err) };
-    } finally {
       set({ isSubmitting: false });
+      return { success: false, message: getErrorMessage(err) };
     }
   },
-
-  // ── Modal ──────────────────────────────────────────────────────
-  openCreateModal: () => set({ isCreateModalOpen: true, splitPreview: null }),
-  closeCreateModal: () => set({ isCreateModalOpen: false, splitPreview: null }),
-  openDetailModal: (job) => set({ currentJob: job, isDetailModalOpen: true }),
-  closeDetailModal: () => set({ isDetailModalOpen: false }),
-  openCancelModal: (job) => set({ cancelTarget: job, isCancelModalOpen: true }),
-  closeCancelModal: () => set({ cancelTarget: null, isCancelModalOpen: false }),
 }));
 
 export default useTrainingStore;

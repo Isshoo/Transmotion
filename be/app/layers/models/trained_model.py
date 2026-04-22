@@ -75,6 +75,14 @@ class TrainedModel(db.Model):
         return bool(self.file_path and self.file_path.startswith("/content/drive/"))
 
     def to_dict(self, include_job=False):
+        job = self.job
+
+        confusion_matrix = job.confusion_matrix if job else None
+        per_class_metrics = job.per_class_metrics if job else None
+        macro_avg = job.macro_avg if job else None
+        weighted_avg = job.weighted_avg if job else None
+        epoch_logs = job.epoch_logs if job else None
+
         data = {
             "id": self.id,
             "name": self.name,
@@ -83,30 +91,40 @@ class TrainedModel(db.Model):
             "base_model_name": self.base_model_name,
             "label_map": self.label_map,
             "num_labels": self.num_labels,
+            "training_config": self.training_config,
             "accuracy": self.accuracy,
             "f1_score": self.f1_score,
             "precision": self.precision,
             "recall": self.recall,
-            "training_config": self.training_config,
+            # Evaluation data — dari kolom sendiri atau fallback ke job
+            "confusion_matrix": confusion_matrix,
+            "per_class_metrics": per_class_metrics,
+            "macro_avg": macro_avg,
+            "weighted_avg": weighted_avg,
+            "epoch_logs": epoch_logs,
+            # File info
+            "file_path": self.file_path,
             "file_size": self.file_size,
+            "is_drive_model": self.is_drive_model(),
+            # Status
             "is_active": self.is_active,
             "is_public": self.is_public,
             "job_id": self.job_id,
             "prediction_count": self.predictions.count(),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "is_drive_model": self.is_drive_model(),
         }
-        if include_job and self.job:
+
+        if include_job and job:
             data["job"] = {
-                "id": self.job.id,
-                "dataset_name": self.job.dataset.name if self.job.dataset else None,
-                "started_at": self.job.started_at.isoformat()
-                if self.job.started_at
-                else None,
-                "finished_at": self.job.finished_at.isoformat()
-                if self.job.finished_at
-                else None,
-                "duration_seconds": self.job.duration_seconds(),
+                "id": job.id,
+                "dataset_id": job.dataset_id,
+                "dataset_name": job.dataset.name if job.dataset else None,
+                "split_info": job.split_info,
+                "started_at": job.started_at.isoformat() if job.started_at else None,
+                "finished_at": job.finished_at.isoformat() if job.finished_at else None,
+                "duration_seconds": job.duration_seconds(),
+                "epoch_logs": job.epoch_logs or [],
             }
+
         return data
