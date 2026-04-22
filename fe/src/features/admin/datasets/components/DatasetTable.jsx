@@ -124,7 +124,7 @@ export default function DatasetTable() {
                   "Baris (Raw)",
                   "Baris (Preprocessed)",
                   "Ukuran",
-                  "Status Preprocessing",
+                  "Status",
                   "Diupload",
                 ].map((h) => (
                   <th

@@ -17,6 +17,8 @@ export default function TestingPage() {
     inputText,
     csvTexts,
     csvFileName,
+    csvHeaders,
+    selectedTextColumn,
     results,
     batchErrors,
     isClassifying,
@@ -28,6 +30,7 @@ export default function TestingPage() {
     setInputMode,
     setInputText,
     setCsvFile,
+    setSelectedTextColumn,
     classify,
     clearResults,
   } = useTestingStore();
@@ -51,7 +54,7 @@ export default function TestingPage() {
       return;
     }
     await setCsvFile(file);
-    toast.success(`${file.name} dimuat — ${csvTexts.length} teks ditemukan`);
+    toast.success(`${file.name} dimuat`);
   };
 
   const canClassify =
@@ -212,7 +215,7 @@ export default function TestingPage() {
               </div>
             </div>
           ) : (
-            <div>
+            <div className="space-y-4">
               {!csvFileName ? (
                 <div
                   onClick={() => fileInputRef.current?.click()}
@@ -229,32 +232,58 @@ export default function TestingPage() {
                     </span>
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
-                    Kolom pertama akan digunakan sebagai teks · Maks 500 baris
+                    Maks 500 baris
                   </p>
                 </div>
               ) : (
-                <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <FileText size={18} className="text-green-600" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">
-                        {csvFileName}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {csvTexts.length} baris ditemukan
-                      </p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <FileText size={18} className="text-green-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">
+                          {csvFileName}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {csvTexts.length} baris teks valid ditemukan
+                        </p>
+                      </div>
                     </div>
+                    <button
+                      onClick={() => {
+                        setCsvFile(null);
+                        clearResults();
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="rounded-lg p-1 text-gray-400 transition hover:bg-white hover:text-gray-600"
+                    >
+                      <X size={15} />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      setCsvFile(null);
-                      clearResults();
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    className="rounded-lg p-1 text-gray-400 transition hover:bg-white hover:text-gray-600"
-                  >
-                    <X size={15} />
-                  </button>
+
+                  {/* Column Selection */}
+                  {csvHeaders.length > 0 && (
+                    <div className="rounded-xl border border-gray-200 bg-white p-4">
+                      <label className="mb-2 block text-sm font-medium text-gray-700">
+                        Pilih Kolom Teks
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {csvHeaders.map((header, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedTextColumn(idx)}
+                            className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                              selectedTextColumn === idx
+                                ? "border-blue-500 bg-blue-50 text-blue-700"
+                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                            }`}
+                          >
+                            {header || `Kolom ${idx + 1}`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               <input

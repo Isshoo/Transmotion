@@ -12,8 +12,11 @@ const useTestingStore = create((set, get) => ({
   selectedModelId: "",
   inputMode: "single", // "single" | "csv"
   inputText: "",
-  csvTexts: [], // [{row: 1, text: "..."}, ...]
+  csvTexts: [], // [{row: 1, text: "..."}, ...] (final texts to classify)
   csvFileName: "",
+  csvHeaders: [],
+  csvRows: [], // [[col1, col2, ...], ...]
+  selectedTextColumn: null, // index of column
 
   // ── Results ────────────────────────────────────────────────
   results: [],
@@ -60,42 +63,78 @@ const useTestingStore = create((set, get) => ({
 
   // ── Parse CSV ───────────────────────────────────────────────
   parseCsvFile: async (file) => {
+    if (!file) return { headers: [], rows: [] };
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target.result;
         const lines = text.split(/\r?\n/).filter((l) => l.trim());
-        // Coba deteksi kolom teks (ambil kolom pertama non-header)
-        const delimiter = text.includes("\t") ? "\t" : ",";
-        const rows = lines.map((line) => {
-          const cols = line.split(delimiter);
-          return cols[0]?.replace(/^["']|["']$/g, "").trim() || "";
+        if (lines.length === 0) {
+          resolve({ headers: [], rows: [] });
+          return;
+        }
+
+        const delimiter = text.includes("\t") ? "\t" : text.includes(";") ? ";" : ",";
+        
+        // Parse all rows
+        const allRows = lines.map((line) => {
+          // Simple CSV split (doesn't handle quoted delimiters perfectly but usually enough)
+          return line.split(delimiter).map(c => c.replace(/^["']|["']$/g, "").trim());
         });
 
-        // Skip baris pertama jika terlihat seperti header
-        const firstRow = rows[0]?.toLowerCase();
-        const isHeader =
-          firstRow === "text" || firstRow === "teks" || firstRow === "content";
-        const data = isHeader ? rows.slice(1) : rows;
+        const headers = allRows[0];
+        const rows = allRows.slice(1);
 
-        resolve(
-          data
-            .filter((t) => t.length > 0)
-            .map((text, i) => ({ row: i + 1, text }))
-        );
+        resolve({ headers, rows });
       };
       reader.readAsText(file, "UTF-8");
     });
   },
 
   setCsvFile: async (file) => {
-    const texts = await get().parseCsvFile(file);
-    set({ csvTexts: texts, csvFileName: file.name, results: [] });
+    if (!file) {
+      set({ 
+        csvTexts: [], 
+        csvFileName: "", 
+        csvHeaders: [], 
+        csvRows: [], 
+        selectedTextColumn: null,
+        results: [] 
+      });
+      return;
+    }
+    const { headers, rows } = await get().parseCsvFile(file);
+    set({ 
+      csvHeaders: headers, 
+      csvRows: rows, 
+      csvFileName: file.name, 
+      results: [],
+      selectedTextColumn: headers.length > 0 ? 0 : null, // Default to first column
+    });
+    
+    // Automatically prepare csvTexts if column is selected
+    get().updateCsvTexts(0);
+  },
+
+  updateCsvTexts: (columnIndex) => {
+    const { csvRows } = get();
+    const texts = csvRows
+      .map((row, i) => ({ 
+        row: i + 1, 
+        text: row[columnIndex] || "" 
+      }))
+      .filter(item => item.text.length > 0);
+    
+    set({ csvTexts: texts, selectedTextColumn: columnIndex });
+  },
+
+  setSelectedTextColumn: (index) => {
+    get().updateCsvTexts(index);
   },
 
   // ── Classify ───────────────────────────────────────────────
   classify: async () => {
-    const { selectedModelId, inputMode, inputText, csvTexts } = get();
+    const { selectedModelId, inputMode, inputText, csvTexts, selectedTextColumn } = get();
     if (!selectedModelId) return;
 
     set({ isClassifying: true, results: [], batchErrors: [], error: null });
@@ -113,8 +152,11 @@ const useTestingStore = create((set, get) => ({
         set({ results: [res.data] });
       } else {
         if (csvTexts.length === 0) {
+          const msg = selectedTextColumn === null 
+            ? "Pilih kolom teks terlebih dahulu" 
+            : "Upload file CSV terlebih dahulu atau kolom yang dipilih kosong";
           set({
-            error: "Upload file CSV terlebih dahulu",
+            error: msg,
             isClassifying: false,
           });
           return;

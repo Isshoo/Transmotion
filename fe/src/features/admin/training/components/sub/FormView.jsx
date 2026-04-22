@@ -60,7 +60,7 @@ export default function FormView() {
       {/* ── Step 1: Pilih Dataset ────────────────────────────── */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <p className="mb-1 text-sm font-semibold text-gray-800">
-          1. Pilih Dataset
+          Pilih Dataset
         </p>
         <p className="mb-4 text-xs text-gray-400">
           Hanya dataset yang sudah dipreprocess yang ditampilkan.
@@ -122,7 +122,7 @@ export default function FormView() {
       {selectedDatasetId && (
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <p className="mb-1 text-sm font-semibold text-gray-800">
-            2. Pembagian Data
+            Pembagian Data
           </p>
           <p className="mb-4 text-xs text-gray-400">
             Tentukan proporsi data yang digunakan untuk testing.
@@ -161,7 +161,7 @@ export default function FormView() {
       {/* ── Step 3: Pilih Model ──────────────────────────────── */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <p className="mb-1 text-sm font-semibold text-gray-800">
-          3. Arsitektur Model
+          Arsitektur Model
         </p>
         <p className="mb-4 text-xs text-gray-400">
           Pilih model transformer yang akan di-fine-tune.
@@ -197,7 +197,7 @@ export default function FormView() {
       {/* ── Step 4: Hyperparameter ───────────────────────────── */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <p className="mb-1 text-sm font-semibold text-gray-800">
-          4. Hyperparameter
+          Hyperparameter
         </p>
         <p className="mb-4 text-xs text-gray-400">
           Konfigurasi proses training. Default sudah dioptimalkan.
@@ -311,8 +311,8 @@ export default function FormView() {
               <input
                 type="number"
                 min={0}
-                max={1000}
-                step={50}
+                max={1}
+                step={0.1}
                 value={hyperparams.warmup_steps}
                 onChange={(e) =>
                   setHyperparam("warmup_steps", Number(e.target.value))

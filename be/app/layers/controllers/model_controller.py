@@ -57,7 +57,8 @@ def get_model(model_id):
 
 
 def get_active_models():
-    models = model_service.get_active_models()
+    model_type = request.args.get("model_type")
+    models = model_service.get_active_models(model_type=model_type)
     return success_response(
         data=[
             {

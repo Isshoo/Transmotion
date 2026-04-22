@@ -128,14 +128,15 @@ def get_all_models(
     return models, total
 
 
-def get_active_models():
+def get_active_models(model_type=None):
     """Untuk dropdown klasifikasi — hanya model aktif & publik."""
-    return (
+    query = (
         db.session.query(TrainedModel)
         .filter(TrainedModel.is_active, TrainedModel.is_public)
-        .order_by(desc(TrainedModel.created_at))
-        .all()
     )
+    if model_type:
+        query = query.filter(TrainedModel.model_type == model_type)
+    return query.order_by(desc(TrainedModel.created_at)).all()
 
 
 def update_model(model_id: str, **kwargs) -> TrainedModel:
