@@ -23,7 +23,7 @@ export default function IterationTable({ mbert, xlmr, metric = "f1_score" }) {
   // Hitung rata-rata per split per model type
   const average = (models, testSize) => {
     const filtered = findModelsBySplit(models, testSize).filter(
-      (m) => m[metric] !== null
+      (m) => m[metric] != null
     );
     if (filtered.length === 0) return null;
     return filtered.reduce((a, m) => a + m[metric], 0) / filtered.length;

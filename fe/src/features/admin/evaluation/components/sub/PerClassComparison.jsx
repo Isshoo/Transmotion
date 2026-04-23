@@ -73,14 +73,14 @@ export default function PerClassComparison({ mbert, xlmr }) {
                     <td
                       key={`xlmr-${metric}`}
                       className={`border border-gray-200 px-3 py-2 text-center font-medium ${
-                        xm?.[metric] !== null &&
-                        bm?.[metric] !== null &&
+                        xm?.[metric] != null &&
+                        bm?.[metric] != null &&
                         xm[metric] > bm[metric]
                           ? "bg-green-50 text-green-700"
                           : "text-gray-700"
                       }`}
                     >
-                      {xm?.[metric] !== null
+                      {xm?.[metric] != null
                         ? `${(xm[metric] * 100).toFixed(2)}%`
                         : "—"}
                     </td>
@@ -89,14 +89,14 @@ export default function PerClassComparison({ mbert, xlmr }) {
                     <td
                       key={`mbert-${metric}`}
                       className={`border border-gray-200 px-3 py-2 text-center font-medium ${
-                        bm?.[metric] !== null &&
-                        xm?.[metric] !== null &&
+                        bm?.[metric] != null &&
+                        xm?.[metric] != null &&
                         bm[metric] > xm[metric]
                           ? "bg-green-50 text-green-700"
                           : "text-gray-700"
                       }`}
                     >
-                      {bm?.[metric] !== null
+                      {bm?.[metric] != null
                         ? `${(bm[metric] * 100).toFixed(2)}%`
                         : "—"}
                     </td>

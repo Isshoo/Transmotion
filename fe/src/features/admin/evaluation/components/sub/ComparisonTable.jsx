@@ -56,9 +56,9 @@ export default function ComparisonTable({ mbert, xlmr }) {
         <tbody>
           {rows.map(({ label, xlmrVal, mbertVal }) => {
             const xlmrWins =
-              xlmrVal !== null && mbertVal !== null && xlmrVal > mbertVal;
+              xlmrVal != null && mbertVal != null && xlmrVal > mbertVal;
             const mbertWins =
-              xlmrVal !== null && mbertVal !== null && mbertVal > xlmrVal;
+              xlmrVal != null && mbertVal != null && mbertVal > xlmrVal;
 
             return (
               <tr key={label} className="hover:bg-gray-50">

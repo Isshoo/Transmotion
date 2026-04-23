@@ -42,8 +42,8 @@ const eslintConfig = defineConfig([
       // React — tidak perlu import React di setiap file (Next.js sudah handle)
       "react/react-in-jsx-scope": "off",
 
-      // Konsistensi — gunakan === bukan ==
-      eqeqeq: ["error", "always"],
+      // Konsistensi — gunakan === bukan == (kecuali untuk cek null/undefined)
+      eqeqeq: ["error", "always", { null: "ignore" }],
 
       // Hindari var, pakai const/let
       "no-var": "error",
