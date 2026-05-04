@@ -66,6 +66,9 @@ create-admin:
 data-prep:
 	$(PYTHON) scripts/dataset/preprocess_dataset.py
 
+scrape:
+	bash scripts/dataset/harvestscrape.sh
+
 # Kualitas Kode
 lint:
 	$(RUFF) check .
