@@ -16,14 +16,14 @@ import {
 import { toast } from "sonner";
 import useUsersStore from "../store";
 import useAuthStore from "@/features/auth/store";
-import UserFormModal from "./UserFormModal";
 import { formatDate } from "@/helpers/formatter";
-import DeleteUserModal from "./DeleteUserModal";
+import UserFormModal from "./modal/UserFormModal";
+import DeleteUserModal from "./modal/DeleteUserModal";
 import Avatar from "./ui/Avatar";
 import { RoleBadge, StatusBadge, VerifiedBadge } from "./ui/Badge";
 import { ActionButton, PaginationButton } from "./ui/Button";
-import buildPageRange from "../helpers/buildPageRange";
 import UserTableSkeleton from "./UserTableSkeleton";
+import { buildPageRange } from "../helpers";
 
 export default function UserTable() {
   const {

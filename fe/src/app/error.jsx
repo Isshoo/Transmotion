@@ -1,11 +1,13 @@
 "use client";
 
+import useAuthStore from "@/features/auth/store";
 import Link from "next/link";
 
 export default function GlobalError({ error, reset }) {
+  const user = useAuthStore((s) => s.user);
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-lg text-center">
         {/* Icon */}
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <svg
@@ -39,7 +41,7 @@ export default function GlobalError({ error, reset }) {
             Coba Lagi
           </button>
           <Link
-            href="/"
+            href={user?.role === "admin" ? "/admin" : "/"}
             className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
           >
             Ke Beranda

@@ -11,8 +11,17 @@ bcrypt==5.0.0
 python-dotenv==1.2.1
 cloudinary==1.44.1
 requests==2.32.5
+gevent==25.9.1
 gunicorn==25.0.1
 waitress==3.0.2
 resend==2.23.0
 redis==7.4.0
 ruff==0.15.8
+pandas==3.0.2
+numpy==2.4.4
+torch
+transformers
+accelerate
+openpyxl==3.1.5
+scikit-learn==1.8.0
+

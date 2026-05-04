@@ -46,8 +46,9 @@ waitress:
 db-init:
 	$(FLASK) db init
 
+# make db-migrate msg="Auto migration"
 db-migrate:
-	$(FLASK) db migrate -m "Auto migration"
+	$(FLASK) db migrate -m "$(or $(msg),Auto migration)"
 
 db-upgrade:
 	$(FLASK) db upgrade
@@ -64,6 +65,9 @@ create-admin:
 
 data-prep:
 	$(PYTHON) scripts/dataset/preprocess_dataset.py
+
+scrape:
+	bash scripts/dataset/harvestscrape.sh
 
 # Kualitas Kode
 lint:
