@@ -24,6 +24,39 @@ MIN_ROWS = 100
 MIN_COLS = 2
 
 
+def _read_any_format(file_path: str) -> pd.DataFrame:
+    """
+    Baca file dataset (Excel atau CSV/Text) dengan deteksi otomatis.
+    Mendukung .csv, .tsv, .txt, .xls, .xlsx.
+    """
+    ext = os.path.splitext(file_path)[1].lower()
+
+    if ext in (".xls", ".xlsx"):
+        # Excel
+        return pd.read_excel(file_path, dtype=str)
+
+    # Untuk CSV/Text, gunakan sep=None agar pandas mendeteksi delimiter (engine='python')
+    try:
+        return pd.read_csv(
+            file_path,
+            engine="python",
+            sep=None,
+            encoding="utf-8",
+            on_bad_lines="skip",
+            dtype=str,
+        )
+    except UnicodeDecodeError:
+        # Fallback ke latin-1 jika utf-8 gagal
+        return pd.read_csv(
+            file_path,
+            engine="python",
+            sep=None,
+            encoding="latin-1",
+            on_bad_lines="skip",
+            dtype=str,
+        )
+
+
 def _ensure_dir(path: str):
     os.makedirs(path, exist_ok=True)
 
@@ -105,33 +138,16 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
         raise BadRequestError("Nama file tidak valid")
 
     ext = os.path.splitext(filename)[1].lower()
-    if ext not in (".csv", ".tsv", ".txt"):
-        raise BadRequestError("Format file harus CSV, TSV, atau TXT")
+    if ext not in (".csv", ".tsv", ".txt", ".xls", ".xlsx"):
+        raise BadRequestError("Format file harus CSV, TSV, TXT, XLS, atau XLSX")
 
     unique_name = f"{_uuid.uuid4().hex}{ext}"
     file_path = os.path.join(DATASET_DIR, unique_name)
     file.save(file_path)
 
     try:
-        delimiter = "\t" if ext == ".tsv" else ";"
-
-        # Baca dengan fallback encoding
-        try:
-            df = pd.read_csv(
-                file_path,
-                delimiter=delimiter,
-                encoding="utf-8",
-                on_bad_lines="skip",
-                dtype=str,
-            )
-        except UnicodeDecodeError:
-            df = pd.read_csv(
-                file_path,
-                delimiter=delimiter,
-                encoding="latin-1",
-                on_bad_lines="skip",
-                dtype=str,
-            )
+        # Baca dengan helper yang mendukung berbagai format
+        df = _read_any_format(file_path)
 
         # Strip spasi di nama kolom
         df.columns = [str(c).strip() for c in df.columns]
@@ -160,8 +176,6 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
                 f"Minimal {MIN_ROWS} baris diperlukan."
             )
 
-        # Tulis ulang file yang sudah dibersihkan
-        df.to_csv(file_path, sep=delimiter, index=False, encoding="utf-8")
         file_size = os.path.getsize(file_path)
         columns = list(df.columns)
 
@@ -209,10 +223,7 @@ def set_columns(dataset_id: str, text_column: str, label_column: str) -> Dataset
 
     # Hitung distribusi kelas dari raw data
     try:
-        delimiter = "\t" if dataset.file_path.endswith(".tsv") else ";"
-        df = pd.read_csv(
-            dataset.file_path, delimiter=delimiter, encoding="utf-8", dtype=str
-        )
+        df = _read_any_format(dataset.file_path)
         valid = df[[text_column, label_column]].dropna()
         valid = valid[valid[text_column].str.strip() != ""]
         valid = valid[valid[label_column].str.strip() != ""]
@@ -248,10 +259,7 @@ def get_raw_data(
     dataset = get_by_id(dataset_id)
 
     try:
-        delimiter = "\t" if dataset.file_path.endswith(".tsv") else ";"
-        df = pd.read_csv(
-            dataset.file_path, delimiter=delimiter, encoding="utf-8", dtype=str
-        )
+        df = _read_any_format(dataset.file_path)
     except Exception as e:
         raise BadRequestError(f"Gagal membaca file dataset: {e}") from None
 
@@ -337,10 +345,7 @@ def _do_preprocess(dataset_id: str):
         if not dataset:
             return
 
-        delimiter = "\t" if dataset.file_path.endswith(".tsv") else ";"
-        df = pd.read_csv(
-            dataset.file_path, delimiter=delimiter, encoding="utf-8", dtype=str
-        )
+        df = _read_any_format(dataset.file_path)
 
         text_col = dataset.text_column
         label_col = dataset.label_column

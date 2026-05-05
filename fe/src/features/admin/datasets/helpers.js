@@ -1,35 +1,22 @@
-// ── Client-side CSV/TSV parser ─────────────────────────────────
+import * as XLSX from "xlsx";
 
-export function parseCSVLine(line, delimiter) {
-  const result = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      inQuotes = !inQuotes;
-    } else if (ch === delimiter && !inQuotes) {
-      result.push(current.trim());
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
+// ── Client-side Data Parser ──────────────────────────────────
 
+/**
+ * Membaca preview file (CSV, TSV, TXT, XLS, XLSX)
+ * Menggunakan library xlsx (SheetJS) untuk mendukung berbagai format dan auto-detect delimiter.
+ */
 export async function parseFilePreview(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const text = e.target.result;
-        const ext = file.name.split(".").pop().toLowerCase();
-        const delimiter = ext === "tsv" ? "\t" : ";";
-        const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+        const data = new Uint8Array(e.target.result);
+        // XLSX.read secara otomatis mendeteksi format (Excel atau Text/CSV)
+        // Untuk CSV/Text, ia juga mencoba mendeteksi delimiter secara otomatis.
+        const workbook = XLSX.read(data, { type: "array" });
 
-        if (lines.length === 0) {
+        if (!workbook.SheetNames.length) {
           resolve({
             columns: [],
             columnCount: 0,
@@ -39,28 +26,61 @@ export async function parseFilePreview(file) {
           return;
         }
 
-        const headers = parseCSVLine(lines[0], delimiter).filter(Boolean);
-        const dataLines = lines.slice(1);
-        const previewRows = dataLines.slice(0, 5).map((line) => {
-          const vals = parseCSVLine(line, delimiter);
-          return headers.reduce(
-            (obj, h, i) => ({ ...obj, [h]: vals[i] ?? "" }),
-            {}
-          );
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        // Ambil data sebagai array of arrays
+        // header: 1 memastikan baris pertama tidak langsung dianggap kunci objek agar kita bisa olah manual
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        if (rows.length === 0) {
+          resolve({
+            columns: [],
+            columnCount: 0,
+            rowCount: 0,
+            previewRows: [],
+          });
+          return;
+        }
+
+        // Baris pertama sebagai header
+        const headers = rows[0]
+          .map((h) => String(h || "").trim())
+          .filter(Boolean);
+        const dataRows = rows.slice(1);
+
+        // Filter baris kosong (SheetJS kadang menyertakan baris yang terlihat kosong tapi punya metadata)
+        const cleanDataRows = dataRows.filter((row) =>
+          Array.isArray(row) && row.some(
+            (cell) =>
+              cell !== null &&
+              cell !== undefined &&
+              String(cell).trim() !== ""
+          )
+        );
+
+        // Buat preview untuk 5 baris pertama
+        const previewRows = cleanDataRows.slice(0, 5).map((row) => {
+          return headers.reduce((obj, h, i) => {
+            obj[h] =
+              row[i] !== undefined && row[i] !== null ? String(row[i]) : "";
+            return obj;
+          }, {});
         });
 
         resolve({
           columns: headers,
           columnCount: headers.length,
-          rowCount: dataLines.length,
+          rowCount: cleanDataRows.length,
           previewRows,
         });
       } catch (err) {
+        console.error("Parse error:", err);
         reject(err);
       }
     };
     reader.onerror = reject;
-    reader.readAsText(file, "UTF-8");
+    reader.readAsArrayBuffer(file);
   });
 }
 

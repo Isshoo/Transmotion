@@ -31,8 +31,8 @@ export default function DatasetUploadModal() {
 
   const processFile = useCallback(async (f) => {
     const ext = f.name.split(".").pop().toLowerCase();
-    if (!["csv", "tsv", "txt"].includes(ext)) {
-      setPreviewError("Format harus CSV, TSV, atau TXT");
+    if (!["csv", "tsv", "txt", "xls", "xlsx"].includes(ext)) {
+      setPreviewError("Format harus CSV, TSV, TXT, XLS, atau XLSX");
       setFile(null);
       setPreview(null);
       return;
@@ -214,7 +214,7 @@ export default function DatasetUploadModal() {
                   </span>
                 </p>
                 <p className="mt-1 text-xs text-gray-400">
-                  CSV, TSV, atau TXT — minimal 100 baris, 2 kolom
+                  CSV, TSV, TXT, XLS, atau XLSX — minimal 100 baris, 2 kolom
                 </p>
               </div>
             ) : (
@@ -256,7 +256,7 @@ export default function DatasetUploadModal() {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv,.tsv,.txt"
+              accept=".csv,.tsv,.txt,.xls,.xlsx"
               className="hidden"
               onChange={handleFileInput}
             />
