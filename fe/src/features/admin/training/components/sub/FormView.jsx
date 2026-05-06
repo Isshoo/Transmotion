@@ -31,6 +31,7 @@ export default function FormView() {
     isLoadingDatasets,
     selectedDatasetId,
     testSize,
+    evalSize,
     modelType,
     jobName,
     hyperparams,
@@ -39,6 +40,7 @@ export default function FormView() {
     isSubmitting,
     setSelectedDatasetId,
     setTestSize,
+    setEvalSize,
     setModelType,
     setJobName,
     setHyperparam,
@@ -117,38 +119,104 @@ export default function FormView() {
           </div>
         )}
       </div>
-
       {/* ── Step 2: Ukuran Test Set + Preview ───────────────── */}
       {selectedDatasetId && (
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <p className="mb-1 text-sm font-semibold text-gray-800">
-            Pembagian Data
+            2. Pembagian Data (Train / Eval / Test)
           </p>
           <p className="mb-4 text-xs text-gray-400">
-            Tentukan proporsi data yang digunakan untuk testing.
+            Data dibagi 3: train untuk pelatihan, eval untuk monitoring per
+            epoch, test untuk evaluasi akhir.
           </p>
 
-          <div className="mb-4">
-            <div className="mb-1.5 flex items-center justify-between">
-              <span className="text-sm text-gray-600">Ukuran Test Set</span>
-              <span className="text-sm font-semibold text-blue-600">
-                {Math.round(testSize * 100)}% test /{" "}
-                {Math.round((1 - testSize) * 100)}% train
-              </span>
+          <div className="mb-5 space-y-4">
+            {/* Test size */}
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-600">
+                  Test Set
+                </span>
+                <span className="text-xs font-semibold text-amber-600">
+                  {Math.round(testSize * 100)}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="40"
+                step="5"
+                value={Math.round(testSize * 100)}
+                onChange={(e) => setTestSize(e.target.value / 100)}
+                className="w-full accent-amber-500"
+              />
             </div>
-            <input
-              type="range"
-              min="5"
-              max="40"
-              step="5"
-              value={Math.round(testSize * 100)}
-              onChange={(e) => setTestSize(e.target.value / 100)}
-              className="w-full accent-blue-600"
-            />
-            <div className="mt-0.5 flex justify-between text-xs text-gray-400">
-              <span>5%</span>
-              <span>40%</span>
+
+            {/* Eval size */}
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-600">
+                  Eval Set
+                </span>
+                <span className="text-xs font-semibold text-purple-600">
+                  {Math.round(evalSize * 100)}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="30"
+                step="5"
+                value={Math.round(evalSize * 100)}
+                onChange={(e) => setEvalSize(e.target.value / 100)}
+                className="w-full accent-purple-500"
+              />
             </div>
+
+            {/* Visual bar */}
+            {splitPreview && (
+              <div>
+                <div className="flex h-4 overflow-hidden rounded-full">
+                  {[
+                    [
+                      Math.round((1 - testSize - evalSize) * 100),
+                      "bg-blue-500",
+                      "Train",
+                    ],
+                    [Math.round(evalSize * 100), "bg-purple-400", "Eval"],
+                    [Math.round(testSize * 100), "bg-amber-400", "Test"],
+                  ].map(([pct, color, label]) => (
+                    <div
+                      key={label}
+                      className={`${color} flex items-center justify-center text-[10px] font-medium text-white transition-all`}
+                      style={{ width: `${pct}%` }}
+                    >
+                      {pct >= 12 && `${label} ${pct}%`}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-1.5 flex gap-3">
+                  {[
+                    [
+                      "bg-blue-500",
+                      `Train ${Math.round((1 - testSize - evalSize) * 100)}%`,
+                    ],
+                    ["bg-purple-400", `Eval ${Math.round(evalSize * 100)}%`],
+                    ["bg-amber-400", `Test ${Math.round(testSize * 100)}%`],
+                  ].map(([color, label]) => (
+                    <span
+                      key={label}
+                      className="flex items-center gap-1 text-xs text-gray-500"
+                    >
+                      <span
+                        className={`inline-block h-2 w-2 rounded-full ${color}`}
+                      />
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <SplitPreviewCard
@@ -157,7 +225,6 @@ export default function FormView() {
           />
         </div>
       )}
-
       {/* ── Step 3: Pilih Model ──────────────────────────────── */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <p className="mb-1 text-sm font-semibold text-gray-800">
@@ -193,7 +260,6 @@ export default function FormView() {
           ))}
         </div>
       </div>
-
       {/* ── Step 4: Hyperparameter ───────────────────────────── */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <p className="mb-1 text-sm font-semibold text-gray-800">
@@ -219,7 +285,7 @@ export default function FormView() {
         </div>
 
         {/* Hyperparameter dasar */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-600">
               Epochs
@@ -257,20 +323,30 @@ export default function FormView() {
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-600">
               Max Length
+              <span className="ml-1 font-normal text-gray-400">(token)</span>
             </label>
             <select
               value={hyperparams.max_length}
-              onChange={(e) =>
-                setHyperparam("max_length", Number(e.target.value))
-              }
+              onChange={(e) => {
+                const val =
+                  e.target.value === "auto" ? "auto" : Number(e.target.value);
+                setHyperparam("max_length", val);
+              }}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
+              <option value="auto">Auto (deteksi otomatis)</option>
               {[64, 128, 256, 512].map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
               ))}
             </select>
+            {hyperparams.max_length === "auto" && (
+              <p className="mt-1 text-[11px] text-gray-400">
+                Max length akan dihitung dari persentil ke-95 panjang token di
+                dataset.
+              </p>
+            )}
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-600">
@@ -284,6 +360,37 @@ export default function FormView() {
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
               {[1e-5, 2e-5, 3e-5, 5e-5].map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">
+              Optimizer
+            </label>
+            <select
+              value={hyperparams.optimizer}
+              onChange={(e) => setHyperparam("optimizer", e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="adamw">AdamW (rekomendasi)</option>
+              <option value="adam">Adam</option>
+              <option value="sgd">SGD</option>
+              <option value="adafactor">Adafactor</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">
+              Dropout
+            </label>
+            <select
+              value={hyperparams.dropout}
+              onChange={(e) => setHyperparam("dropout", Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              {[0.0, 0.1, 0.2, 0.3, 0.5].map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
@@ -339,7 +446,6 @@ export default function FormView() {
           </div>
         )}
       </div>
-
       {/* ── Tombol Train ─────────────────────────────────────── */}
       <button
         onClick={handleSubmit}
@@ -356,7 +462,6 @@ export default function FormView() {
           </>
         )}
       </button>
-
       {!canSubmit && !isSubmitting && (
         <p className="text-center text-xs text-gray-400">
           {!selectedDatasetId

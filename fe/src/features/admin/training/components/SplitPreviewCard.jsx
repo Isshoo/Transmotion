@@ -38,10 +38,11 @@ export default function SplitPreviewCard({ preview, isLoading }) {
       </div>
 
       {/* Ringkasan */}
-      <div className="grid grid-cols-3 divide-x border-t">
+      <div className="grid grid-cols-4 divide-x border-t">
         {[
           ["Total", preview.total],
           ["Train", preview.train_total],
+          ["Eval", preview.eval_total],
           ["Test", preview.test_total],
         ].map(([label, value]) => (
           <div key={label} className="px-4 py-2.5 text-center">
@@ -77,6 +78,24 @@ export default function SplitPreviewCard({ preview, isLoading }) {
             </div>
             <div>
               <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                Eval set
+              </p>
+              <div className="space-y-1.5">
+                {Object.entries(preview.eval_per_class || {}).map(
+                  ([label, count]) => (
+                    <Bar
+                      key={label}
+                      label={label}
+                      count={count}
+                      total={preview.eval_total}
+                      color="bg-purple-400"
+                    />
+                  )
+                )}
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
                 Test set
               </p>
               <div className="space-y-2">
@@ -95,6 +114,23 @@ export default function SplitPreviewCard({ preview, isLoading }) {
             </div>
           </div>
         )}
+
+      {/* Legend */}
+      <div className="flex gap-4 border-t px-4 py-2">
+        {[
+          ["bg-blue-400", "Train"],
+          ["bg-purple-400", "Eval"],
+          ["bg-amber-400", "Test"],
+        ].map(([color, label]) => (
+          <span
+            key={label}
+            className="flex items-center gap-1 text-xs text-gray-500"
+          >
+            <span className={`inline-block h-2 w-2 rounded-full ${color}`} />
+            {label}
+          </span>
+        ))}
+      </div>
 
       {/* Error list */}
       {hasErrors && (

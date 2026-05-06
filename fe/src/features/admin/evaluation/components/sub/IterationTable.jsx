@@ -1,5 +1,6 @@
 import { MetricCell } from "../ui/Cell";
 import { findModelsBySplit, fmtPct } from "../ui/Helpers";
+import { useRouter } from "next/navigation";
 
 const SPLITS = [
   { label: "60:40", testSize: 0.4 },
@@ -8,7 +9,8 @@ const SPLITS = [
   { label: "90:10", testSize: 0.1 },
 ];
 
-export default function IterationTable({ mbert, xlmr, metric = "f1_score" }) {
+export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
+  const router = useRouter();
   const maxIter = SPLITS.reduce((acc, s) => {
     const xlmrCount = findModelsBySplit(xlmr, s.testSize).length;
     const mbertCount = findModelsBySplit(mbert, s.testSize).length;
@@ -81,22 +83,35 @@ export default function IterationTable({ mbert, xlmr, metric = "f1_score" }) {
               {SPLITS.map((s) => {
                 const models = findModelsBySplit(xlmr, s.testSize);
                 const m = models[iter];
+
+                const handleClick = () => {
+                  if (!m) return;
+                  router.push(`/admin/models/${m.id}`);
+                };
                 return (
                   <MetricCell
                     key={`xlmr-${s.label}-${iter}`}
                     value={m?.[metric]}
                     highlight={iter === models.length - 1 && models.length > 0}
+                    onClick={handleClick}
+                    cursor={m ? "pointer" : "default"}
                   />
                 );
               })}
               {SPLITS.map((s) => {
                 const models = findModelsBySplit(mbert, s.testSize);
                 const m = models[iter];
+                const handleClick = () => {
+                  if (!m) return;
+                  router.push(`/admin/models/${m.id}`);
+                };
                 return (
                   <MetricCell
                     key={`mbert-${s.label}-${iter}`}
                     value={m?.[metric]}
                     highlight={iter === models.length - 1 && models.length > 0}
+                    onClick={handleClick}
+                    cursor={m ? "pointer" : "default"}
                   />
                 );
               })}

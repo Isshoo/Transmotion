@@ -56,9 +56,6 @@ export function AverageTable({ macroAvg, weightedAvg }) {
   if (!macroAvg && !weightedAvg) return null;
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-        Rata-rata
-      </p>
       <div className="overflow-hidden rounded-lg border border-gray-200">
         <table className="w-full text-xs">
           <thead>

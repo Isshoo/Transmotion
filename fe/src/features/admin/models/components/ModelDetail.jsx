@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import useModelStore from "../store";
+import EditModelModal from "./modal/EditModelModal";
 import ConfusionMatrix from "@/features/admin/training/components/ConfusionMatrix";
 import EpochLogsTable from "@/features/admin/training/components/EpochLogsTable";
 import { Section } from "./ui/Section";
@@ -164,9 +165,6 @@ export default function ModelDetail({ modelId }) {
                     key={idx}
                     className="inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700"
                   >
-                    <span className="rounded-full bg-purple-200 px-1.5 py-0.5 text-[10px] font-bold text-purple-800">
-                      {idx}
-                    </span>
                     {label}
                   </span>
                 ))}
@@ -264,12 +262,14 @@ export default function ModelDetail({ modelId }) {
       {/* ── Baris 6: Hyperparameter ───────────────────────────── */}
       {m.job?.hyperparams && (
         <Section title="Hyperparameter Training">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
             {[
               ["Learning Rate", m.job.hyperparams.learning_rate],
               ["Epochs", m.job.hyperparams.epochs],
               ["Batch Size", m.job.hyperparams.batch_size],
               ["Max Length", m.job.hyperparams.max_length],
+              ["Dropout", m.job.hyperparams.dropout],
+              ["Optimizer", m.job.hyperparams.optimizer],
               ["Warmup Steps", m.job.hyperparams.warmup_steps],
               ["Weight Decay", m.job.hyperparams.weight_decay],
             ].map(([label, value]) => (
@@ -287,12 +287,16 @@ export default function ModelDetail({ modelId }) {
 
           {/* Split info */}
           {m.job?.split_info && (
-            <div className="mt-4 grid grid-cols-3 gap-3">
+            <div className="mt-4 grid grid-cols-4 gap-3">
               {[
                 ["Total Data", m.job.split_info.total?.toLocaleString("id")],
                 [
                   "Train Set",
                   m.job.split_info.train_total?.toLocaleString("id"),
+                ],
+                [
+                  "Validation Set",
+                  m.job.split_info.eval_total?.toLocaleString("id"),
                 ],
                 ["Test Set", m.job.split_info.test_total?.toLocaleString("id")],
               ].map(([label, value]) => (
@@ -317,6 +321,8 @@ export default function ModelDetail({ modelId }) {
           <EpochLogsTable logs={m.epoch_logs} />
         </Section>
       )}
+
+      <EditModelModal />
     </div>
   );
 }

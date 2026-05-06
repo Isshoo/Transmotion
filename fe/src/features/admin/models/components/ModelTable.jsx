@@ -124,10 +124,9 @@ export default function ModelTable() {
                   "Dataset",
                   "Kelas",
                   "Accuracy",
-                  "F1",
                   "Status",
                   "Dibuat",
-                  "",
+                  "Aksi",
                 ].map((h) => (
                   <th
                     key={h}
@@ -202,12 +201,7 @@ export default function ModelTable() {
                         color="text-blue-600"
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <MetricPill
-                        value={model.f1_score}
-                        color="text-green-600"
-                      />
-                    </td>
+
                     <td className="px-4 py-3">
                       {model.is_active ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
@@ -225,7 +219,7 @@ export default function ModelTable() {
                         : "—"}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-start gap-1">
                         <Link
                           href={`/admin/models/${model.id}`}
                           title="Detail"

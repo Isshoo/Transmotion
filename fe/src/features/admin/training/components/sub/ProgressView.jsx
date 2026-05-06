@@ -10,6 +10,7 @@ export default function ProgressView() {
   if (!activeJob) return null;
 
   const job = activeJob;
+  console.log(job);
   const pct = job.progress || 0;
 
   const handleCancel = async () => {
@@ -81,17 +82,17 @@ export default function ProgressView() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 ["Train Loss", last.train_loss?.toFixed(4)],
-                ["Val Loss", last.val_loss?.toFixed(4)],
+                ["Val Loss", last.eval_loss?.toFixed(4)],
                 [
-                  "Val Accuracy",
+                  "Accuracy",
                   last.val_accuracy !== null
-                    ? `${(last.val_accuracy * 100).toFixed(2)}%`
+                    ? `${(last.eval_accuracy * 100).toFixed(2)}%`
                     : null,
                 ],
                 [
-                  "Val F1",
-                  last.val_f1 !== null
-                    ? `${(last.val_f1 * 100).toFixed(2)}%`
+                  "F1-Score",
+                  last.eval_f1 !== null
+                    ? `${(last.eval_f1 * 100).toFixed(2)}%`
                     : null,
                 ],
               ].map(([label, value]) => (
@@ -125,8 +126,10 @@ export default function ProgressView() {
                     "Epoch",
                     "Train Loss",
                     "Val Loss",
-                    "Val Accuracy",
-                    "Val F1",
+                    "Accuracy",
+                    "Precision",
+                    "Recall",
+                    "F1-Score",
                   ].map((h) => (
                     <th
                       key={h}
@@ -154,16 +157,26 @@ export default function ProgressView() {
                       {log.train_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.val_loss?.toFixed(4) ?? "—"}
+                      {log.eval_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.val_accuracy !== null
-                        ? `${(log.val_accuracy * 100).toFixed(2)}%`
+                      {log.eval_accuracy !== null
+                        ? `${(log.eval_accuracy * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.val_f1 !== null
-                        ? `${(log.val_f1 * 100).toFixed(2)}%`
+                      {log.eval_precision !== null
+                        ? `${(log.eval_precision * 100).toFixed(2)}%`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-2.5 text-gray-600">
+                      {log.eval_recall !== null
+                        ? `${(log.eval_recall * 100).toFixed(2)}%`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-2.5 text-gray-600">
+                      {log.eval_f1 !== null
+                        ? `${(log.eval_f1 * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                   </tr>
@@ -186,6 +199,8 @@ export default function ProgressView() {
               ["Epochs", job.hyperparams.epochs],
               ["Batch", job.hyperparams.batch_size],
               ["MaxLen", job.hyperparams.max_length],
+              ["Dropout", job.hyperparams.dropout],
+              ["Optimizer", job.hyperparams.optimizer],
               ["Warmup", job.hyperparams.warmup_steps],
               ["Decay", job.hyperparams.weight_decay],
             ].map(([l, v]) => (

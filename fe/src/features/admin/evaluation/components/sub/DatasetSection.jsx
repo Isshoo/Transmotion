@@ -31,9 +31,9 @@ export default function DatasetSection({ group }) {
           <>
             <span className="text-gray-300">·</span>
             <span className="text-xs text-gray-500">
-              Best XLM-R F1:{" "}
+              Best XLM-R Accuracy:{" "}
               <span className="font-semibold text-gray-700">
-                {fmtPct(bestModel(xlmr)?.f1_score)}
+                {fmtPct(bestModel(xlmr)?.accuracy)}
               </span>
             </span>
           </>
@@ -42,9 +42,9 @@ export default function DatasetSection({ group }) {
           <>
             <span className="text-gray-300">·</span>
             <span className="text-xs text-gray-500">
-              Best MBERT F1:{" "}
+              Best MBERT Accuracy:{" "}
               <span className="font-semibold text-gray-700">
-                {fmtPct(bestModel(mbert)?.f1_score)}
+                {fmtPct(bestModel(mbert)?.accuracy)}
               </span>
             </span>
           </>
@@ -54,13 +54,13 @@ export default function DatasetSection({ group }) {
       {/* Tabel iterasi */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <p className="mb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-          Tabel Iterasi — F1 Score
+          Tabel Iterasi — Accuracy
         </p>
         <p className="mb-4 text-[11px] text-gray-400">
           Setiap baris = iterasi training ke-N dengan split yang sama. Rata-rata
           dihitung dari semua iterasi per kolom.
         </p>
-        <IterationTable mbert={mbert} xlmr={xlmr} metric="f1_score" />
+        <IterationTable mbert={mbert} xlmr={xlmr} metric="accuracy" />
       </div>
 
       {/* Tabel perbandingan */}
@@ -69,7 +69,7 @@ export default function DatasetSection({ group }) {
           Perbandingan Metrik — Model Terbaik
         </p>
         <p className="mb-4 text-[11px] text-gray-400">
-          Dibandingkan dari model dengan F1 Score tertinggi masing-masing tipe.
+          Dibandingkan dari model dengan Accuracy tertinggi masing-masing tipe.
         </p>
         <ComparisonTable mbert={mbert} xlmr={xlmr} />
       </div>

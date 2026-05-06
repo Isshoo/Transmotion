@@ -12,7 +12,8 @@ const useTrainingStore = create((set, get) => ({
   datasets: [],
   isLoadingDatasets: false,
   selectedDatasetId: "",
-  testSize: 0.2,
+  testSize: 0.1,
+  evalSize: 0.1,
   modelType: "mbert",
   jobName: "",
   hyperparams: {
@@ -22,6 +23,8 @@ const useTrainingStore = create((set, get) => ({
     max_length: 256,
     warmup_steps: 0.1,
     weight_decay: 0.01,
+    dropout: 0.1,
+    optimizer: "adamw",
   },
 
   // ── Split preview ──────────────────────────────────────────
@@ -41,7 +44,8 @@ const useTrainingStore = create((set, get) => ({
     set({
       view: "form",
       selectedDatasetId: "",
-      testSize: 0.2,
+      testSize: 0.1,
+      evalSize: 0.1,
       modelType: "mbert",
       jobName: "",
       splitPreview: null,
@@ -52,6 +56,8 @@ const useTrainingStore = create((set, get) => ({
         max_length: 256,
         warmup_steps: 0.1,
         weight_decay: 0.01,
+        dropout: 0.1,
+        optimizer: "adamw",
       },
     });
 
@@ -79,7 +85,8 @@ const useTrainingStore = create((set, get) => ({
       view: "form",
       activeJob: null,
       selectedDatasetId: "",
-      testSize: 0.2,
+      testSize: 0.1,
+      evalSize: 0.1,
       modelType: "mbert",
       jobName: "",
       splitPreview: null,
@@ -90,6 +97,8 @@ const useTrainingStore = create((set, get) => ({
         max_length: 256,
         warmup_steps: 0.1,
         weight_decay: 0.01,
+        dropout: 0.1,
+        optimizer: "adamw",
       },
     });
   },
@@ -117,13 +126,21 @@ const useTrainingStore = create((set, get) => ({
   // ── Form setters ───────────────────────────────────────────
   setSelectedDatasetId: (id) => {
     set({ selectedDatasetId: id, splitPreview: null });
-    if (id) get().fetchSplitPreview(id, get().testSize);
+    if (id) get().fetchSplitPreview(id, get().testSize, get().evalSize);
   },
 
   setTestSize: (v) => {
     set({ testSize: v });
-    const { selectedDatasetId } = get();
-    if (selectedDatasetId) get().fetchSplitPreview(selectedDatasetId, v);
+    const { selectedDatasetId, evalSize } = get();
+    if (selectedDatasetId)
+      get().fetchSplitPreview(selectedDatasetId, v, evalSize);
+  },
+
+  setEvalSize: (v) => {
+    set({ evalSize: v });
+    const { selectedDatasetId, testSize } = get();
+    if (selectedDatasetId)
+      get().fetchSplitPreview(selectedDatasetId, testSize, v);
   },
 
   setModelType: (v) => set({ modelType: v }),
@@ -134,12 +151,13 @@ const useTrainingStore = create((set, get) => ({
     })),
 
   // ── Split preview ──────────────────────────────────────────
-  fetchSplitPreview: async (datasetId, testSize) => {
+  fetchSplitPreview: async (datasetId, testSize, evalSize = 0.1) => {
     set({ isLoadingPreview: true });
     try {
       const { data: res } = await trainingApi.splitPreview({
         dataset_id: datasetId,
         test_size: testSize,
+        eval_size: evalSize,
       });
       set({ splitPreview: res.data, isLoadingPreview: false });
     } catch (err) {
@@ -155,23 +173,25 @@ const useTrainingStore = create((set, get) => ({
 
   // ── Submit ─────────────────────────────────────────────────
   createJob: async () => {
-    const { selectedDatasetId, testSize, modelType, jobName, hyperparams } =
-      get();
-
+    const {
+      selectedDatasetId,
+      testSize,
+      evalSize,
+      modelType,
+      jobName,
+      hyperparams,
+    } = get();
     set({ isSubmitting: true });
     try {
       const { data: res } = await trainingApi.create({
         dataset_id: selectedDatasetId,
         model_type: modelType,
         test_size: testSize,
+        eval_size: evalSize,
         job_name: jobName.trim() || undefined,
         ...hyperparams,
       });
-      set({
-        activeJob: res.data,
-        view: "progress",
-        isSubmitting: false,
-      });
+      set({ activeJob: res.data, view: "progress", isSubmitting: false });
       return { success: true };
     } catch (err) {
       set({ isSubmitting: false });

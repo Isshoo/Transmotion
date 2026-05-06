@@ -87,7 +87,6 @@ def get_active_job():
 
 
 def split_preview():
-    """GET/POST — hitung preview split sebelum buat job."""
     try:
         data = SplitPreviewSchema().load(request.get_json() or request.args.to_dict())
     except ValidationError as err:
@@ -96,6 +95,7 @@ def split_preview():
     preview = training_job_service.compute_split_preview(
         dataset_id=data["dataset_id"],
         test_size=data["test_size"],
+        eval_size=data.get("eval_size", 0.1),
     )
     return success_response(data=preview, message="Preview split berhasil dihitung")
 
@@ -106,19 +106,32 @@ def create_job():
     except ValidationError as err:
         return _parse_err(err)
 
+    # Validasi dan normalisasi max_length
+    max_length = data.get("max_length", 128)
+    if max_length != "auto":
+        try:
+            max_length = int(max_length)
+            if max_length not in [64, 128, 256, 512]:
+                max_length = 128
+        except (ValueError, TypeError):
+            max_length = 128
+
     hyperparams = {
         "learning_rate": data["learning_rate"],
         "epochs": data["epochs"],
         "batch_size": data["batch_size"],
-        "max_length": data["max_length"],
+        "max_length": max_length,  # "auto" atau integer
         "warmup_steps": data["warmup_steps"],
         "weight_decay": data["weight_decay"],
+        "dropout": data["dropout"],
+        "optimizer": data["optimizer"],
     }
 
     job = training_job_service.create(
         dataset_id=data["dataset_id"],
         model_type=data["model_type"],
         test_size=data["test_size"],
+        eval_size=data.get("eval_size", 0.1),
         hyperparams=hyperparams,
         job_name=data.get("job_name"),
         user_id=request.current_user.id,
