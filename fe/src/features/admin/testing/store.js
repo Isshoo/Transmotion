@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import * as XLSX from "xlsx";
 import testingApi from "./api";
 import { getErrorMessage } from "@/helpers/error";
 
@@ -91,6 +92,42 @@ const useTestingStore = create((set, get) => ({
     });
   },
 
+  // ── Parse Excel ─────────────────────────────────────────────
+  parseExcelFile: async (file) => {
+    if (!file) return { headers: [], rows: [] };
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          // Use first sheet
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          // Convert to array of arrays (header: 1 → raw rows)
+          const allRows = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1,
+            defval: "",
+            blankrows: false,
+          });
+          if (allRows.length === 0) {
+            resolve({ headers: [], rows: [] });
+            return;
+          }
+          const headers = allRows[0].map((h) => String(h ?? "").trim());
+          const rows = allRows.slice(1).map((row) =>
+            row.map((cell) => String(cell ?? "").trim())
+          );
+          resolve({ headers, rows });
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  },
+
   setCsvFile: async (file) => {
     if (!file) {
       set({ 
@@ -103,13 +140,17 @@ const useTestingStore = create((set, get) => ({
       });
       return;
     }
-    const { headers, rows } = await get().parseCsvFile(file);
+    const ext = file.name.split(".").pop().toLowerCase();
+    const isExcel = ext === "xlsx" || ext === "xls";
+    const { headers, rows } = isExcel
+      ? await get().parseExcelFile(file)
+      : await get().parseCsvFile(file);
     set({ 
       csvHeaders: headers, 
       csvRows: rows, 
       csvFileName: file.name, 
       results: [],
-      selectedTextColumn: headers.length > 0 ? 0 : null, // Default to first column
+      selectedTextColumn: headers.length > 0 ? 0 : null,
     });
     
     // Automatically prepare csvTexts if column is selected

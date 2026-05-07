@@ -81,7 +81,7 @@ export default function TestingPage() {
       <div>
         <h1 className="text-lg font-semibold text-gray-800">Testing</h1>
         <p className="text-sm text-gray-500">
-          Uji model dengan teks tunggal atau batch dari file CSV
+          Uji model dengan teks tunggal atau batch dari file CSV / Excel
         </p>
       </div>
 
@@ -217,7 +217,7 @@ export default function TestingPage() {
           <div className="flex overflow-hidden rounded-lg border border-gray-200">
             {[
               { key: "single", label: "Teks Tunggal" },
-              { key: "csv", label: "Upload CSV" },
+              { key: "csv", label: "Upload File" },
             ].map(({ key, label }) => (
               <button
                 key={key}
@@ -285,10 +285,10 @@ export default function TestingPage() {
                   <p className="text-sm text-gray-600">
                     Klik untuk upload{" "}
                     <span className="font-medium text-blue-600">
-                      CSV / TSV / TXT
+                      CSV / TSV / TXT / Excel
                     </span>
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">Maks 500 baris</p>
+                  <p className="mt-1 text-xs text-gray-400">Maks 500 baris · .csv .tsv .txt .xlsx .xls</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -345,7 +345,7 @@ export default function TestingPage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv,.tsv,.txt"
+                accept=".csv,.tsv,.txt,.xlsx,.xls"
                 className="hidden"
                 onChange={handleFileChange}
               />
