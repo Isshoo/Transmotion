@@ -6,7 +6,7 @@ from flask import Blueprint, current_app, request
 
 from app.layers.controllers import colab_controller, training_job_controller
 from app.layers.middlewares.auth_middleware import admin_required, jwt_required_custom
-from app.utils.response import error_response
+from app.utils.response import error_response, success_response
 
 training_job_bp = Blueprint("training_jobs", __name__, url_prefix="/api/training-jobs")
 colab_bp = Blueprint("colab", __name__, url_prefix="/api/colab")
@@ -155,3 +155,18 @@ def colab_complete_job(job_id):
 @_colab_key_required
 def colab_fail_job(job_id):
     return colab_controller.colab_fail_job(job_id)
+
+
+@colab_bp.route("/health-check", methods=["POST"])
+@jwt_required_custom  # admin bisa trigger manual
+def trigger_health_check():
+    from flask import current_app
+
+    from app.layers.services import colab_service
+
+    api_key = current_app.config.get("COLAB_API_KEY", "")
+    result = colab_service.health_check(api_key)
+    status = colab_service.get_status()
+    return success_response(
+        data={"health_ok": result, "status": status}, message="Health check selesai"
+    )

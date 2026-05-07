@@ -270,16 +270,24 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
     os.makedirs(model_dir, exist_ok=True)
 
     model_path = data.get("file_path") or None
-    file_size = None
+    file_size = data.get("file_size") or None
 
     if model_file and model_file.filename:
         ext = os.path.splitext(model_file.filename)[1] or ".pt"
         local_path = os.path.join(model_dir, f"{_uuid.uuid4().hex}{ext}")
         model_file.save(local_path)
-        file_size = os.path.getsize(local_path)
-        # Jika tidak ada file_path dari Drive, pakai local path
         if not model_path:
             model_path = local_path
+        if not file_size:
+            # Fallback ke ukuran lokal hanya jika tidak ada ukuran dari Drive
+            file_size = os.path.getsize(local_path)
+
+    # Konversi ke integer jika string
+    if file_size and isinstance(file_size, str):
+        try:
+            file_size = int(file_size)
+        except ValueError:
+            file_size = None
 
     label_map = data.get("label_map")
     if isinstance(label_map, str):

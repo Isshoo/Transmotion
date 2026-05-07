@@ -1,11 +1,15 @@
 """
 Colab service — mengelola koneksi ke Colab worker.
 
-Alur baru:
-1. Colab start → POST /api/colab/register → simpan URL di sini
-2. User buat job → training_job_service memanggil call_train()
-3. Flask POST ke Colab URL → Colab mulai training
-4. Colab POST progress → Flask simpan + broadcast SSE
+Strategi status yang lebih reliable:
+1. Colab register saat online (set last_ping)
+2. Colab kirim heartbeat tiap 60s (update last_ping)
+3. Backend punya dua threshold:
+   - WARN_THRESHOLD: belum ping > 90s → status "degraded" (mungkin lambat)
+   - OFFLINE_THRESHOLD: belum ping > 180s → status "offline"
+   (lebih pendek dari 300s agar tidak terlalu lama terlambat deteksi)
+4. Backend bisa aktif health-check ke Colab jika diperlukan
+5. SSE broadcast status saat ada perubahan meaningful
 """
 
 import threading
@@ -17,22 +21,12 @@ import requests
 
 from app.utils.logger import logger
 
-# ── State in-memory ────────────────────────────────────────────────────────────
-# Key: session_id, Value: {url, registered_at, last_ping}
 _colab_sessions: dict = {}
 _lock = threading.Lock()
 
-# Timeout: session dianggap offline jika tidak ada ping selama N detik
-SESSION_TIMEOUT_SECONDS = 300  # 5 menit
-
-
-def _broadcast_status():
-    """Broadcast status terkini ke semua subscriber SSE."""
-    try:
-        from app.layers.services.sse_service import sse_manager
-        sse_manager.publish("colab:status", get_status(), event="update")
-    except Exception:
-        pass  # Jangan crash jika SSE belum ready
+# Threshold yang lebih agresif
+WARN_THRESHOLD_SECONDS = 90  # degraded jika belum ping 90s
+OFFLINE_THRESHOLD_SECONDS = 180  # offline jika belum ping 180s
 
 
 def register(url: str, session_id: str) -> dict:
@@ -42,9 +36,11 @@ def register(url: str, session_id: str) -> dict:
             "session_id": session_id,
             "registered_at": datetime.now(timezone.utc).isoformat(),
             "last_ping": time.time(),
+            "last_health_check": None,
+            "health_check_failed": 0,
         }
     logger.info(f"Colab registered: session={session_id} url={url}")
-    _broadcast_status()  # ← tambahkan
+    _broadcast_status()
     return _colab_sessions[session_id]
 
 
@@ -53,34 +49,43 @@ def unregister(session_id: str):
         if session_id in _colab_sessions:
             del _colab_sessions[session_id]
             logger.info(f"Colab unregistered: session={session_id}")
-    _broadcast_status()  # ← tambahkan
+    _broadcast_status()
 
 
 def ping(session_id: str):
-    """Update last_ping timestamp."""
     with _lock:
         if session_id in _colab_sessions:
             _colab_sessions[session_id]["last_ping"] = time.time()
+            _colab_sessions[session_id]["health_check_failed"] = 0
+
+
+def _session_status(session: dict) -> str:
+    """
+    Tentukan status satu session berdasarkan last_ping.
+    Returns: "online" | "degraded" | "offline"
+    """
+    now = time.time()
+    elapsed = now - session["last_ping"]
+
+    if elapsed < WARN_THRESHOLD_SECONDS:
+        return "online"
+    elif elapsed < OFFLINE_THRESHOLD_SECONDS:
+        return "degraded"
+    else:
+        return "offline"
 
 
 def get_active_session() -> Optional[dict]:
-    """
-    Ambil satu session Colab yang aktif.
-    Prioritaskan session yang paling baru registrasi.
-    """
+    """Ambil session yang statusnya online atau degraded."""
     with _lock:
-        now = time.time()
-        active = [
-            s
-            for s in _colab_sessions.values()
-            if now - s["last_ping"] < SESSION_TIMEOUT_SECONDS
-        ]
+        sessions = list(_colab_sessions.values())
+
+    active = [s for s in sessions if _session_status(s) in ("online", "degraded")]
 
     if not active:
         return None
 
-    # Ambil yang paling baru
-    return sorted(active, key=lambda s: s["registered_at"], reverse=True)[0]
+    return sorted(active, key=lambda s: s["last_ping"], reverse=True)[0]
 
 
 def is_available() -> bool:
@@ -88,33 +93,108 @@ def is_available() -> bool:
 
 
 def get_status() -> dict:
-    """Status untuk admin UI."""
-    session = get_active_session()
+    """
+    Status detail untuk SSE dan admin UI.
+    Lebih informatif dari sebelumnya.
+    """
     with _lock:
-        total = len(_colab_sessions)
+        sessions = list(_colab_sessions.values())
 
-    if session:
+    if not sessions:
         return {
-            "online": True,
-            "session_id": session["session_id"],
-            "url": session["url"],
-            "registered_at": session["registered_at"],
+            "online": False,
+            "status": "offline",
+            "message": "Tidak ada Colab worker yang terdaftar",
+            "session_id": None,
+            "url": None,
+            "registered_at": None,
+            "last_ping_seconds_ago": None,
         }
+
+    # Ambil session terbaik
+    best = sorted(sessions, key=lambda s: s["last_ping"], reverse=True)[0]
+    status = _session_status(best)
+    elapsed = int(time.time() - best["last_ping"])
+
+    if status == "online":
+        message = f"Online — ping {elapsed}s lalu"
+    elif status == "degraded":
+        message = f"Koneksi tidak stabil — ping terakhir {elapsed}s lalu"
+    else:
+        message = f"Offline — ping terakhir {elapsed}s lalu"
+
     return {
-        "online": False,
-        "total_registered": total,
-        "message": "Tidak ada Colab worker yang aktif",
+        "online": status in ("online", "degraded"),
+        "status": status,  # "online" | "degraded" | "offline"
+        "message": message,
+        "session_id": best["session_id"],
+        "url": best["url"],
+        "registered_at": best["registered_at"],
+        "last_ping_seconds_ago": elapsed,
     }
 
 
-def call_train(job_data: dict, api_key: str) -> bool:
+def health_check(api_key: str) -> bool:
     """
-    Panggil endpoint /train di Colab.
-    Return True jika berhasil, False jika gagal.
+    Aktif cek apakah Colab masih merespons.
+    Dipanggil saat status degraded untuk konfirmasi.
     """
     session = get_active_session()
     if not session:
-        logger.warning("No active Colab session — job will stay queued")
+        return False
+
+    url = f"{session['url']}/health"
+    try:
+        res = requests.get(
+            url,
+            headers={"X-Backend-Key": api_key},
+            timeout=10,
+        )
+        if res.status_code == 200:
+            # Update last_ping karena Colab terbukti hidup
+            with _lock:
+                sid = session["session_id"]
+                if sid in _colab_sessions:
+                    _colab_sessions[sid]["last_ping"] = time.time()
+                    _colab_sessions[sid]["last_health_check"] = time.time()
+                    _colab_sessions[sid]["health_check_failed"] = 0
+            logger.info(f"Health check OK: {url}")
+            return True
+        else:
+            _mark_health_check_failed(session["session_id"])
+            return False
+    except Exception as e:
+        logger.warning(f"Health check failed: {url} — {e}")
+        _mark_health_check_failed(session["session_id"])
+        return False
+
+
+def _mark_health_check_failed(session_id: str):
+    with _lock:
+        if session_id in _colab_sessions:
+            _colab_sessions[session_id]["health_check_failed"] = (
+                _colab_sessions[session_id].get("health_check_failed", 0) + 1
+            )
+            # Jika gagal 3x berturut-turut → paksa offline dengan set last_ping ke masa lalu
+            if _colab_sessions[session_id]["health_check_failed"] >= 3:
+                _colab_sessions[session_id]["last_ping"] = 0
+                logger.warning(
+                    f"Session {session_id} marked offline after 3 failed health checks"
+                )
+
+
+def _broadcast_status():
+    try:
+        from app.layers.services.sse_service import sse_manager
+
+        sse_manager.publish("colab:status", get_status(), event="update")
+    except Exception:
+        pass
+
+
+def call_train(job_data: dict, api_key: str) -> bool:
+    session = get_active_session()
+    if not session:
         return False
 
     url = f"{session['url']}/train"
@@ -129,13 +209,10 @@ def call_train(job_data: dict, api_key: str) -> bool:
             logger.info(f"Colab accepted job {job_data.get('id', '')[:8]}")
             return True
         else:
-            logger.error(f"Colab rejected job: {res.status_code} {res.text[:200]}")
+            logger.error(f"Colab rejected: {res.status_code}")
+            _mark_health_check_failed(session["session_id"])
             return False
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to call Colab /train: {e}")
-        # Tandai session sebagai tidak responsif
-        with _lock:
-            sid = session["session_id"]
-            if sid in _colab_sessions:
-                _colab_sessions[sid]["last_ping"] = 0
+        _mark_health_check_failed(session["session_id"])
         return False

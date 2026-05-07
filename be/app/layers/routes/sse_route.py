@@ -268,14 +268,17 @@ def stream_jobs_list():
 def stream_colab_status():
     """
     Stream status Colab.
-    - Langsung kirim status terkini saat connect (bukan hanya saat ada event)
-    - Kirim ulang status terkini setiap ping timeout
+    Kirim status terkini setiap koneksi, update tiap ada perubahan,
+    dan kirim ulang setiap 30s agar browser selalu sinkron.
     """
+    COLAB_STATUS_INTERVAL = (
+        30  # lebih pendek dari PING_TIMEOUT agar update lebih sering
+    )
 
     def generate():
         from app.layers.services import colab_service
 
-        # Kirim status terkini saat pertama connect
+        # Kirim status terkini saat connect
         yield sse_manager._format(colab_service.get_status(), "init")
 
         channel = "colab:status"
@@ -283,11 +286,11 @@ def stream_colab_status():
         try:
             while True:
                 try:
-                    msg = q.get(timeout=PING_TIMEOUT)
+                    msg = q.get(timeout=COLAB_STATUS_INTERVAL)
                     yield msg
                 except queue.Empty:
-                    # Saat timeout, kirim status terkini (bukan ping kosong)
-                    # Ini memastikan badge selalu sinkron meski tidak ada event
+                    # Setiap interval, kirim status terkini meski tidak ada event
+                    # Ini memastikan badge selalu sinkron dengan kondisi aktual
                     current_status = colab_service.get_status()
                     yield sse_manager._format(current_status, "ping")
         finally:

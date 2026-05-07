@@ -234,7 +234,7 @@ export default function FormView() {
                       "bg-blue-500",
                       "Train",
                     ],
-                    [Math.round(evalSize * 100), "bg-purple-400", "Validation"],
+                    [Math.round(evalSize * 100), "bg-purple-400", "Val"],
                     [Math.round(testSize * 100), "bg-amber-400", "Test"],
                   ].map(([pct, color, label]) => (
                     <div
@@ -242,7 +242,7 @@ export default function FormView() {
                       className={`${color} flex items-center justify-center text-[10px] font-medium text-white transition-all`}
                       style={{ width: `${pct}%` }}
                     >
-                      {pct >= 12 && `${label} ${pct}%`}
+                      {pct >= 5 && `${label} ${pct}%`}
                     </div>
                   ))}
                 </div>

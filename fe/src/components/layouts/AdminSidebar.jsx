@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/libs/utils";
 import useAuthStore from "@/features/auth/store";
-import { ColabStatusBadge } from "@/features/admin/training/components/ui/Badge";
+import ColabStatusBadge from "../ui/ColabStatusBadge";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },

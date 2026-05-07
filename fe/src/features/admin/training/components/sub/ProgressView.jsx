@@ -10,7 +10,6 @@ export default function ProgressView() {
   if (!activeJob) return null;
 
   const job = activeJob;
-  console.log(job);
   const pct = job.progress || 0;
 
   const handleCancel = async () => {
@@ -38,7 +37,9 @@ export default function ProgressView() {
             <p className="text-sm text-blue-600">{job.display_name}</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-blue-700">{pct}%</p>
+            <p className="text-2xl font-bold text-blue-700">
+              {pct !== 100 ? pct + "%" : "Finishing..."}
+            </p>
             <p className="text-xs text-blue-500">
               Epoch {job.current_epoch} / {job.total_epochs}
             </p>

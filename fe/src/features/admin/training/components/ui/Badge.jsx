@@ -1,50 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { Loader2, CheckCircle, XCircle, Clock, Ban } from "lucide-react";
-import { Wifi, WifiOff } from "lucide-react";
-import { useSSE } from "@/hooks/useSSE";
-
-export function ColabStatusBadge() {
-  const [status, setStatus] = useState(null);
-
-  useSSE("/api/sse/colab-status", {
-    onMessage: (data, eventType) => {
-      if (
-        eventType === "init" ||
-        eventType === "update" ||
-        eventType === "ping"
-      ) {
-        setStatus(data);
-      }
-    },
-  });
-
-  if (!status) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-400">
-        <Loader2 size={11} className="animate-spin" />
-        Colab
-      </span>
-    );
-  }
-
-  if (status.online) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-        <Wifi size={11} />
-        Colab Online
-      </span>
-    );
-  }
-
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-500">
-      <WifiOff size={11} />
-      Colab Offline
-    </span>
-  );
-}
 
 export function StatusBadge({ status }) {
   const STATUS_CONFIG = {
