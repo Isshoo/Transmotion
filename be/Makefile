@@ -69,6 +69,12 @@ data-prep:
 scrape:
 	bash scripts/dataset/harvestscrape.sh
 
+excel2csv:
+	$(PYTHON) scripts/dataset/excel_to_csv.py
+
+csv2excel:
+	$(PYTHON) scripts/dataset/csv_to_excel.py
+
 # Kualitas Kode
 lint:
 	$(RUFF) check .
