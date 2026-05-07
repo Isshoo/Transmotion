@@ -67,6 +67,8 @@ export default function ProgressView() {
               <strong>
                 {job.split_info.train_total?.toLocaleString("id")}
               </strong>{" "}
+              / Validasi:{" "}
+              <strong>{job.split_info.eval_total?.toLocaleString("id")}</strong>{" "}
               / Test:{" "}
               <strong>{job.split_info.test_total?.toLocaleString("id")}</strong>
             </span>

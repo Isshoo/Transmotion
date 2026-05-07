@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -20,6 +20,27 @@ import { MetricBar } from "./ui/Bar";
 import { PerClassTable } from "./ui/Table";
 import { AverageTable } from "../../training/components/ui/Table";
 
+function TabHeader({ tabs, activeTab, setActiveTab }) {
+  if (!tabs || tabs.length <= 1) return null;
+  return (
+    <div className="mb-5 flex border-b border-gray-100">
+      {tabs.map(({ key, label, color }) => (
+        <button
+          key={key}
+          onClick={() => setActiveTab(key)}
+          className={`border-b-2 px-5 py-2.5 text-xs font-semibold transition ${
+            activeTab === key
+              ? `border-current ${color}`
+              : "border-transparent text-gray-400 hover:text-gray-600"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function ModelDetail({ modelId }) {
   const router = useRouter();
   const {
@@ -30,6 +51,10 @@ export default function ModelDetail({ modelId }) {
     updateModel,
     openEditModal,
   } = useModelStore();
+
+  const [activeMetricTab, setActiveMetricTab] = useState("test");
+  const [activeCMTab, setActiveCMTab] = useState("test");
+  const [activePerClassTab, setActivePerClassTab] = useState("test");
 
   useEffect(() => {
     fetchModel(modelId);
@@ -45,6 +70,23 @@ export default function ModelDetail({ modelId }) {
   }
 
   const m = currentModel;
+
+  const testLabels = m.confusion_matrix?.labels || [];
+  const evalLabels = m.eval_confusion_matrix?.labels || [];
+  const hasEvalMetrics = m.eval_accuracy != null || m.eval_f1 != null;
+
+  const splitTabs = [
+    { key: "test", label: "Test Set (Final)", color: "text-amber-600" },
+    ...(hasEvalMetrics
+      ? [
+          {
+            key: "eval",
+            label: "Val Set (Validation)",
+            color: "text-purple-600",
+          },
+        ]
+      : []),
+  ];
 
   const formatSize = (bytes) => {
     if (!bytes) return "—";
@@ -210,52 +252,144 @@ export default function ModelDetail({ modelId }) {
       </div>
 
       {/* ── Baris 2: Metrik Evaluasi ──────────────────────────── */}
-      <Section title="Metrik Evaluasi (Test Set)">
-        <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-4">
-          {[
-            ["Accuracy", m.accuracy, "text-blue-600"],
-            ["F1 Score", m.f1_score, "text-green-600"],
-            ["Precision", m.precision, "text-purple-600"],
-            ["Recall", m.recall, "text-amber-600"],
-          ].map(([label, value, color]) => (
-            <div key={label} className="text-center">
-              <p className="text-xs text-gray-400">{label}</p>
-              <p className={`mt-1 text-3xl font-bold ${color}`}>
-                {value !== null ? `${(value * 100).toFixed(2)}%` : "—"}
-              </p>
+      <Section title="Metrik Evaluasi">
+        <TabHeader
+          tabs={splitTabs}
+          activeTab={activeMetricTab}
+          setActiveTab={setActiveMetricTab}
+        />
+
+        {activeMetricTab === "test" ? (
+          <>
+            <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {[
+                ["Accuracy", m.accuracy, "text-blue-600"],
+                ["F1 Score", m.f1_score, "text-green-600"],
+                ["Precision", m.precision, "text-purple-600"],
+                ["Recall", m.recall, "text-amber-600"],
+              ].map(([label, value, color]) => (
+                <div key={label} className="text-center">
+                  <p className="text-xs text-gray-400">{label}</p>
+                  <p className={`mt-1 text-3xl font-bold ${color}`}>
+                    {value !== null ? `${(value * 100).toFixed(2)}%` : "—"}
+                  </p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="space-y-3">
-          <MetricBar label="Accuracy" value={m.accuracy} color="bg-blue-500" />
-          <MetricBar label="F1 Score" value={m.f1_score} color="bg-green-500" />
-          <MetricBar
-            label="Precision"
-            value={m.precision}
-            color="bg-purple-500"
-          />
-          <MetricBar label="Recall" value={m.recall} color="bg-amber-500" />
-        </div>
+            <div className="space-y-3">
+              <MetricBar label="MCC" value={m.mcc} color="bg-blue-500" />
+              <MetricBar
+                label="ROC-AUC"
+                value={m.roc_auc}
+                color="bg-green-500"
+              />
+              <MetricBar
+                label="Mean Std"
+                value={m.mean_std}
+                color="bg-purple-500"
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {[
+                ["Accuracy", m.eval_accuracy, "text-blue-600"],
+                ["F1 Score", m.eval_f1, "text-green-600"],
+                ["Precision", m.eval_precision, "text-purple-600"],
+                ["Recall", m.eval_recall, "text-amber-600"],
+              ].map(([label, value, color]) => (
+                <div key={label} className="text-center">
+                  <p className="text-xs text-gray-400">{label}</p>
+                  <p className={`mt-1 text-3xl font-bold ${color}`}>
+                    {value !== null ? `${(value * 100).toFixed(2)}%` : "—"}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-4 text-xs text-gray-400 italic">
+              * Metrik MCC, ROC-AUC, dan Mean Std tidak dihitung dari test set.
+            </p>
+          </>
+        )}
       </Section>
 
-      {/* ── Baris 3: Metrik Per Kelas ─────────────────────────── */}
-      {m.per_class_metrics && (
+      {/* ── Baris 3: Metrik Per Kelas & Rata-rata ──────────────── */}
+      {(m.per_class_metrics || m.eval_per_class_metrics) && (
         <Section title="Metrik Per Kelas">
-          <PerClassTable perClass={m.per_class_metrics} />
-        </Section>
-      )}
+          <TabHeader
+            tabs={[
+              { key: "test", label: "Test Set", color: "text-amber-600" },
+              ...(m.eval_per_class_metrics
+                ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
+                : []),
+            ]}
+            activeTab={activePerClassTab}
+            setActiveTab={setActivePerClassTab}
+          />
 
-      {/* ── Baris 4: Rata-rata ────────────────────────────────── */}
-      {(m.macro_avg || m.weighted_avg) && (
-        <Section title="Rata-rata">
-          <AverageTable macroAvg={m.macro_avg} weightedAvg={m.weighted_avg} />
+          {activePerClassTab === "test" && (
+            <>
+              <PerClassTable
+                perClass={m.per_class_metrics}
+                labels={testLabels}
+              />
+              {(m.macro_avg || m.weighted_avg) && (
+                <div className="mt-6">
+                  <p className="mb-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    Rata-rata (Test Set)
+                  </p>
+                  <AverageTable
+                    macroAvg={m.macro_avg}
+                    weightedAvg={m.weighted_avg}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {activePerClassTab === "eval" && (
+            <>
+              <PerClassTable
+                perClass={m.eval_per_class_metrics}
+                labels={evalLabels}
+              />
+              {(m.eval_macro_avg || m.eval_weighted_avg) && (
+                <div className="mt-6">
+                  <p className="mb-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    Rata-rata (Val Set)
+                  </p>
+                  <AverageTable
+                    macroAvg={m.eval_macro_avg}
+                    weightedAvg={m.eval_weighted_avg}
+                  />
+                </div>
+              )}
+            </>
+          )}
         </Section>
       )}
 
       {/* ── Baris 5: Confusion Matrix ─────────────────────────── */}
-      {m.confusion_matrix && (
+      {(m.confusion_matrix || m.eval_confusion_matrix) && (
         <Section title="Confusion Matrix">
-          <ConfusionMatrix data={m.confusion_matrix} />
+          <TabHeader
+            tabs={[
+              { key: "test", label: "Test Set", color: "text-amber-600" },
+              ...(m.eval_confusion_matrix
+                ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
+                : []),
+            ]}
+            activeTab={activeCMTab}
+            setActiveTab={setActiveCMTab}
+          />
+          {activeCMTab === "test" && m.confusion_matrix && (
+            <ConfusionMatrix data={m.confusion_matrix} />
+          )}
+          {activeCMTab === "eval" && m.eval_confusion_matrix && (
+            <ConfusionMatrix data={m.eval_confusion_matrix} />
+          )}
         </Section>
       )}
 

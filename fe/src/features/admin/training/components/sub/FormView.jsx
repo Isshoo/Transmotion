@@ -343,7 +343,7 @@ export default function FormView() {
             </select>
             {hyperparams.max_length === "auto" && (
               <p className="mt-1 text-[11px] text-gray-400">
-                Max length akan dihitung dari persentil ke-95 panjang token di
+                Max length akan dihitung dari persentil ke-99 panjang token di
                 dataset.
               </p>
             )}
