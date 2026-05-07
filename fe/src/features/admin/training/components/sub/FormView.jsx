@@ -48,6 +48,9 @@ export default function FormView() {
   } = useTrainingStore();
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isDatasetDropdownOpen, setIsDatasetDropdownOpen] = useState(false);
+
+  const selectedDataset = datasets.find((d) => d.id === selectedDatasetId);
 
   const canSubmit =
     selectedDatasetId && splitPreview?.is_valid && modelType && !isSubmitting;
@@ -78,44 +81,92 @@ export default function FormView() {
             dahulu.
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {datasets.map((ds) => (
-              <button
-                key={ds.id}
-                type="button"
-                onClick={() => setSelectedDatasetId(ds.id)}
-                className={`rounded-xl border px-4 py-3 text-left transition ${
-                  selectedDatasetId === ds.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                }`}
-              >
-                <p
-                  className={`text-sm font-medium ${
-                    selectedDatasetId === ds.id
-                      ? "text-blue-700"
-                      : "text-gray-800"
-                  }`}
-                >
-                  {ds.name}
-                </p>
-                <div className="mt-0.5 flex flex-wrap gap-2 text-xs text-gray-500">
-                  <span>
-                    {ds.num_rows_preprocessed?.toLocaleString("id")} baris
-                  </span>
-                  <span>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsDatasetDropdownOpen(!isDatasetDropdownOpen)}
+              className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                selectedDatasetId
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+              }`}
+            >
+              {selectedDataset ? (
+                <div>
+                  <p className="text-sm font-medium text-blue-700">
+                    {selectedDataset.name}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-blue-500">
+                    {selectedDataset.num_rows_preprocessed?.toLocaleString(
+                      "id"
+                    )}{" "}
+                    baris ·{" "}
                     {
-                      Object.keys(ds.class_distribution_preprocessed ?? {})
-                        .length
+                      Object.keys(
+                        selectedDataset.class_distribution_preprocessed ?? {}
+                      ).length
                     }{" "}
-                    kelas
-                  </span>
-                  <span>
-                    {ds.text_column} → {ds.label_column}
-                  </span>
+                    kelas · {selectedDataset.text_column} →{" "}
+                    {selectedDataset.label_column}
+                  </p>
                 </div>
-              </button>
-            ))}
+              ) : (
+                <span className="text-sm text-gray-400">Pilih dataset...</span>
+              )}
+              <ChevronDown
+                size={18}
+                className={`text-gray-400 transition-transform ${
+                  isDatasetDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {isDatasetDropdownOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setIsDatasetDropdownOpen(false)}
+                />
+                <div className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
+                  {datasets.map((ds) => (
+                    <button
+                      key={ds.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedDatasetId(ds.id);
+                        setIsDatasetDropdownOpen(false);
+                      }}
+                      className={`flex w-full flex-col px-4 py-3 text-left transition hover:bg-gray-50 ${
+                        selectedDatasetId === ds.id ? "bg-blue-50" : ""
+                      }`}
+                    >
+                      <p
+                        className={`text-sm font-medium ${
+                          selectedDatasetId === ds.id
+                            ? "text-blue-700"
+                            : "text-gray-800"
+                        }`}
+                      >
+                        {ds.name}
+                      </p>
+                      <div className="mt-0.5 flex gap-2 text-[11px] text-gray-500">
+                        <span>
+                          {ds.num_rows_preprocessed?.toLocaleString("id")} baris
+                        </span>
+                        <span>
+                          {
+                            Object.keys(
+                              ds.class_distribution_preprocessed ?? {}
+                            ).length
+                          }{" "}
+                          kelas
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -123,11 +174,11 @@ export default function FormView() {
       {selectedDatasetId && (
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <p className="mb-1 text-sm font-semibold text-gray-800">
-            2. Pembagian Data (Train / Eval / Test)
+            Pembagian Data (Train / Validation / Test)
           </p>
           <p className="mb-4 text-xs text-gray-400">
-            Data dibagi 3: train untuk pelatihan, eval untuk monitoring per
-            epoch, test untuk evaluasi akhir.
+            Data dibagi 3: train untuk pelatihan, validation untuk monitoring
+            per epoch, test untuk evaluasi akhir.
           </p>
 
           <div className="mb-5 space-y-4">
@@ -156,7 +207,7 @@ export default function FormView() {
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="text-xs font-medium text-gray-600">
-                  Eval Set
+                  Validation Set
                 </span>
                 <span className="text-xs font-semibold text-purple-600">
                   {Math.round(evalSize * 100)}%
@@ -183,7 +234,7 @@ export default function FormView() {
                       "bg-blue-500",
                       "Train",
                     ],
-                    [Math.round(evalSize * 100), "bg-purple-400", "Eval"],
+                    [Math.round(evalSize * 100), "bg-purple-400", "Validation"],
                     [Math.round(testSize * 100), "bg-amber-400", "Test"],
                   ].map(([pct, color, label]) => (
                     <div
@@ -201,7 +252,10 @@ export default function FormView() {
                       "bg-blue-500",
                       `Train ${Math.round((1 - testSize - evalSize) * 100)}%`,
                     ],
-                    ["bg-purple-400", `Eval ${Math.round(evalSize * 100)}%`],
+                    [
+                      "bg-purple-400",
+                      `Validation ${Math.round(evalSize * 100)}%`,
+                    ],
                     ["bg-amber-400", `Test ${Math.round(testSize * 100)}%`],
                   ].map(([color, label]) => (
                     <span

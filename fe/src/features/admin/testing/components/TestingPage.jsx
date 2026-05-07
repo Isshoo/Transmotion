@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Send, Loader2, UploadCloud, FileText, X, Filter } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Send,
+  Loader2,
+  UploadCloud,
+  FileText,
+  X,
+  Filter,
+  ChevronDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import useTestingStore from "../store";
 import { BatchResults, SingleResult } from "./ui/Result";
@@ -35,6 +43,9 @@ export default function TestingPage() {
     clearResults,
   } = useTestingStore();
 
+  const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
+  const selectedModel = activeModels.find((m) => m.id === selectedModelId);
+
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -49,8 +60,8 @@ export default function TestingPage() {
     const file = e.target.files[0];
     if (!file) return;
     const ext = file.name.split(".").pop().toLowerCase();
-    if (!["csv", "tsv", "txt"].includes(ext)) {
-      toast.error("Format harus CSV, TSV, atau TXT");
+    if (!["csv", "tsv", "txt", "xlsx", "xls"].includes(ext)) {
+      toast.error("Format harus CSV, TSV, TXT, XLSX, atau XLS");
       return;
     }
     await setCsvFile(file);
@@ -109,49 +120,95 @@ export default function TestingPage() {
                 Tidak ada model aktif dengan filter ini.
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {activeModels.map((model) => (
-                  <button
-                    key={model.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedModelId(model.id);
-                      clearResults();
-                      fetchHistory();
-                    }}
-                    className={`rounded-xl border px-4 py-3 text-left transition ${
-                      selectedModelId === model.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <p
-                        className={`truncate text-sm font-medium ${
-                          selectedModelId === model.id
-                            ? "text-blue-700"
-                            : "text-gray-800"
-                        }`}
-                      >
-                        {model.name}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
+                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                    selectedModelId
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                  }`}
+                >
+                  {selectedModel ? (
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-blue-700">
+                        {selectedModel.name}
                       </p>
                       <span
-                        className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-                          model.model_type === "xlmr"
+                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                          selectedModel.model_type === "xlmr"
                             ? "bg-purple-100 text-purple-700"
                             : "bg-teal-100 text-teal-700"
                         }`}
                       >
-                        {model.model_type?.toUpperCase()}
+                        {selectedModel.model_type?.toUpperCase()}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-xs text-gray-400">
-                      {model.accuracy !== null &&
-                        `Acc: ${(model.accuracy * 100).toFixed(1)}% · `}
-                      {model.num_labels} kelas
-                    </p>
-                  </button>
-                ))}
+                  ) : (
+                    <span className="text-sm text-gray-400">
+                      Pilih model...
+                    </span>
+                  )}
+                  <ChevronDown
+                    size={18}
+                    className={`text-gray-400 transition-transform ${
+                      isModelDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {isModelDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsModelDropdownOpen(false)}
+                    />
+                    <div className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
+                      {activeModels.map((model) => (
+                        <button
+                          key={model.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedModelId(model.id);
+                            clearResults();
+                            fetchHistory();
+                            setIsModelDropdownOpen(false);
+                          }}
+                          className={`flex w-full flex-col px-4 py-3 text-left transition hover:bg-gray-50 ${
+                            selectedModelId === model.id ? "bg-blue-50" : ""
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <p
+                              className={`truncate text-sm font-medium ${
+                                selectedModelId === model.id
+                                  ? "text-blue-700"
+                                  : "text-gray-800"
+                              }`}
+                            >
+                              {model.name}
+                            </p>
+                            <span
+                              className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                                model.model_type === "xlmr"
+                                  ? "bg-purple-100 text-purple-700"
+                                  : "bg-teal-100 text-teal-700"
+                              }`}
+                            >
+                              {model.model_type?.toUpperCase()}
+                            </span>
+                          </div>
+                          <p className="mt-0.5 text-[11px] text-gray-400">
+                            {model.accuracy !== null &&
+                              `Acc: ${(model.accuracy * 100).toFixed(1)}% · `}
+                            {model.num_labels} kelas
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -231,9 +288,7 @@ export default function TestingPage() {
                       CSV / TSV / TXT
                     </span>
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">
-                    Maks 500 baris
-                  </p>
+                  <p className="mt-1 text-xs text-gray-400">Maks 500 baris</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -253,7 +308,8 @@ export default function TestingPage() {
                       onClick={() => {
                         setCsvFile(null);
                         clearResults();
-                        if (fileInputRef.current) fileInputRef.current.value = "";
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
                       }}
                       className="rounded-lg p-1 text-gray-400 transition hover:bg-white hover:text-gray-600"
                     >

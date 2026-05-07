@@ -42,7 +42,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
         {[
           ["Total", preview.total],
           ["Train", preview.train_total],
-          ["Eval", preview.eval_total],
+          ["Validation", preview.eval_total],
           ["Test", preview.test_total],
         ].map(([label, value]) => (
           <div key={label} className="px-4 py-2.5 text-center">
@@ -57,7 +57,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
       {/* Per kelas */}
       {preview.train_per_class &&
         Object.keys(preview.train_per_class).length > 0 && (
-          <div className="grid grid-cols-1 gap-4 border-t p-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 border-t p-4 sm:grid-cols-3">
             <div>
               <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
                 Train set
@@ -78,7 +78,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
             </div>
             <div>
               <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                Eval set
+                Validation set
               </p>
               <div className="space-y-1.5">
                 {Object.entries(preview.eval_per_class || {}).map(
@@ -119,7 +119,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
       <div className="flex gap-4 border-t px-4 py-2">
         {[
           ["bg-blue-400", "Train"],
-          ["bg-purple-400", "Eval"],
+          ["bg-purple-400", "Validation"],
           ["bg-amber-400", "Test"],
         ].map(([color, label]) => (
           <span
