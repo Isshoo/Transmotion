@@ -126,20 +126,20 @@ class TrainingJob(db.Model):
                 "final_roc_auc": tm.roc_auc if tm else None,
                 "final_mean_std": tm.mean_std if tm else None,
                 # Eval set metrics
-                "eval_accuracy": tm.eval_accuracy if tm else None,
-                "eval_f1": tm.eval_f1 if tm else None,
-                "eval_precision": tm.eval_precision if tm else None,
-                "eval_recall": tm.eval_recall if tm else None,
+                "val_accuracy": tm.val_accuracy if tm else None,
+                "val_f1": tm.val_f1 if tm else None,
+                "val_precision": tm.val_precision if tm else None,
+                "val_recall": tm.val_recall if tm else None,
                 # Confusion matrix & per-class (test)
                 "confusion_matrix": tm.confusion_matrix if tm else None,
                 "per_class_metrics": tm.per_class_metrics if tm else None,
                 "macro_avg": tm.macro_avg if tm else None,
                 "weighted_avg": tm.weighted_avg if tm else None,
                 # Confusion matrix & per-class (eval)
-                "eval_confusion_matrix": tm.eval_confusion_matrix if tm else None,
-                "eval_per_class_metrics": tm.eval_per_class_metrics if tm else None,
-                "eval_macro_avg": tm.eval_macro_avg if tm else None,
-                "eval_weighted_avg": tm.eval_weighted_avg if tm else None,
+                "val_confusion_matrix": tm.val_confusion_matrix if tm else None,
+                "val_per_class_metrics": tm.val_per_class_metrics if tm else None,
+                "val_macro_avg": tm.val_macro_avg if tm else None,
+                "val_weighted_avg": tm.val_weighted_avg if tm else None,
             }
         )
 

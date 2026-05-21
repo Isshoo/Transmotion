@@ -46,26 +46,26 @@ export default function EpochLogsTable({ logs }) {
                       {log.train_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="bg-purple-50/30 px-3 py-2 text-gray-600">
-                      {log.eval_loss?.toFixed(4) ?? "—"}
+                      {log.val_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="bg-purple-50/30 px-3 py-2 text-gray-600">
-                      {log.eval_accuracy != null
-                        ? `${(log.eval_accuracy * 100).toFixed(2)}%`
+                      {log.val_accuracy != null
+                        ? `${(log.val_accuracy * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="bg-purple-50/30 px-3 py-2 text-gray-600">
-                      {log.eval_precision != null
-                        ? `${(log.eval_precision * 100).toFixed(2)}%`
+                      {log.val_precision != null
+                        ? `${(log.val_precision * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="bg-purple-50/30 px-3 py-2 text-gray-600">
-                      {log.eval_recall != null
-                        ? `${(log.eval_recall * 100).toFixed(2)}%`
+                      {log.val_recall != null
+                        ? `${(log.val_recall * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="bg-purple-50/30 px-3 py-2 text-gray-600">
-                      {log.eval_f1 != null
-                        ? `${(log.eval_f1 * 100).toFixed(2)}%`
+                      {log.val_f1 != null
+                        ? `${(log.val_f1 * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                   </tr>

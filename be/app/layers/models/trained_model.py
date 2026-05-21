@@ -40,10 +40,10 @@ class TrainedModel(db.Model):
     mean_std = db.Column(db.Float, nullable=True)  # std dev confidence scores
 
     # Eval set metrics
-    eval_accuracy = db.Column(db.Float, nullable=True)
-    eval_f1 = db.Column(db.Float, nullable=True)
-    eval_precision = db.Column(db.Float, nullable=True)
-    eval_recall = db.Column(db.Float, nullable=True)
+    val_accuracy = db.Column(db.Float, nullable=True)
+    val_f1 = db.Column(db.Float, nullable=True)
+    val_precision = db.Column(db.Float, nullable=True)
+    val_recall = db.Column(db.Float, nullable=True)
 
     # Confusion matrix & per-class (test)
     confusion_matrix = db.Column(JSON, nullable=True)
@@ -52,10 +52,10 @@ class TrainedModel(db.Model):
     weighted_avg = db.Column(JSON, nullable=True)
 
     # Confusion matrix & per-class (eval)
-    eval_confusion_matrix = db.Column(JSON, nullable=True)
-    eval_per_class_metrics = db.Column(JSON, nullable=True)
-    eval_macro_avg = db.Column(JSON, nullable=True)
-    eval_weighted_avg = db.Column(JSON, nullable=True)
+    val_confusion_matrix = db.Column(JSON, nullable=True)
+    val_per_class_metrics = db.Column(JSON, nullable=True)
+    val_macro_avg = db.Column(JSON, nullable=True)
+    val_weighted_avg = db.Column(JSON, nullable=True)
 
     # Config yang dipakai saat training (snapshot dari hyperparams)
     training_config = db.Column(JSON, nullable=True)
@@ -129,20 +129,20 @@ class TrainedModel(db.Model):
             "roc_auc": self.roc_auc,
             "mean_std": self.mean_std,
             # Eval set metrics
-            "eval_accuracy": self.eval_accuracy,
-            "eval_f1": self.eval_f1,
-            "eval_precision": self.eval_precision,
-            "eval_recall": self.eval_recall,
+            "val_accuracy": self.val_accuracy,
+            "val_f1": self.val_f1,
+            "val_precision": self.val_precision,
+            "val_recall": self.val_recall,
             # Confusion matrix & per-class (test)
             "confusion_matrix": self.confusion_matrix,
             "per_class_metrics": self.per_class_metrics,
             "macro_avg": self.macro_avg,
             "weighted_avg": self.weighted_avg,
             # Confusion matrix & per-class (eval)
-            "eval_confusion_matrix": self.eval_confusion_matrix,
-            "eval_per_class_metrics": self.eval_per_class_metrics,
-            "eval_macro_avg": self.eval_macro_avg,
-            "eval_weighted_avg": self.eval_weighted_avg,
+            "val_confusion_matrix": self.val_confusion_matrix,
+            "val_per_class_metrics": self.val_per_class_metrics,
+            "val_macro_avg": self.val_macro_avg,
+            "val_weighted_avg": self.val_weighted_avg,
             # Epoch logs berasal dari job (bukan metric model)
             "epoch_logs": job.epoch_logs if job else None,
             "file_path": self.file_path,

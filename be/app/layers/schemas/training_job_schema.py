@@ -24,7 +24,7 @@ class CreateTrainingJobSchema(Schema):
         validate=validate.Range(min=0.05, max=0.4),
         error_messages={"required": "Ukuran test set harus diisi"},
     )
-    eval_size = fields.Float(
+    val_size = fields.Float(
         load_default=0.1,
         validate=validate.Range(min=0.05, max=0.3),
     )
@@ -69,7 +69,7 @@ class SplitPreviewSchema(Schema):
         required=True,
         validate=validate.Range(min=0.05, max=0.4),
     )
-    eval_size = fields.Float(
+    val_size = fields.Float(
         load_default=0.1,
         validate=validate.Range(min=0.05, max=0.3),
     )
@@ -88,11 +88,11 @@ class UpdateJobProgressSchema(Schema):
     train_accuracy = fields.Float(load_default=None)
     train_f1 = fields.Float(load_default=None)
     # Eval metrics (validation set)
-    eval_loss = fields.Float(load_default=None)
-    eval_accuracy = fields.Float(load_default=None)
-    eval_precision = fields.Float(load_default=None)
-    eval_recall = fields.Float(load_default=None)
-    eval_f1 = fields.Float(load_default=None)
+    val_loss = fields.Float(load_default=None)
+    val_accuracy = fields.Float(load_default=None)
+    val_precision = fields.Float(load_default=None)
+    val_recall = fields.Float(load_default=None)
+    val_f1 = fields.Float(load_default=None)
     colab_session_id = fields.String(load_default=None)
 
 
@@ -100,10 +100,10 @@ class CompleteJobSchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
     model_name = fields.String(required=True)
     # Eval set metrics
-    eval_accuracy = fields.Float(load_default=None)
-    eval_f1 = fields.Float(load_default=None)
-    eval_precision = fields.Float(load_default=None)
-    eval_recall = fields.Float(load_default=None)
+    val_accuracy = fields.Float(load_default=None)
+    val_f1 = fields.Float(load_default=None)
+    val_precision = fields.Float(load_default=None)
+    val_recall = fields.Float(load_default=None)
     # Test set metrics
     accuracy = fields.Float(required=True)
     f1_score = fields.Float(required=True)
@@ -124,10 +124,10 @@ class CompleteJobSchema(Schema):
     macro_avg = fields.Str(load_default=None)
     weighted_avg = fields.Str(load_default=None)
     # Eval set evaluation
-    eval_confusion_matrix = fields.Str(load_default=None)
-    eval_per_class_metrics = fields.Str(load_default=None)
-    eval_macro_avg = fields.Str(load_default=None)
-    eval_weighted_avg = fields.Str(load_default=None)
+    val_confusion_matrix = fields.Str(load_default=None)
+    val_per_class_metrics = fields.Str(load_default=None)
+    val_macro_avg = fields.Str(load_default=None)
+    val_weighted_avg = fields.Str(load_default=None)
 
 
 class JobListQuerySchema(Schema):

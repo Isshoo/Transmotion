@@ -72,8 +72,8 @@ export default function ModelDetail({ modelId }) {
   const m = currentModel;
 
   const testLabels = m.confusion_matrix?.labels || [];
-  const evalLabels = m.eval_confusion_matrix?.labels || [];
-  const hasEvalMetrics = m.eval_accuracy != null || m.eval_f1 != null;
+  const evalLabels = m.val_confusion_matrix?.labels || [];
+  const hasEvalMetrics = m.val_accuracy != null || m.val_f1 != null;
 
   const splitTabs = [
     { key: "test", label: "Test Set (Final)", color: "text-amber-600" },
@@ -294,10 +294,10 @@ export default function ModelDetail({ modelId }) {
           <>
             <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-4">
               {[
-                ["Accuracy", m.eval_accuracy, "text-blue-600"],
-                ["F1 Score", m.eval_f1, "text-green-600"],
-                ["Precision", m.eval_precision, "text-purple-600"],
-                ["Recall", m.eval_recall, "text-amber-600"],
+                ["Accuracy", m.val_accuracy, "text-blue-600"],
+                ["F1 Score", m.val_f1, "text-green-600"],
+                ["Precision", m.val_precision, "text-purple-600"],
+                ["Recall", m.val_recall, "text-amber-600"],
               ].map(([label, value, color]) => (
                 <div key={label} className="text-center">
                   <p className="text-xs text-gray-400">{label}</p>
@@ -316,12 +316,12 @@ export default function ModelDetail({ modelId }) {
       </Section>
 
       {/* ── Baris 3: Metrik Per Kelas & Rata-rata ──────────────── */}
-      {(m.per_class_metrics || m.eval_per_class_metrics) && (
+      {(m.per_class_metrics || m.val_per_class_metrics) && (
         <Section title="Metrik Per Kelas">
           <TabHeader
             tabs={[
               { key: "test", label: "Test Set", color: "text-amber-600" },
-              ...(m.eval_per_class_metrics
+              ...(m.val_per_class_metrics
                 ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
                 : []),
             ]}
@@ -352,17 +352,17 @@ export default function ModelDetail({ modelId }) {
           {activePerClassTab === "eval" && (
             <>
               <PerClassTable
-                perClass={m.eval_per_class_metrics}
+                perClass={m.val_per_class_metrics}
                 labels={evalLabels}
               />
-              {(m.eval_macro_avg || m.eval_weighted_avg) && (
+              {(m.val_macro_avg || m.val_weighted_avg) && (
                 <div className="mt-6">
                   <p className="mb-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
                     Rata-rata (Val Set)
                   </p>
                   <AverageTable
-                    macroAvg={m.eval_macro_avg}
-                    weightedAvg={m.eval_weighted_avg}
+                    macroAvg={m.val_macro_avg}
+                    weightedAvg={m.val_weighted_avg}
                   />
                 </div>
               )}
@@ -372,12 +372,12 @@ export default function ModelDetail({ modelId }) {
       )}
 
       {/* ── Baris 5: Confusion Matrix ─────────────────────────── */}
-      {(m.confusion_matrix || m.eval_confusion_matrix) && (
+      {(m.confusion_matrix || m.val_confusion_matrix) && (
         <Section title="Confusion Matrix">
           <TabHeader
             tabs={[
               { key: "test", label: "Test Set", color: "text-amber-600" },
-              ...(m.eval_confusion_matrix
+              ...(m.val_confusion_matrix
                 ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
                 : []),
             ]}
@@ -387,8 +387,8 @@ export default function ModelDetail({ modelId }) {
           {activeCMTab === "test" && m.confusion_matrix && (
             <ConfusionMatrix data={m.confusion_matrix} />
           )}
-          {activeCMTab === "eval" && m.eval_confusion_matrix && (
-            <ConfusionMatrix data={m.eval_confusion_matrix} />
+          {activeCMTab === "eval" && m.val_confusion_matrix && (
+            <ConfusionMatrix data={m.val_confusion_matrix} />
           )}
         </Section>
       )}
@@ -430,7 +430,7 @@ export default function ModelDetail({ modelId }) {
                 ],
                 [
                   "Validation Set",
-                  m.job.split_info.eval_total?.toLocaleString("id"),
+                  m.job.split_info.val_total?.toLocaleString("id"),
                 ],
                 ["Test Set", m.job.split_info.test_total?.toLocaleString("id")],
               ].map(([label, value]) => (

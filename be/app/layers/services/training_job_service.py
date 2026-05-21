@@ -39,7 +39,7 @@ def get_all(page=1, per_page=20, status=None, model_type=None, sort_order="desc"
 def compute_split_preview(
     dataset_id: str,
     test_size: float,
-    eval_size: float = 0.1,
+    val_size: float = 0.1,
 ) -> dict:
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
@@ -56,17 +56,17 @@ def compute_split_preview(
         raise BadRequestError("Informasi distribusi kelas tidak tersedia")
 
     train_per_class = {}
-    eval_per_class = {}
+    val_per_class = {}
     test_per_class = {}
     errors = []
 
     for label, count in dist.items():
         test_n = max(1, math.floor(count * test_size))
-        eval_n = max(1, math.floor(count * eval_size))
-        train_n = count - test_n - eval_n
+        val_n = max(1, math.floor(count * val_size))
+        train_n = count - test_n - val_n
 
         train_per_class[label] = train_n
-        eval_per_class[label] = eval_n
+        val_per_class[label] = val_n
         test_per_class[label] = test_n
 
         if train_n < MIN_SAMPLES_PER_CLASS:
@@ -76,7 +76,7 @@ def compute_split_preview(
             )
 
     train_total = sum(train_per_class.values())
-    eval_total = sum(eval_per_class.values())
+    val_total = sum(val_per_class.values())
     test_total = sum(test_per_class.values())
 
     if train_total < MIN_TOTAL_TRAIN:
@@ -88,13 +88,13 @@ def compute_split_preview(
         "dataset_id": dataset_id,
         "dataset_name": dataset.name,
         "test_size": test_size,
-        "eval_size": eval_size,
+        "val_size": val_size,
         "total": total,
         "train_total": train_total,
-        "eval_total": eval_total,
+        "val_total": val_total,
         "test_total": test_total,
         "train_per_class": train_per_class,
-        "eval_per_class": eval_per_class,
+        "val_per_class": val_per_class,
         "test_per_class": test_per_class,
         "labels": list(dist.keys()),
         "num_labels": len(dist),
@@ -107,7 +107,7 @@ def create(
     dataset_id: str,
     model_type: str,
     test_size: float,
-    eval_size: float,
+    val_size: float,
     hyperparams: dict,
     job_name: str | None,
     user_id: str | None,
@@ -122,7 +122,7 @@ def create(
     if not dataset.columns_configured():
         raise BadRequestError("Kolom teks dan label belum dikonfigurasi")
 
-    split_info = compute_split_preview(dataset_id, test_size, eval_size)
+    split_info = compute_split_preview(dataset_id, test_size, val_size)
     if not split_info["is_valid"]:
         raise BadRequestError(
             "Data tidak cukup: " + "; ".join(split_info["validation_errors"])
@@ -237,11 +237,11 @@ def update_progress(job_id: str, data: dict) -> TrainingJob:
             "train_accuracy": data.get("train_accuracy"),
             "train_f1": data.get("train_f1"),
             # Eval
-            "eval_loss": data.get("eval_loss"),
-            "eval_accuracy": data.get("eval_accuracy"),
-            "eval_precision": data.get("eval_precision"),
-            "eval_recall": data.get("eval_recall"),
-            "eval_f1": data.get("eval_f1"),
+            "val_loss": data.get("val_loss"),
+            "val_accuracy": data.get("val_accuracy"),
+            "val_precision": data.get("val_precision"),
+            "val_recall": data.get("val_recall"),
+            "val_f1": data.get("val_f1"),
         }
     )
     job.epoch_logs = epoch_logs
@@ -311,10 +311,10 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
     per_class_metrics = pjf(data.get("per_class_metrics"))
     macro_avg = pjf(data.get("macro_avg"))
     weighted_avg = pjf(data.get("weighted_avg"))
-    eval_confusion_matrix = pjf(data.get("eval_confusion_matrix"))
-    eval_per_class_metrics = pjf(data.get("eval_per_class_metrics"))
-    eval_macro_avg = pjf(data.get("eval_macro_avg"))
-    eval_weighted_avg = pjf(data.get("eval_weighted_avg"))
+    val_confusion_matrix = pjf(data.get("val_confusion_matrix"))
+    val_per_class_metrics = pjf(data.get("val_per_class_metrics"))
+    val_macro_avg = pjf(data.get("val_macro_avg"))
+    val_weighted_avg = pjf(data.get("val_weighted_avg"))
 
     trained_model = TrainedModel(
         name=data.get("model_name", f"Model dari job {job_id[:8]}"),
@@ -331,19 +331,19 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
         roc_auc=data.get("roc_auc"),
         mean_std=data.get("mean_std"),
         # Eval set metrics
-        eval_accuracy=data.get("eval_accuracy"),
-        eval_f1=data.get("eval_f1"),
-        eval_precision=data.get("eval_precision"),
-        eval_recall=data.get("eval_recall"),
+        val_accuracy=data.get("val_accuracy"),
+        val_f1=data.get("val_f1"),
+        val_precision=data.get("val_precision"),
+        val_recall=data.get("val_recall"),
         # Evaluation data
         confusion_matrix=confusion_matrix,
         per_class_metrics=per_class_metrics,
         macro_avg=macro_avg,
         weighted_avg=weighted_avg,
-        eval_confusion_matrix=eval_confusion_matrix,
-        eval_per_class_metrics=eval_per_class_metrics,
-        eval_macro_avg=eval_macro_avg,
-        eval_weighted_avg=eval_weighted_avg,
+        val_confusion_matrix=val_confusion_matrix,
+        val_per_class_metrics=val_per_class_metrics,
+        val_macro_avg=val_macro_avg,
+        val_weighted_avg=val_weighted_avg,
         training_config=job.hyperparams,
         file_path=model_path,
         file_size=file_size,

@@ -42,7 +42,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
         {[
           ["Total", preview.total],
           ["Train", preview.train_total],
-          ["Validation", preview.eval_total],
+          ["Validation", preview.val_total],
           ["Test", preview.test_total],
         ].map(([label, value]) => (
           <div key={label} className="px-4 py-2.5 text-center">
@@ -81,13 +81,13 @@ export default function SplitPreviewCard({ preview, isLoading }) {
                 Validation set
               </p>
               <div className="space-y-1.5">
-                {Object.entries(preview.eval_per_class || {}).map(
+                {Object.entries(preview.val_per_class || {}).map(
                   ([label, count]) => (
                     <Bar
                       key={label}
                       label={label}
                       count={count}
-                      total={preview.eval_total}
+                      total={preview.val_total}
                       color="bg-purple-400"
                     />
                   )

@@ -157,7 +157,7 @@ const useTrainingStore = create((set, get) => ({
       const { data: res } = await trainingApi.splitPreview({
         dataset_id: datasetId,
         test_size: testSize,
-        eval_size: evalSize,
+        val_size: evalSize,
       });
       set({ splitPreview: res.data, isLoadingPreview: false });
     } catch (err) {
@@ -187,7 +187,7 @@ const useTrainingStore = create((set, get) => ({
         dataset_id: selectedDatasetId,
         model_type: modelType,
         test_size: testSize,
-        eval_size: evalSize,
+        val_size: evalSize,
         job_name: jobName.trim() || undefined,
         ...hyperparams,
       });

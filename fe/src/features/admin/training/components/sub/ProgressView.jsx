@@ -69,7 +69,7 @@ export default function ProgressView() {
                 {job.split_info.train_total?.toLocaleString("id")}
               </strong>{" "}
               / Validasi:{" "}
-              <strong>{job.split_info.eval_total?.toLocaleString("id")}</strong>{" "}
+              <strong>{job.split_info.val_total?.toLocaleString("id")}</strong>{" "}
               / Test:{" "}
               <strong>{job.split_info.test_total?.toLocaleString("id")}</strong>
             </span>
@@ -85,17 +85,17 @@ export default function ProgressView() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 ["Train Loss", last.train_loss?.toFixed(4)],
-                ["Val Loss", last.eval_loss?.toFixed(4)],
+                ["Val Loss", last.val_loss?.toFixed(4)],
                 [
                   "Accuracy",
                   last.val_accuracy !== null
-                    ? `${(last.eval_accuracy * 100).toFixed(2)}%`
+                    ? `${(last.val_accuracy * 100).toFixed(2)}%`
                     : null,
                 ],
                 [
                   "F1-Score",
-                  last.eval_f1 !== null
-                    ? `${(last.eval_f1 * 100).toFixed(2)}%`
+                  last.val_f1 !== null
+                    ? `${(last.val_f1 * 100).toFixed(2)}%`
                     : null,
                 ],
               ].map(([label, value]) => (
@@ -160,26 +160,26 @@ export default function ProgressView() {
                       {log.train_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.eval_loss?.toFixed(4) ?? "—"}
+                      {log.val_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.eval_accuracy !== null
-                        ? `${(log.eval_accuracy * 100).toFixed(2)}%`
+                      {log.val_accuracy !== null
+                        ? `${(log.val_accuracy * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.eval_precision !== null
-                        ? `${(log.eval_precision * 100).toFixed(2)}%`
+                      {log.val_precision !== null
+                        ? `${(log.val_precision * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.eval_recall !== null
-                        ? `${(log.eval_recall * 100).toFixed(2)}%`
+                      {log.val_recall !== null
+                        ? `${(log.val_recall * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="px-4 py-2.5 text-gray-600">
-                      {log.eval_f1 !== null
-                        ? `${(log.eval_f1 * 100).toFixed(2)}%`
+                      {log.val_f1 !== null
+                        ? `${(log.val_f1 * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                   </tr>

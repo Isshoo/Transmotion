@@ -95,7 +95,7 @@ def split_preview():
     preview = training_job_service.compute_split_preview(
         dataset_id=data["dataset_id"],
         test_size=data["test_size"],
-        eval_size=data.get("eval_size", 0.1),
+        val_size=data.get("val_size", 0.1),
     )
     return success_response(data=preview, message="Preview split berhasil dihitung")
 
@@ -131,7 +131,7 @@ def create_job():
         dataset_id=data["dataset_id"],
         model_type=data["model_type"],
         test_size=data["test_size"],
-        eval_size=data.get("eval_size", 0.1),
+        val_size=data.get("val_size", 0.1),
         hyperparams=hyperparams,
         job_name=data.get("job_name"),
         user_id=request.current_user.id,

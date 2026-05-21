@@ -36,9 +36,9 @@ export default function EvaluationResults({ job }) {
   if (!job) return null;
 
   const testLabels = job.confusion_matrix?.labels || [];
-  const evalLabels = job.eval_confusion_matrix?.labels || [];
+  const evalLabels = job.val_confusion_matrix?.labels || [];
 
-  const hasEvalMetrics = job.eval_accuracy != null || job.eval_f1 != null;
+  const hasEvalMetrics = job.val_accuracy != null || job.val_f1 != null;
 
   const splitTabs = [
     { key: "test", label: "Test Set (Final)", color: "text-amber-600" },
@@ -138,44 +138,44 @@ export default function EvaluationResults({ job }) {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <MetricsCard
                 label="Accuracy"
-                value={job.eval_accuracy}
+                value={job.val_accuracy}
                 color="text-blue-600"
               />
               <MetricsCard
                 label="F1 Score"
-                value={job.eval_f1}
+                value={job.val_f1}
                 color="text-green-600"
               />
               <MetricsCard
                 label="Precision"
-                value={job.eval_precision}
+                value={job.val_precision}
                 color="text-purple-600"
               />
               <MetricsCard
                 label="Recall"
-                value={job.eval_recall}
+                value={job.val_recall}
                 color="text-amber-600"
               />
             </div>
             <div className="space-y-2.5">
               <MetricBar
                 label="Accuracy"
-                value={job.eval_accuracy}
+                value={job.val_accuracy}
                 color="bg-blue-400"
               />
               <MetricBar
                 label="F1 Score"
-                value={job.eval_f1}
+                value={job.val_f1}
                 color="bg-green-400"
               />
               <MetricBar
                 label="Precision"
-                value={job.eval_precision}
+                value={job.val_precision}
                 color="bg-purple-400"
               />
               <MetricBar
                 label="Recall"
-                value={job.eval_recall}
+                value={job.val_recall}
                 color="bg-amber-400"
               />
             </div>
@@ -188,11 +188,11 @@ export default function EvaluationResults({ job }) {
       </TabSection>
 
       {/* ── Confusion Matrix ─────────────────────────────────── */}
-      {(job.confusion_matrix || job.eval_confusion_matrix) && (
+      {(job.confusion_matrix || job.val_confusion_matrix) && (
         <TabSection
           tabs={[
             { key: "test", label: "Test Set", color: "text-amber-600" },
-            ...(job.eval_confusion_matrix
+            ...(job.val_confusion_matrix
               ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
               : []),
           ]}
@@ -202,18 +202,18 @@ export default function EvaluationResults({ job }) {
           {activeCMTab === "test" && job.confusion_matrix && (
             <ConfusionMatrix data={job.confusion_matrix} />
           )}
-          {activeCMTab === "eval" && job.eval_confusion_matrix && (
-            <ConfusionMatrix data={job.eval_confusion_matrix} />
+          {activeCMTab === "eval" && job.val_confusion_matrix && (
+            <ConfusionMatrix data={job.val_confusion_matrix} />
           )}
         </TabSection>
       )}
 
       {/* ── Per-Class Metrics ─────────────────────────────────── */}
-      {(job.per_class_metrics || job.eval_per_class_metrics) && (
+      {(job.per_class_metrics || job.val_per_class_metrics) && (
         <TabSection
           tabs={[
             { key: "test", label: "Test Set", color: "text-amber-600" },
-            ...(job.eval_per_class_metrics
+            ...(job.val_per_class_metrics
               ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
               : []),
           ]}
@@ -228,6 +228,9 @@ export default function EvaluationResults({ job }) {
               />
               {(job.macro_avg || job.weighted_avg) && (
                 <div className="mt-4">
+                  <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                    Average Metrics
+                  </p>
                   <AverageTable
                     macroAvg={job.macro_avg}
                     weightedAvg={job.weighted_avg}
@@ -239,17 +242,17 @@ export default function EvaluationResults({ job }) {
           {activePerClassTab === "eval" && (
             <>
               <PerClassTable
-                perClass={job.eval_per_class_metrics}
+                perClass={job.val_per_class_metrics}
                 labels={evalLabels}
               />
-              {(job.eval_macro_avg || job.eval_weighted_avg) && (
+              {(job.val_macro_avg || job.val_weighted_avg) && (
                 <div className="mt-4">
                   <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
                     Average Metrics
                   </p>
                   <AverageTable
-                    macroAvg={job.eval_macro_avg}
-                    weightedAvg={job.eval_weighted_avg}
+                    macroAvg={job.val_macro_avg}
+                    weightedAvg={job.val_weighted_avg}
                   />
                 </div>
               )}
