@@ -47,7 +47,7 @@ export default function FormView() {
     createJob,
   } = useTrainingStore();
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(true);
   const [isDatasetDropdownOpen, setIsDatasetDropdownOpen] = useState(false);
 
   const selectedDataset = datasets.find((d) => d.id === selectedDatasetId);

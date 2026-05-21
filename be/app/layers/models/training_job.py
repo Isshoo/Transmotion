@@ -32,6 +32,7 @@ class TrainingJob(db.Model):
     hyperparams = db.Column(JSON, nullable=False, default=dict)
     split_info = db.Column(JSON, nullable=True)
 
+    # Process tracking
     status = db.Column(
         Enum(JobStatus), default=JobStatus.QUEUED, nullable=False, index=True
     )
@@ -39,33 +40,6 @@ class TrainingJob(db.Model):
     current_epoch = db.Column(db.Integer, default=0)
     total_epochs = db.Column(db.Integer, default=0)
     epoch_logs = db.Column(JSON, nullable=True, default=list)
-
-    # Test set metrics (final)
-    final_accuracy = db.Column(db.Float, nullable=True)
-    final_f1 = db.Column(db.Float, nullable=True)
-    final_precision = db.Column(db.Float, nullable=True)
-    final_recall = db.Column(db.Float, nullable=True)
-    final_mcc = db.Column(db.Float, nullable=True)
-    final_roc_auc = db.Column(db.Float, nullable=True)
-    final_mean_std = db.Column(db.Float, nullable=True)
-
-    # Eval set metrics (dari validation selama training)
-    eval_accuracy = db.Column(db.Float, nullable=True)
-    eval_f1 = db.Column(db.Float, nullable=True)
-    eval_precision = db.Column(db.Float, nullable=True)
-    eval_recall = db.Column(db.Float, nullable=True)
-
-    # Confusion matrix & per-class (test set)
-    confusion_matrix = db.Column(JSON, nullable=True)
-    per_class_metrics = db.Column(JSON, nullable=True)
-    macro_avg = db.Column(JSON, nullable=True)
-    weighted_avg = db.Column(JSON, nullable=True)
-
-    # Confusion matrix & per-class (eval set)
-    eval_confusion_matrix = db.Column(JSON, nullable=True)
-    eval_per_class_metrics = db.Column(JSON, nullable=True)
-    eval_macro_avg = db.Column(JSON, nullable=True)
-    eval_weighted_avg = db.Column(JSON, nullable=True)
 
     error_message = db.Column(Text, nullable=True)
     started_at = db.Column(db.DateTime(timezone=True), nullable=True)
@@ -125,29 +99,6 @@ class TrainingJob(db.Model):
             "current_epoch": self.current_epoch,
             "total_epochs": self.total_epochs,
             "epoch_logs": self.epoch_logs or [],
-            # Test set
-            "final_accuracy": self.final_accuracy,
-            "final_f1": self.final_f1,
-            "final_precision": self.final_precision,
-            "final_recall": self.final_recall,
-            "final_mcc": self.final_mcc,
-            "final_roc_auc": self.final_roc_auc,
-            "final_mean_std": self.final_mean_std,
-            # Eval set
-            "eval_accuracy": self.eval_accuracy,
-            "eval_f1": self.eval_f1,
-            "eval_precision": self.eval_precision,
-            "eval_recall": self.eval_recall,
-            # Confusion matrix test
-            "confusion_matrix": self.confusion_matrix,
-            "per_class_metrics": self.per_class_metrics,
-            "macro_avg": self.macro_avg,
-            "weighted_avg": self.weighted_avg,
-            # Confusion matrix eval
-            "eval_confusion_matrix": self.eval_confusion_matrix,
-            "eval_per_class_metrics": self.eval_per_class_metrics,
-            "eval_macro_avg": self.eval_macro_avg,
-            "eval_weighted_avg": self.eval_weighted_avg,
             "error_message": self.error_message,
             "duration_seconds": self.duration_seconds(),
             "colab_session_id": self.colab_session_id,
@@ -160,6 +111,38 @@ class TrainingJob(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
-        if include_model and self.trained_model:
-            data["trained_model"] = self.trained_model.to_dict()
+
+        # Proxy metrics dari trained_model (single source of truth).
+        # Key tetap sama agar frontend tidak perlu diubah.
+        tm = self.trained_model
+        data.update(
+            {
+                # Test set metrics
+                "final_accuracy": tm.accuracy if tm else None,
+                "final_f1": tm.f1_score if tm else None,
+                "final_precision": tm.precision if tm else None,
+                "final_recall": tm.recall if tm else None,
+                "final_mcc": tm.mcc if tm else None,
+                "final_roc_auc": tm.roc_auc if tm else None,
+                "final_mean_std": tm.mean_std if tm else None,
+                # Eval set metrics
+                "eval_accuracy": tm.eval_accuracy if tm else None,
+                "eval_f1": tm.eval_f1 if tm else None,
+                "eval_precision": tm.eval_precision if tm else None,
+                "eval_recall": tm.eval_recall if tm else None,
+                # Confusion matrix & per-class (test)
+                "confusion_matrix": tm.confusion_matrix if tm else None,
+                "per_class_metrics": tm.per_class_metrics if tm else None,
+                "macro_avg": tm.macro_avg if tm else None,
+                "weighted_avg": tm.weighted_avg if tm else None,
+                # Confusion matrix & per-class (eval)
+                "eval_confusion_matrix": tm.eval_confusion_matrix if tm else None,
+                "eval_per_class_metrics": tm.eval_per_class_metrics if tm else None,
+                "eval_macro_avg": tm.eval_macro_avg if tm else None,
+                "eval_weighted_avg": tm.eval_weighted_avg if tm else None,
+            }
+        )
+
+        if include_model and tm:
+            data["trained_model"] = tm.to_dict()
         return data

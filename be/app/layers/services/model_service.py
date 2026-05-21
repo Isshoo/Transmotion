@@ -130,9 +130,8 @@ def get_all_models(
 
 def get_active_models(model_type=None):
     """Untuk dropdown klasifikasi — hanya model aktif & publik."""
-    query = (
-        db.session.query(TrainedModel)
-        .filter(TrainedModel.is_active, TrainedModel.is_public)
+    query = db.session.query(TrainedModel).filter(
+        TrainedModel.is_active, TrainedModel.is_public
     )
     if model_type:
         query = query.filter(TrainedModel.model_type == model_type)

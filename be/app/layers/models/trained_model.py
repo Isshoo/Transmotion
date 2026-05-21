@@ -112,15 +112,6 @@ class TrainedModel(db.Model):
 
         job = self.job
 
-        # Fallback ke job jika kolom di model kosong
-        def _fb(attr, job_attr=None):
-            val = getattr(self, attr, None)
-            if val is not None:
-                return val
-            if job and job_attr:
-                return getattr(job, job_attr, None)
-            return None
-
         data = {
             "id": self.id,
             "name": self.name,
@@ -142,19 +133,17 @@ class TrainedModel(db.Model):
             "eval_f1": self.eval_f1,
             "eval_precision": self.eval_precision,
             "eval_recall": self.eval_recall,
-            # Evaluation data fallback dari job
-            "confusion_matrix": _fb("confusion_matrix", "confusion_matrix"),
-            "per_class_metrics": _fb("per_class_metrics", "per_class_metrics"),
-            "macro_avg": _fb("macro_avg", "macro_avg"),
-            "weighted_avg": _fb("weighted_avg", "weighted_avg"),
-            "eval_confusion_matrix": _fb(
-                "eval_confusion_matrix", "eval_confusion_matrix"
-            ),
-            "eval_per_class_metrics": _fb(
-                "eval_per_class_metrics", "eval_per_class_metrics"
-            ),
-            "eval_macro_avg": _fb("eval_macro_avg", "eval_macro_avg"),
-            "eval_weighted_avg": _fb("eval_weighted_avg", "eval_weighted_avg"),
+            # Confusion matrix & per-class (test)
+            "confusion_matrix": self.confusion_matrix,
+            "per_class_metrics": self.per_class_metrics,
+            "macro_avg": self.macro_avg,
+            "weighted_avg": self.weighted_avg,
+            # Confusion matrix & per-class (eval)
+            "eval_confusion_matrix": self.eval_confusion_matrix,
+            "eval_per_class_metrics": self.eval_per_class_metrics,
+            "eval_macro_avg": self.eval_macro_avg,
+            "eval_weighted_avg": self.eval_weighted_avg,
+            # Epoch logs berasal dari job (bukan metric model)
             "epoch_logs": job.epoch_logs if job else None,
             "file_path": self.file_path,
             "file_size": self.file_size,

@@ -356,28 +356,6 @@ def complete_job(job_id: str, model_file, data: dict) -> TrainedModel:
     job.status = JobStatus.COMPLETED
     job.progress = 100
     job.finished_at = datetime.now(timezone.utc)
-    # Test set
-    job.final_accuracy = data.get("accuracy")
-    job.final_f1 = data.get("f1_score")
-    job.final_precision = data.get("precision")
-    job.final_recall = data.get("recall")
-    job.final_mcc = data.get("mcc")
-    job.final_roc_auc = data.get("roc_auc")
-    job.final_mean_std = data.get("mean_std")
-    # Eval set
-    job.eval_accuracy = data.get("eval_accuracy")
-    job.eval_f1 = data.get("eval_f1")
-    job.eval_precision = data.get("eval_precision")
-    job.eval_recall = data.get("eval_recall")
-    # Confusion matrix
-    job.confusion_matrix = confusion_matrix
-    job.per_class_metrics = per_class_metrics
-    job.macro_avg = macro_avg
-    job.weighted_avg = weighted_avg
-    job.eval_confusion_matrix = eval_confusion_matrix
-    job.eval_per_class_metrics = eval_per_class_metrics
-    job.eval_macro_avg = eval_macro_avg
-    job.eval_weighted_avg = eval_weighted_avg
 
     if data.get("colab_session_id"):
         job.colab_session_id = data["colab_session_id"]

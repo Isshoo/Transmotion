@@ -27,12 +27,6 @@ class PreprocessedRow(db.Model):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-    updated_at = db.Column(
-        db.DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
 
     dataset = db.relationship("Dataset", back_populates="preprocessed_rows")
 
@@ -48,5 +42,4 @@ class PreprocessedRow(db.Model):
             "label": self.label,
             "row_index": self.row_index,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
