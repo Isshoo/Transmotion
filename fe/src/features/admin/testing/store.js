@@ -6,7 +6,7 @@ import { getErrorMessage } from "@/helpers/error";
 const useTestingStore = create((set, get) => ({
   // ── Models ─────────────────────────────────────────────────
   activeModels: [],
-  isLoadingModels: false,
+  isLoadingModels: true,
   modelTypeFilter: "",
 
   // ── Form ───────────────────────────────────────────────────

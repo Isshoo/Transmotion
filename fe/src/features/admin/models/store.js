@@ -13,7 +13,7 @@ const useModelStore = create((set, get) => ({
   isActiveFilter: "",
   sortBy: "created_at",
   sortOrder: "desc",
-  isLoading: false,
+  isLoading: true,
 
   // ── Active models (untuk dropdown klasifikasi) ─────────────────
   activeModels: [],

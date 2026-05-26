@@ -20,6 +20,12 @@ export default function EvaluationPage() {
   useEffect(() => {
     fetchDatasets();
     fetchCompare("");
+    return () => {
+      useEvaluationStore.setState({
+        isLoadingDatasets: true,
+        isLoadingCompare: true,
+      });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -31,9 +37,7 @@ export default function EvaluationPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--accent) shadow-[0_0_12px_rgba(99,102,241,0.35)]">
-              <BarChart2 size={16} className="text-white" />
-            </div>
+            <BarChart2 size={20} className="text-(--accent)" />
             Evaluasi Performa
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">

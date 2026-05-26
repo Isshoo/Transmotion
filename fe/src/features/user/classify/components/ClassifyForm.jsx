@@ -50,6 +50,12 @@ export default function ClassifyForm() {
   useEffect(() => {
     fetchActiveModels();
     fetchHistory();
+    return () => {
+      useClassifyStore.setState({
+        isLoadingModels: true,
+        isLoadingHistory: true,
+      });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

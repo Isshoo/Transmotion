@@ -10,6 +10,7 @@ import {
   ChevronRight,
   CheckCircle,
   XCircle,
+  Cpu,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/helpers/formatter";
@@ -45,6 +46,9 @@ export default function ModelTable() {
 
   useEffect(() => {
     fetchModels();
+    return () => {
+      useModelStore.setState({ isLoading: true });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -70,7 +74,8 @@ export default function ModelTable() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-(--text-primary)">
+          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+            <Cpu size={20} className="text-(--accent)" />
             Model Terlatih
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">

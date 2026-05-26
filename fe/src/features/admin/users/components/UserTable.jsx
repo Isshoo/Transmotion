@@ -58,6 +58,9 @@ export default function UserTable() {
 
   useEffect(() => {
     fetchUsers();
+    return () => {
+      useUsersStore.setState({ isLoading: true });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -96,9 +99,7 @@ export default function UserTable() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--accent) shadow-[0_0_12px_rgba(99,102,241,0.35)]">
-              <Users size={16} className="text-white" />
-            </div>
+            <Users size={20} className="text-(--accent)" />
             Manajemen Pengguna
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
@@ -107,7 +108,7 @@ export default function UserTable() {
         </div>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 rounded-xl bg-(--accent) px-4 py-2.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Plus size={16} />
           Tambah Pengguna

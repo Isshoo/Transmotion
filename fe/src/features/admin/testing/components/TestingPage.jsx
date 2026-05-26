@@ -9,6 +9,7 @@ import {
   X,
   Filter,
   ChevronDown,
+  FlaskConical,
 } from "lucide-react";
 import { toast } from "sonner";
 import useTestingStore from "../store";
@@ -53,6 +54,12 @@ export default function TestingPage() {
     if (selectedModelId !== "") {
       fetchHistory();
     }
+    return () => {
+      useTestingStore.setState({
+        isLoadingModels: true,
+        isLoadingHistory: true,
+      });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -79,7 +86,8 @@ export default function TestingPage() {
     <div className="animate-fade-in space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-(--text-primary)">
+        <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+          <FlaskConical size={20} className="text-(--accent)" />
           Testing
         </h1>
         <p className="mt-1 text-sm text-(--text-secondary)">

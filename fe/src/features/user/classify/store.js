@@ -6,7 +6,7 @@ import { getErrorMessage } from "@/helpers/error";
 const useClassifyStore = create((set, get) => ({
   // ── Models ─────────────────────────────────────────────────────
   activeModels: [],
-  isLoadingModels: false,
+  isLoadingModels: true,
 
   // ── Form state ─────────────────────────────────────────────────
   selectedModelId: "",

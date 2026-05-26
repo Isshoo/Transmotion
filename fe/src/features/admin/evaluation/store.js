@@ -4,7 +4,7 @@ import evaluationApi from "./api";
 const useEvaluationStore = create((set, get) => ({
   // ── Datasets ───────────────────────────────────────────────
   datasets: [],
-  isLoadingDatasets: false,
+  isLoadingDatasets: true,
 
   // ── Selected ───────────────────────────────────────────────
   selectedDatasetId: "",
@@ -12,7 +12,7 @@ const useEvaluationStore = create((set, get) => ({
   // ── Compare data ───────────────────────────────────────────
   // Array of { dataset_id, dataset_name, mbert: [], xlmr: [] }
   compareData: [],
-  isLoadingCompare: false,
+  isLoadingCompare: true,
 
   // ── Fetch ──────────────────────────────────────────────────
   fetchDatasets: async () => {

@@ -20,9 +20,9 @@ import ThemeToggle from "../ui/ThemeToggle";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Dataset", href: "/admin/datasets", icon: Database },
+  { label: "Datasets", href: "/admin/datasets", icon: Database },
   { label: "Training", href: "/admin/training", icon: BrainCircuit },
-  { label: "Model", href: "/admin/models", icon: Cpu },
+  { label: "Models", href: "/admin/models", icon: Cpu },
   { label: "Evaluation", href: "/admin/evaluation", icon: BarChart2 },
   { label: "Testing", href: "/admin/testing", icon: FlaskConical },
   { label: "Users", href: "/admin/users", icon: Users },

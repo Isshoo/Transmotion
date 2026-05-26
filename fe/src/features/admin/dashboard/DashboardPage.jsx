@@ -16,6 +16,7 @@ import {
   Trophy,
   Star,
   BarChart3,
+  LayoutDashboard,
 } from "lucide-react";
 import { toast } from "sonner";
 import dashboardApi from "./api";
@@ -65,11 +66,12 @@ export default function DashboardPage() {
   const xlmrF1 = model_comparison?.avg_f1?.xlmr;
 
   return (
-    <div className="animate-fade-in space-y-8 pb-10">
+    <div className="animate-fade-in space-y-6 pb-5">
       {/* Header section */}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-(--text-primary)">
+          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+            <LayoutDashboard size={20} className="text-(--accent)" />
             Overview
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">

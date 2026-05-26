@@ -11,7 +11,7 @@ const useDatasetStore = create((set, get) => ({
   perPage: 10,
   search: "",
   statusFilter: "",
-  isLoading: false,
+  isLoading: true,
 
   // ── Detail ─────────────────────────────────────────────────────
   currentDataset: null,
