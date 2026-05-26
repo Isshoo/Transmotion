@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import AdminSidebar from "./AdminSidebar";
 import { Menu, BrainCircuit } from "lucide-react";
 
 export default function AdminLayoutWrapper({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const mainRef = useRef(null);
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [pathname]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-(--bg-base)">
@@ -47,7 +56,7 @@ export default function AdminLayoutWrapper({ children }) {
         </div>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        <main ref={mainRef} className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
       </div>
     </div>
   );
