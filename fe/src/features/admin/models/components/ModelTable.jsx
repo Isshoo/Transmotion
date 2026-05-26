@@ -138,11 +138,11 @@ export default function ModelTable() {
             </thead>
             <tbody className="divide-y divide-(--border-subtle)">
               {isLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
+                Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     {[...Array(8)].map((_, j) => (
                       <td key={j} className="px-4 py-4">
-                        <div className="h-3.5 w-20 rounded-md bg-(--bg-elevated)" />
+                        <div className="h-6 w-20 rounded-md bg-(--bg-elevated)" />
                       </td>
                     ))}
                   </tr>

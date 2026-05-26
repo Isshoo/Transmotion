@@ -1,6 +1,7 @@
 from flask import Flask
 
 from app.layers.routes.auth_route import auth_bp
+from app.layers.routes.dashboard_route import dashboard_bp
 from app.layers.routes.dataset_route import dataset_bp
 from app.layers.routes.model_route import model_bp, prediction_bp
 from app.layers.routes.social_auth_route import social_auth_bp
@@ -19,3 +20,4 @@ def register_routes(app: Flask) -> None:
     app.register_blueprint(model_bp)
     app.register_blueprint(prediction_bp)
     app.register_blueprint(sse_bp)
+    app.register_blueprint(dashboard_bp)

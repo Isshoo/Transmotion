@@ -13,9 +13,11 @@ export default function TrainingPage() {
   const { view, activeJob, init, setActiveJob, isCheckingActive } =
     useTrainingStore();
 
-  // Reset dan cek job aktif setiap kali halaman dibuka
   useEffect(() => {
     init();
+    return () => {
+      useTrainingStore.setState({ isCheckingActive: true });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
