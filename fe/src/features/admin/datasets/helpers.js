@@ -50,13 +50,15 @@ export async function parseFilePreview(file) {
         const dataRows = rows.slice(1);
 
         // Filter baris kosong (SheetJS kadang menyertakan baris yang terlihat kosong tapi punya metadata)
-        const cleanDataRows = dataRows.filter((row) =>
-          Array.isArray(row) && row.some(
-            (cell) =>
-              cell !== null &&
-              cell !== undefined &&
-              String(cell).trim() !== ""
-          )
+        const cleanDataRows = dataRows.filter(
+          (row) =>
+            Array.isArray(row) &&
+            row.some(
+              (cell) =>
+                cell !== null &&
+                cell !== undefined &&
+                String(cell).trim() !== ""
+            )
         );
 
         // Buat preview untuk 5 baris pertama

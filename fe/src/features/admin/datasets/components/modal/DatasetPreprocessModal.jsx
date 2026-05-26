@@ -78,34 +78,34 @@ export default function DatasetPreprocessModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-xl">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="animate-scale-in w-full max-w-md rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-xl)">
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-4">
+        <div className="flex items-center justify-between rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
           <div>
-            <h2 className="text-base font-semibold text-gray-800">
+            <h2 className="text-base font-semibold tracking-tight text-(--text-primary)">
               Preprocessing Dataset
             </h2>
-            <p className="mt-0.5 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-(--text-secondary)">
               {preprocessTarget.name}
             </p>
           </div>
           <button
             onClick={closePreprocessModal}
-            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 py-5">
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
           {/* Info kolom yang tersedia */}
           {columns.length > 0 && (
-            <div className="rounded-lg bg-blue-50 px-3 py-2">
-              <p className="text-xs font-medium text-blue-700">
+            <div className="rounded-md border border-(--accent-muted) bg-(--accent-muted) px-3 py-2.5 opacity-80">
+              <p className="text-xs font-medium text-(--accent)">
                 Kolom tersedia:
               </p>
-              <p className="mt-0.5 text-xs text-blue-600">
+              <p className="mt-1 text-xs text-(--accent)">
                 {columns.join(", ")}
               </p>
             </div>
@@ -113,7 +113,7 @@ export default function DatasetPreprocessModal() {
 
           {/* Kolom Teks */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
               Kolom Teks
             </label>
             {columns.length > 0 ? (
@@ -123,7 +123,11 @@ export default function DatasetPreprocessModal() {
                   setTextColumn(e.target.value);
                   setErrors((p) => ({ ...p, textColumn: undefined }));
                 }}
-                className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.textColumn ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+                className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:ring-2 ${
+                  errors.textColumn
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
               >
                 <option value="">-- Pilih kolom --</option>
                 {columns.map((c) => (
@@ -141,17 +145,23 @@ export default function DatasetPreprocessModal() {
                   setErrors((p) => ({ ...p, textColumn: undefined }));
                 }}
                 placeholder="cth. text"
-                className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.textColumn ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+                className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:ring-2 ${
+                  errors.textColumn
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
               />
             )}
             {errors.textColumn && (
-              <p className="mt-1 text-xs text-red-500">{errors.textColumn}</p>
+              <p className="mt-1.5 text-xs text-(--error)">
+                {errors.textColumn}
+              </p>
             )}
           </div>
 
           {/* Kolom Label */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
               Kolom Label
             </label>
             {columns.length > 0 ? (
@@ -161,7 +171,11 @@ export default function DatasetPreprocessModal() {
                   setLabelColumn(e.target.value);
                   setErrors((p) => ({ ...p, labelColumn: undefined }));
                 }}
-                className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.labelColumn ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+                className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:ring-2 ${
+                  errors.labelColumn
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
               >
                 <option value="">-- Pilih kolom --</option>
                 {columns.map((c) => (
@@ -179,22 +193,30 @@ export default function DatasetPreprocessModal() {
                   setErrors((p) => ({ ...p, labelColumn: undefined }));
                 }}
                 placeholder="cth. label"
-                className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.labelColumn ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+                className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:ring-2 ${
+                  errors.labelColumn
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
               />
             )}
             {errors.labelColumn && (
-              <p className="mt-1 text-xs text-red-500">{errors.labelColumn}</p>
+              <p className="mt-1.5 text-xs text-(--error)">
+                {errors.labelColumn}
+              </p>
             )}
           </div>
 
           {/* Split Ratio */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+          <div className="rounded-lg border border-(--border-default) bg-(--bg-surface) p-4 shadow-sm">
+            <label className="mb-3 block text-sm font-medium text-(--text-secondary)">
               Pembagian Data
             </label>
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="w-12 text-xs text-gray-500">Test</span>
+                <span className="w-10 text-xs font-medium text-(--text-tertiary)">
+                  Test
+                </span>
                 <input
                   type="range"
                   min="5"
@@ -205,14 +227,16 @@ export default function DatasetPreprocessModal() {
                     setTestSize(e.target.value / 100);
                     setErrors((p) => ({ ...p, split: undefined }));
                   }}
-                  className="flex-1 accent-blue-600"
+                  className="flex-1 cursor-pointer accent-(--warning)"
                 />
-                <span className="w-8 text-right text-xs font-medium text-gray-700">
+                <span className="w-10 text-right text-xs font-semibold text-(--text-primary)">
                   {testPct}%
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-12 text-xs text-gray-500">Val</span>
+                <span className="w-10 text-xs font-medium text-(--text-tertiary)">
+                  Val
+                </span>
                 <input
                   type="range"
                   min="5"
@@ -223,44 +247,44 @@ export default function DatasetPreprocessModal() {
                     setValSize(e.target.value / 100);
                     setErrors((p) => ({ ...p, split: undefined }));
                   }}
-                  className="flex-1 accent-purple-600"
+                  className="flex-1 cursor-pointer accent-(--data-2)"
                 />
-                <span className="w-8 text-right text-xs font-medium text-gray-700">
+                <span className="w-10 text-right text-xs font-semibold text-(--text-primary)">
                   {valPct}%
                 </span>
               </div>
             </div>
 
             {/* Visual bar */}
-            <div className="mt-3 flex h-4 overflow-hidden rounded-full">
+            <div className="mt-4 flex h-3.5 overflow-hidden rounded-full bg-(--bg-elevated)">
               <div
-                className="flex items-center justify-center bg-blue-500 text-[10px] font-medium text-white transition-all"
+                className="flex items-center justify-center bg-(--accent) text-[9px] font-bold text-white transition-all duration-300"
                 style={{ width: `${trainPct}%` }}
               >
                 {trainPct >= 15 && `Train ${trainPct}%`}
               </div>
               <div
-                className="flex items-center justify-center bg-purple-400 text-[10px] font-medium text-white transition-all"
+                className="flex items-center justify-center bg-(--data-2) text-[9px] font-bold text-white transition-all duration-300"
                 style={{ width: `${valPct}%` }}
               >
                 {valPct >= 10 && `${valPct}%`}
               </div>
               <div
-                className="flex items-center justify-center bg-amber-400 text-[10px] font-medium text-white transition-all"
+                className="flex items-center justify-center bg-(--warning) text-[9px] font-bold text-white transition-all duration-300"
                 style={{ width: `${testPct}%` }}
               >
                 {testPct >= 10 && `${testPct}%`}
               </div>
             </div>
-            <div className="mt-1 flex gap-3">
+            <div className="mt-3 flex gap-4">
               {[
-                ["bg-blue-500", "Train"],
-                ["bg-purple-400", "Val"],
-                ["bg-amber-400", "Test"],
+                ["bg-(--accent)", "Train"],
+                ["bg-(--data-2)", "Val"],
+                ["bg-(--warning)", "Test"],
               ].map(([color, label]) => (
                 <span
                   key={label}
-                  className="flex items-center gap-1 text-xs text-gray-500"
+                  className="flex items-center gap-1.5 text-[10px] font-medium tracking-wide text-(--text-tertiary) uppercase"
                 >
                   <span
                     className={`inline-block h-2 w-2 rounded-full ${color}`}
@@ -270,24 +294,24 @@ export default function DatasetPreprocessModal() {
               ))}
             </div>
             {errors.split && (
-              <p className="mt-1 text-xs text-red-500">{errors.split}</p>
+              <p className="mt-2 text-xs text-(--error)">{errors.split}</p>
             )}
           </div>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 border-t pt-4">
+          <div className="flex justify-end gap-2.5 border-t border-(--border-default) pt-5">
             <button
               type="button"
               onClick={closePreprocessModal}
               disabled={isSubmitting}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? "Memproses..." : "Jalankan Preprocessing"}
             </button>

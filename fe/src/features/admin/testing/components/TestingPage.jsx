@@ -76,47 +76,55 @@ export default function TestingPage() {
       : csvTexts.length > 0);
 
   return (
-    <div className="space-y-6">
+    <div className="animate-fade-in space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-lg font-semibold text-gray-800">Testing</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-xl font-semibold tracking-tight text-(--text-primary)">
+          Testing
+        </h1>
+        <p className="mt-1 text-sm text-(--text-secondary)">
           Uji model dengan teks tunggal atau batch dari file CSV / Excel
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* Input panel (3/5) */}
-        <div className="space-y-4 lg:col-span-3">
+        <div className="space-y-5 lg:col-span-3">
           {/* Filter + pilih model */}
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Model</label>
+          <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                Pilih Model
+              </label>
               {/* Filter arsitektur */}
-              <div className="ml-auto flex items-center gap-1">
-                <Filter size={13} className="text-gray-400" />
+              <div className="flex items-center gap-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-1">
+                <Filter size={12} className="ml-1 text-(--text-tertiary)" />
                 {["", "mbert", "xlmr"].map((v) => (
                   <button
                     key={v}
                     onClick={() => setModelTypeFilter(v)}
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition ${
+                    className={`rounded-md px-2 py-1 text-[10px] font-bold tracking-wider uppercase transition-all duration-150 ${
                       modelTypeFilter === v
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                        : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                     }`}
                   >
-                    {v === "" ? "Semua" : v.toUpperCase()}
+                    {v === "" ? "Semua" : v}
                   </button>
                 ))}
               </div>
             </div>
 
             {isLoadingModels ? (
-              <div className="rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-400">
+              <div className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-elevated) px-4 py-3.5 text-sm font-medium text-(--text-tertiary)">
+                <Loader2
+                  size={16}
+                  className="animate-spin text-(--text-secondary)"
+                />{" "}
                 Memuat model...
               </div>
             ) : activeModels.length === 0 ? (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              <div className="rounded-xl border border-(--warning-muted)/50 bg-(--warning-muted)/10 px-4 py-3.5 text-sm font-medium text-(--warning)">
                 Tidak ada model aktif dengan filter ini.
               </div>
             ) : (
@@ -124,36 +132,36 @@ export default function TestingPage() {
                 <button
                   type="button"
                   onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left shadow-(--shadow-sm) transition-all duration-200 outline-none focus:ring-2 focus:ring-(--accent-muted) ${
                     selectedModelId
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                      ? "border-(--accent) bg-(--accent-muted)/5"
+                      : "border-(--border-strong) bg-(--bg-elevated) hover:border-(--accent-muted)"
                   }`}
                 >
                   {selectedModel ? (
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-blue-700">
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-bold text-(--accent)">
                         {selectedModel.name}
                       </p>
                       <span
-                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                        className={`rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${
                           selectedModel.model_type === "xlmr"
-                            ? "bg-purple-100 text-purple-700"
-                            : "bg-teal-100 text-teal-700"
+                            ? "border-(--data-4)/20 bg-(--data-4)/10 text-(--data-4)"
+                            : "border-(--data-1)/20 bg-(--data-1)/10 text-(--data-1)"
                         }`}
                       >
-                        {selectedModel.model_type?.toUpperCase()}
+                        {selectedModel.model_type}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-sm text-gray-400">
-                      Pilih model...
+                    <span className="text-sm font-medium text-(--text-tertiary)">
+                      Pilih model untuk mulai testing...
                     </span>
                   )}
                   <ChevronDown
                     size={18}
-                    className={`text-gray-400 transition-transform ${
-                      isModelDropdownOpen ? "rotate-180" : ""
+                    className={`text-(--text-tertiary) transition-transform duration-200 ${
+                      isModelDropdownOpen ? "rotate-180 text-(--accent)" : ""
                     }`}
                   />
                 </button>
@@ -164,48 +172,52 @@ export default function TestingPage() {
                       className="fixed inset-0 z-10"
                       onClick={() => setIsModelDropdownOpen(false)}
                     />
-                    <div className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
-                      {activeModels.map((model) => (
-                        <button
-                          key={model.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedModelId(model.id);
-                            clearResults();
-                            fetchHistory();
-                            setIsModelDropdownOpen(false);
-                          }}
-                          className={`flex w-full flex-col px-4 py-3 text-left transition hover:bg-gray-50 ${
-                            selectedModelId === model.id ? "bg-blue-50" : ""
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <p
-                              className={`truncate text-sm font-medium ${
-                                selectedModelId === model.id
-                                  ? "text-blue-700"
-                                  : "text-gray-800"
-                              }`}
-                            >
-                              {model.name}
+                    <div className="scrollbar-thin scrollbar-thumb-(--border-strong) animate-scale-in absolute z-20 mt-2 max-h-60 w-full overflow-y-auto rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-lg)">
+                      <div className="p-1">
+                        {activeModels.map((model) => (
+                          <button
+                            key={model.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedModelId(model.id);
+                              clearResults();
+                              fetchHistory();
+                              setIsModelDropdownOpen(false);
+                            }}
+                            className={`flex w-full flex-col rounded-lg px-4 py-3 text-left transition-colors ${
+                              selectedModelId === model.id
+                                ? "bg-(--accent-muted)/10"
+                                : "hover:bg-(--bg-overlay)"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <p
+                                className={`truncate text-sm font-bold ${
+                                  selectedModelId === model.id
+                                    ? "text-(--accent)"
+                                    : "text-(--text-primary)"
+                                }`}
+                              >
+                                {model.name}
+                              </p>
+                              <span
+                                className={`shrink-0 rounded-md border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase ${
+                                  model.model_type === "xlmr"
+                                    ? "border-(--data-4)/20 bg-(--data-4)/10 text-(--data-4)"
+                                    : "border-(--data-1)/20 bg-(--data-1)/10 text-(--data-1)"
+                                }`}
+                              >
+                                {model.model_type}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-[11px] font-medium text-(--text-tertiary)">
+                              {model.accuracy !== null &&
+                                `Acc: ${(model.accuracy * 100).toFixed(1)}% · `}
+                              {model.num_labels} kelas
                             </p>
-                            <span
-                              className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-                                model.model_type === "xlmr"
-                                  ? "bg-purple-100 text-purple-700"
-                                  : "bg-teal-100 text-teal-700"
-                              }`}
-                            >
-                              {model.model_type?.toUpperCase()}
-                            </span>
-                          </div>
-                          <p className="mt-0.5 text-[11px] text-gray-400">
-                            {model.accuracy !== null &&
-                              `Acc: ${(model.accuracy * 100).toFixed(1)}% · `}
-                            {model.num_labels} kelas
-                          </p>
-                        </button>
-                      ))}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}
@@ -214,7 +226,7 @@ export default function TestingPage() {
           </div>
 
           {/* Mode toggle */}
-          <div className="flex overflow-hidden rounded-lg border border-gray-200">
+          <div className="flex overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-elevated) p-1 shadow-(--shadow-sm)">
             {[
               { key: "single", label: "Teks Tunggal" },
               { key: "csv", label: "Upload File" },
@@ -225,10 +237,10 @@ export default function TestingPage() {
                   setInputMode(key);
                   clearResults();
                 }}
-                className={`flex-1 py-2 text-sm font-medium transition ${
+                className={`flex-1 rounded-lg py-2.5 text-sm font-bold tracking-wide transition-all duration-200 ${
                   inputMode === key
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-600 hover:bg-gray-50"
+                    ? "border border-(--border-subtle) bg-(--bg-surface) text-(--text-primary) shadow-(--shadow-sm)"
+                    : "text-(--text-tertiary) hover:bg-(--bg-overlay) hover:text-(--text-secondary)"
                 }`}
               >
                 {label}
@@ -237,162 +249,196 @@ export default function TestingPage() {
           </div>
 
           {/* Input area */}
-          {inputMode === "single" ? (
-            <div>
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                rows={6}
-                placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
-                className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                maxLength={5000}
-                onKeyDown={(e) => {
-                  if (
-                    e.key === "Enter" &&
-                    (e.ctrlKey || e.metaKey) &&
-                    canClassify
-                  ) {
-                    classify();
-                  }
-                }}
-              />
-              <div className="mt-1 flex justify-between">
-                <p className="text-xs text-gray-400">{inputText.length}/5000</p>
-                {inputText && (
-                  <button
-                    onClick={() => {
-                      setInputText("");
-                      clearResults();
-                    }}
-                    className="text-xs text-gray-400 hover:text-gray-600"
-                  >
-                    Hapus
-                  </button>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {!csvFileName ? (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="cursor-pointer rounded-xl border-2 border-dashed border-gray-300 px-6 py-10 text-center transition hover:border-blue-400 hover:bg-gray-50"
-                >
-                  <UploadCloud
-                    size={28}
-                    className="mx-auto mb-2 text-gray-400"
-                  />
-                  <p className="text-sm text-gray-600">
-                    Klik untuk upload{" "}
-                    <span className="font-medium text-blue-600">
-                      CSV / TSV / TXT / Excel
-                    </span>
+          <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
+            {inputMode === "single" ? (
+              <div>
+                <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Input Teks
+                </label>
+                <textarea
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  rows={6}
+                  placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
+                  className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-3 font-mono text-sm leading-relaxed text-(--text-primary) transition-all duration-200 outline-none placeholder:font-sans placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                  maxLength={5000}
+                  onKeyDown={(e) => {
+                    if (
+                      e.key === "Enter" &&
+                      (e.ctrlKey || e.metaKey) &&
+                      canClassify
+                    ) {
+                      classify();
+                    }
+                  }}
+                />
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary)">
+                    {inputText.length}/5000
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">Maks 500 baris · .csv .tsv .txt .xlsx .xls</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <FileText size={18} className="text-green-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">
-                          {csvFileName}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {csvTexts.length} baris teks valid ditemukan
-                        </p>
-                      </div>
-                    </div>
+                  {inputText && (
                     <button
                       onClick={() => {
-                        setCsvFile(null);
+                        setInputText("");
                         clearResults();
-                        if (fileInputRef.current)
-                          fileInputRef.current.value = "";
                       }}
-                      className="rounded-lg p-1 text-gray-400 transition hover:bg-white hover:text-gray-600"
+                      className="text-[11px] font-bold tracking-wide text-(--error) opacity-80 transition-opacity hover:opacity-100"
                     >
-                      <X size={15} />
+                      Hapus
                     </button>
-                  </div>
-
-                  {/* Column Selection */}
-                  {csvHeaders.length > 0 && (
-                    <div className="rounded-xl border border-gray-200 bg-white p-4">
-                      <label className="mb-2 block text-sm font-medium text-gray-700">
-                        Pilih Kolom Teks
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {csvHeaders.map((header, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setSelectedTextColumn(idx)}
-                            className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
-                              selectedTextColumn === idx
-                                ? "border-blue-500 bg-blue-50 text-blue-700"
-                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-                            }`}
-                          >
-                            {header || `Kolom ${idx + 1}`}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   )}
                 </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.tsv,.txt,.xlsx,.xls"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </div>
-          )}
-
-          {/* Error */}
-          {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              {error}
-            </div>
-          )}
-
-          {/* Tombol klasifikasi */}
-          <button
-            onClick={classify}
-            disabled={!canClassify}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isClassifying ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />{" "}
-                Mengklasifikasikan...
-              </>
+              </div>
             ) : (
-              <>
-                <Send size={16} /> Klasifikasikan
-              </>
+              <div className="space-y-5">
+                <label className="block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Input File
+                </label>
+                {!csvFileName ? (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-12 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--accent-muted)/5"
+                  >
+                    <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-overlay) transition-colors group-hover:bg-(--accent-muted)/20">
+                      <UploadCloud
+                        size={28}
+                        className="text-(--text-tertiary) transition-colors group-hover:text-(--accent)"
+                      />
+                    </div>
+                    <p className="text-sm font-medium text-(--text-secondary)">
+                      Klik untuk upload{" "}
+                      <span className="font-bold text-(--accent)">
+                        CSV / TSV / TXT / Excel
+                      </span>
+                    </p>
+                    <p className="mt-1.5 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
+                      Maks 500 baris · .csv .tsv .txt .xlsx .xls
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between rounded-xl border border-(--success-muted)/50 bg-(--success-muted)/10 px-5 py-4 shadow-(--shadow-sm)">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-(--success-muted)/30 bg-(--success-muted)/20">
+                          <FileText size={20} className="text-(--success)" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-(--text-primary)">
+                            {csvFileName}
+                          </p>
+                          <p className="mt-0.5 text-[11px] font-medium text-(--text-tertiary)">
+                            <strong className="text-(--success)">
+                              {csvTexts.length}
+                            </strong>{" "}
+                            baris teks valid ditemukan
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setCsvFile(null);
+                          clearResults();
+                          if (fileInputRef.current)
+                            fileInputRef.current.value = "";
+                        }}
+                        className="rounded-lg p-2 text-(--text-tertiary) transition-colors hover:bg-(--bg-overlay) hover:text-(--error)"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+
+                    {/* Column Selection */}
+                    {csvHeaders.length > 0 && (
+                      <div className="rounded-xl border border-(--border-default) bg-(--bg-elevated) p-5">
+                        <label className="mb-3 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                          Pilih Kolom Teks
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {csvHeaders.map((header, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setSelectedTextColumn(idx)}
+                              className={`rounded-lg border px-3.5 py-2 text-xs font-bold tracking-wide transition-all duration-150 ${
+                                selectedTextColumn === idx
+                                  ? "border-(--accent) bg-(--accent) text-white shadow-(--shadow-sm)"
+                                  : "border-(--border-strong) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
+                              }`}
+                            >
+                              {header || `Kolom ${idx + 1}`}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.tsv,.txt,.xlsx,.xls"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
             )}
-          </button>
+
+            {/* Error */}
+            {error && (
+              <div className="mt-4 flex items-start gap-2 rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 px-4 py-3 text-sm font-medium text-(--error)">
+                <span className="mt-0.5 text-[16px]">⚠️</span> {error}
+              </div>
+            )}
+
+            {/* Tombol klasifikasi */}
+            <div className="mt-5 border-t border-(--border-subtle) pt-5">
+              <button
+                onClick={classify}
+                disabled={!canClassify}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none disabled:active:scale-100"
+              >
+                {isClassifying ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />{" "}
+                    Mengklasifikasikan...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} /> Klasifikasikan
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Result panel (2/5) */}
         <div className="lg:col-span-2">
           {!isClassifying && results.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 py-16 text-center">
-              <Send size={32} className="mb-3 text-gray-300" />
-              <p className="text-sm text-gray-400">Hasil akan muncul di sini</p>
+            <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-surface) px-6 py-16 text-center transition-colors hover:border-(--border-default)">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-(--border-subtle) bg-(--bg-elevated)">
+                <Send size={28} className="ml-1 text-(--text-tertiary)" />
+              </div>
+              <p className="text-sm font-bold text-(--text-secondary)">
+                Belum ada hasil
+              </p>
+              <p className="mx-auto mt-1.5 max-w-[200px] text-xs font-medium text-(--text-tertiary)">
+                Hasil klasifikasi teks Anda akan muncul di sini
+              </p>
             </div>
           )}
           {isClassifying && (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-blue-200 bg-blue-50 py-16 text-center">
-              <Loader2 size={28} className="mb-3 animate-spin text-blue-500" />
-              <p className="text-sm font-medium text-blue-700">
+            <div className="flex h-full min-h-[300px] animate-pulse flex-col items-center justify-center rounded-xl border border-(--accent-muted)/50 bg-(--accent-muted)/10 px-6 py-16 text-center">
+              <Loader2
+                size={36}
+                className="mb-4 animate-spin text-(--accent)"
+              />
+              <p className="text-sm font-bold text-(--accent)">
                 {inputMode === "csv"
                   ? `Mengklasifikasikan ${csvTexts.length} teks...`
                   : "Menganalisis teks..."}
+              </p>
+              <p className="mt-2 text-xs font-medium text-(--text-secondary)">
+                Mohon tunggu sebentar
               </p>
             </div>
           )}

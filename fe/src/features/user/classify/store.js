@@ -47,10 +47,23 @@ const useClassifyStore = create((set, get) => ({
   },
 
   setSelectedModelId: (id) => {
-    set({ selectedModelId: id, result: null, batchResults: [], batchErrors: [], error: null });
+    set({
+      selectedModelId: id,
+      result: null,
+      batchResults: [],
+      batchErrors: [],
+      error: null,
+    });
     get().fetchHistory();
   },
-  setInputMode: (mode) => set({ inputMode: mode, result: null, batchResults: [], batchErrors: [], error: null }),
+  setInputMode: (mode) =>
+    set({
+      inputMode: mode,
+      result: null,
+      batchResults: [],
+      batchErrors: [],
+      error: null,
+    }),
   setInputText: (text) => set({ inputText: text, result: null, error: null }),
 
   // ── Parse Files ──────────────────────────────────────────────
@@ -65,9 +78,15 @@ const useClassifyStore = create((set, get) => ({
           resolve({ headers: [], rows: [] });
           return;
         }
-        const delimiter = text.includes("\t") ? "\t" : text.includes(";") ? ";" : ",";
+        const delimiter = text.includes("\t")
+          ? "\t"
+          : text.includes(";")
+            ? ";"
+            : ",";
         const allRows = lines.map((line) => {
-          return line.split(delimiter).map(c => c.replace(/^["']|["']$/g, "").trim());
+          return line
+            .split(delimiter)
+            .map((c) => c.replace(/^["']|["']$/g, "").trim());
         });
         const headers = allRows[0];
         const rows = allRows.slice(1);
@@ -97,9 +116,9 @@ const useClassifyStore = create((set, get) => ({
             return;
           }
           const headers = allRows[0].map((h) => String(h ?? "").trim());
-          const rows = allRows.slice(1).map((row) =>
-            row.map((cell) => String(cell ?? "").trim())
-          );
+          const rows = allRows
+            .slice(1)
+            .map((row) => row.map((cell) => String(cell ?? "").trim()));
           resolve({ headers, rows });
         } catch (err) {
           reject(err);
@@ -112,14 +131,14 @@ const useClassifyStore = create((set, get) => ({
 
   setCsvFile: async (file) => {
     if (!file) {
-      set({ 
-        csvTexts: [], 
-        csvFileName: "", 
-        csvHeaders: [], 
-        csvRows: [], 
+      set({
+        csvTexts: [],
+        csvFileName: "",
+        csvHeaders: [],
+        csvRows: [],
         selectedTextColumn: null,
         batchResults: [],
-        batchErrors: []
+        batchErrors: [],
       });
       return;
     }
@@ -129,10 +148,10 @@ const useClassifyStore = create((set, get) => ({
       const { headers, rows } = isExcel
         ? await get().parseExcelFile(file)
         : await get().parseCsvFile(file);
-      set({ 
-        csvHeaders: headers, 
-        csvRows: rows, 
-        csvFileName: file.name, 
+      set({
+        csvHeaders: headers,
+        csvRows: rows,
+        csvFileName: file.name,
         result: null,
         batchResults: [],
         batchErrors: [],
@@ -147,11 +166,11 @@ const useClassifyStore = create((set, get) => ({
   updateCsvTexts: (columnIndex) => {
     const { csvRows } = get();
     const texts = csvRows
-      .map((row, i) => ({ 
-        row: i + 1, 
-        text: row[columnIndex] || "" 
+      .map((row, i) => ({
+        row: i + 1,
+        text: row[columnIndex] || "",
       }))
-      .filter(item => item.text.length > 0);
+      .filter((item) => item.text.length > 0);
     set({ csvTexts: texts, selectedTextColumn: columnIndex });
   },
 
@@ -164,7 +183,13 @@ const useClassifyStore = create((set, get) => ({
     const { selectedModelId, inputMode, inputText, csvTexts } = get();
     if (!selectedModelId) return;
 
-    set({ isClassifying: true, result: null, batchResults: [], batchErrors: [], error: null });
+    set({
+      isClassifying: true,
+      result: null,
+      batchResults: [],
+      batchErrors: [],
+      error: null,
+    });
     try {
       if (inputMode === "single") {
         if (!inputText.trim()) {
@@ -178,17 +203,20 @@ const useClassifyStore = create((set, get) => ({
         set({ result: res.data, isClassifying: false });
       } else {
         if (csvTexts.length === 0) {
-          set({ error: "Pilih file dan kolom teks terlebih dahulu", isClassifying: false });
+          set({
+            error: "Pilih file dan kolom teks terlebih dahulu",
+            isClassifying: false,
+          });
           return;
         }
         const { data: res } = await classifyApi.classifyBatch({
           model_id: selectedModelId,
           texts: csvTexts.map((r) => r.text),
         });
-        set({ 
-          batchResults: res.data.results, 
+        set({
+          batchResults: res.data.results,
           batchErrors: res.data.errors || [],
-          isClassifying: false 
+          isClassifying: false,
         });
       }
       get().fetchHistory();
@@ -197,7 +225,8 @@ const useClassifyStore = create((set, get) => ({
     }
   },
 
-  clearResult: () => set({ result: null, batchResults: [], batchErrors: [], error: null }),
+  clearResult: () =>
+    set({ result: null, batchResults: [], batchErrors: [], error: null }),
 
   // ── History ────────────────────────────────────────────────────
   fetchHistory: async () => {

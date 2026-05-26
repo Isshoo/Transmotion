@@ -39,18 +39,22 @@ export default function ForgotPasswordForm() {
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <div className="mb-4 text-4xl">📧</div>
-        <h2 className="mb-2 text-xl font-semibold text-gray-800">
+      <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+        <div className="mb-4 text-5xl">📧</div>
+        <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
           Cek email kamu!
         </h2>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
           {activeTab === "forgot"
             ? "Link reset password sudah dikirim ke "
             : "Link verifikasi sudah dikirim ulang ke "}
-          <strong>{email}</strong>. Cek inbox atau folder spam kamu.
+          <strong className="text-(--text-primary)">{email}</strong>. Cek inbox
+          atau folder spam kamu.
         </p>
-        <Link href="/login" className="text-sm text-blue-600 hover:underline">
+        <Link
+          href="/login"
+          className="text-sm font-bold tracking-wide text-(--accent) hover:underline"
+        >
           ← Kembali ke halaman masuk
         </Link>
       </div>
@@ -58,25 +62,25 @@ export default function ForgotPasswordForm() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-      <h1 className="mb-1 text-2xl font-semibold text-gray-800">
+    <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
+      <h1 className="mb-2 text-3xl font-black tracking-tight text-(--text-primary)">
         Bantuan Akun
       </h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <p className="mb-6 text-sm font-medium text-(--text-secondary)">
         Pilih jenis bantuan yang kamu butuhkan.
       </p>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 rounded-lg bg-gray-100 p-1">
+      <div className="mb-6 flex gap-1 rounded-xl border border-(--border-subtle) bg-(--bg-overlay) p-1">
         <button
           onClick={() => {
             setActiveTab("forgot");
             setError(null);
           }}
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
+          className={`flex-1 rounded-lg py-2.5 text-xs font-bold tracking-wide transition-all duration-200 ${
             activeTab === "forgot"
-              ? "bg-white text-gray-800 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "border border-(--border-strong) bg-(--bg-surface) text-(--text-primary) shadow-(--shadow-sm)"
+              : "text-(--text-tertiary) hover:text-(--text-secondary)"
           }`}
         >
           Lupa Password
@@ -86,10 +90,10 @@ export default function ForgotPasswordForm() {
             setActiveTab("resend");
             setError(null);
           }}
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
+          className={`flex-1 rounded-lg py-2.5 text-xs font-bold tracking-wide transition-all duration-200 ${
             activeTab === "resend"
-              ? "bg-white text-gray-800 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "border border-(--border-strong) bg-(--bg-surface) text-(--text-primary) shadow-(--shadow-sm)"
+              : "text-(--text-tertiary) hover:text-(--text-secondary)"
           }`}
         >
           Kirim Ulang Verifikasi
@@ -97,21 +101,21 @@ export default function ForgotPasswordForm() {
       </div>
 
       {/* Deskripsi tab */}
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-6 rounded-xl border border-(--border-subtle) bg-(--bg-surface) p-4 text-[13px] leading-relaxed font-medium text-(--text-secondary)">
         {activeTab === "forgot"
           ? "Masukkan email kamu dan kami akan kirimkan link untuk membuat password baru."
           : "Belum menerima email verifikasi? Masukkan email kamu untuk mengirim ulang."}
       </p>
 
       {error && (
-        <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+        <div className="mb-5 rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 p-3.5 text-xs font-bold text-(--error) shadow-(--shadow-sm)">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Email
           </label>
           <input
@@ -120,14 +124,14 @@ export default function ForgotPasswordForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="kamu@email.com"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-lg bg-blue-600 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading
             ? "Mengirim..."
@@ -137,8 +141,11 @@ export default function ForgotPasswordForm() {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm">
-        <Link href="/login" className="text-blue-600 hover:underline">
+      <p className="mt-6 text-center">
+        <Link
+          href="/login"
+          className="text-sm font-bold tracking-wide text-(--text-secondary) transition-colors hover:text-(--accent) hover:underline"
+        >
           ← Kembali ke halaman masuk
         </Link>
       </p>

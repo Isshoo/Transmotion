@@ -6,9 +6,9 @@ export default function Avatar({ user }) {
       <Image
         src={user.avatar_url}
         alt={user.name}
-        width={8}
-        height={8}
-        className="h-8 w-8 rounded-full object-cover"
+        width={32}
+        height={32}
+        className="h-8 w-8 rounded-full border border-(--border-subtle) object-cover shadow-(--shadow-sm)"
       />
     );
   }
@@ -19,7 +19,7 @@ export default function Avatar({ user }) {
     .join("")
     .toUpperCase();
   return (
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-(--accent-muted) bg-(--accent-muted) text-[11px] font-black text-(--accent) shadow-(--shadow-sm)">
       {initials}
     </div>
   );

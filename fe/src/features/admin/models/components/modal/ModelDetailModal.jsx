@@ -28,32 +28,39 @@ export default function ModelDetailModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="flex max-h-[92vh] w-full max-w-3xl flex-col rounded-2xl bg-white shadow-xl">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div
+        className="animate-scale-in flex max-h-[92vh] w-full max-w-3xl flex-col rounded-2xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-lg)"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b px-6 py-4">
-          <div className="flex items-center gap-2">
-            <BrainCircuit size={18} className="text-blue-600" />
+        <div className="flex shrink-0 items-center justify-between rounded-t-2xl border-b border-(--border-subtle) bg-(--bg-elevated) px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-(--accent-muted) bg-(--accent-muted)/20">
+              <BrainCircuit size={20} className="text-(--accent)" />
+            </div>
             <div>
-              <h2 className="text-base font-semibold text-gray-800">
+              <h2 className="text-base font-bold tracking-tight text-(--text-primary)">
                 {m.name}
               </h2>
-              <p className="text-xs text-gray-400">{m.id}</p>
+              <p className="mt-0.5 font-mono text-[10px] text-(--text-tertiary)">
+                ID: {m.id}
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {m.is_active ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                <CheckCircle size={11} /> Aktif
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-(--success-muted)/50 bg-(--success-muted)/20 px-3 py-1 text-[10px] font-bold tracking-wider text-(--success) uppercase shadow-(--shadow-sm)">
+                <CheckCircle size={12} /> Aktif
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
-                <XCircle size={11} /> Nonaktif
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-(--border-strong) bg-(--bg-elevated) px-3 py-1 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase shadow-(--shadow-sm)">
+                <XCircle size={12} /> Nonaktif
               </span>
             )}
             <button
               onClick={closeDetailModal}
-              className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100"
+              className="rounded-lg p-2 text-(--text-tertiary) transition-colors hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             >
               <X size={18} />
             </button>
@@ -61,10 +68,10 @@ export default function ModelDetailModal() {
         </div>
 
         {/* Body */}
-        <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
+        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) scrollbar-track-transparent flex-1 space-y-6 overflow-y-auto p-6">
           {/* Info umum */}
           <Section title="Informasi Model">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
                 ["Arsitektur", m.model_type?.toUpperCase()],
                 ["Base Model", m.base_model_name ?? "—"],
@@ -85,10 +92,12 @@ export default function ModelDetailModal() {
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5"
+                  className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) px-3 py-3 text-center shadow-(--shadow-sm)"
                 >
-                  <p className="text-xs text-gray-400">{label}</p>
-                  <p className="mt-0.5 truncate text-sm font-medium text-gray-700">
+                  <p className="text-[9px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+                    {label}
+                  </p>
+                  <p className="mt-1.5 truncate text-xs font-bold text-(--text-primary)">
                     {value}
                   </p>
                 </div>
@@ -99,20 +108,22 @@ export default function ModelDetailModal() {
           {/* Deskripsi */}
           {m.description && (
             <Section title="Deskripsi">
-              <p className="text-sm text-gray-700">{m.description}</p>
+              <p className="font-mono text-sm leading-relaxed text-(--text-secondary)">
+                {m.description}
+              </p>
             </Section>
           )}
 
           {/* Label mapping */}
           {m.label_map && Object.keys(m.label_map).length > 0 && (
             <Section title="Label Kelas">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {Object.entries(m.label_map).map(([idx, label]) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-(--data-3)/30 bg-(--data-3)/10 px-3 py-1.5 text-[10px] font-bold tracking-wider text-(--data-3) uppercase"
                   >
-                    <span className="rounded-full bg-purple-200 px-1.5 py-0.5 text-[10px] font-bold text-purple-800">
+                    <span className="rounded-full bg-(--data-3)/20 px-1.5 py-0.5 text-[9px] font-black text-(--data-3)">
                       {idx}
                     </span>
                     {label}
@@ -124,23 +135,27 @@ export default function ModelDetailModal() {
 
           {/* Metrik utama */}
           <Section title="Metrik Evaluasi (Test Set)">
-            <div className="space-y-3">
+            <div className="space-y-4">
               <MetricBar
                 label="Accuracy"
                 value={m.accuracy}
-                color="bg-blue-500"
+                color="bg-(--accent)"
               />
               <MetricBar
                 label="F1 Score"
                 value={m.f1_score}
-                color="bg-green-500"
+                color="bg-(--success)"
               />
               <MetricBar
                 label="Precision"
                 value={m.precision}
-                color="bg-purple-500"
+                color="bg-(--data-2)"
               />
-              <MetricBar label="Recall" value={m.recall} color="bg-amber-500" />
+              <MetricBar
+                label="Recall"
+                value={m.recall}
+                color="bg-(--warning)"
+              />
             </div>
           </Section>
 
@@ -154,49 +169,49 @@ export default function ModelDetailModal() {
           {/* Rata-rata */}
           {(m.macro_avg || m.weighted_avg) && (
             <Section title="Rata-rata">
-              <div className="overflow-hidden rounded-lg border border-gray-200">
+              <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b bg-gray-50">
-                      {["", "Precision", "Recall", "F1-Score"].map((h) => (
+                    <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
+                      {["Type", "Precision", "Recall", "F1-Score"].map((h) => (
                         <th
                           key={h}
-                          className="px-3 py-2 text-left font-semibold text-gray-500"
+                          className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
                         >
                           {h}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-(--border-subtle) bg-(--bg-surface)">
                     {m.macro_avg && (
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-3 py-2 font-semibold text-gray-700">
+                      <tr className="transition-colors duration-150 hover:bg-(--bg-overlay)">
+                        <td className="px-4 py-3 font-bold text-(--text-primary)">
                           Macro Average
                         </td>
-                        <td className="px-3 py-2 text-gray-600">
+                        <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
                           {(m.macro_avg.precision * 100).toFixed(2)}%
                         </td>
-                        <td className="px-3 py-2 text-gray-600">
+                        <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
                           {(m.macro_avg.recall * 100).toFixed(2)}%
                         </td>
-                        <td className="px-3 py-2 text-gray-600">
+                        <td className="px-4 py-3 font-mono font-bold text-(--accent)">
                           {(m.macro_avg.f1 * 100).toFixed(2)}%
                         </td>
                       </tr>
                     )}
                     {m.weighted_avg && (
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-3 py-2 font-semibold text-gray-700">
+                      <tr className="transition-colors duration-150 hover:bg-(--bg-overlay)">
+                        <td className="px-4 py-3 font-bold text-(--text-primary)">
                           Weighted Average
                         </td>
-                        <td className="px-3 py-2 text-gray-600">
+                        <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
                           {(m.weighted_avg.precision * 100).toFixed(2)}%
                         </td>
-                        <td className="px-3 py-2 text-gray-600">
+                        <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
                           {(m.weighted_avg.recall * 100).toFixed(2)}%
                         </td>
-                        <td className="px-3 py-2 text-gray-600">
+                        <td className="px-4 py-3 font-mono font-bold text-(--accent)">
                           {(m.weighted_avg.f1 * 100).toFixed(2)}%
                         </td>
                       </tr>
@@ -217,7 +232,7 @@ export default function ModelDetailModal() {
           {/* Hyperparameter */}
           {m.training_config && (
             <Section title="Hyperparameter Training">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {[
                   ["Learning Rate", m.training_config.learning_rate],
                   ["Epochs", m.training_config.epochs],
@@ -228,10 +243,12 @@ export default function ModelDetailModal() {
                 ].map(([l, v]) => (
                   <span
                     key={l}
-                    className="rounded-md border border-gray-200 px-2.5 py-1 text-xs text-gray-600"
+                    className="rounded-md border border-(--border-strong) bg-(--bg-elevated) px-3 py-1.5 text-[10px] font-bold tracking-wide text-(--text-secondary) uppercase shadow-(--shadow-sm)"
                   >
                     {l}:{" "}
-                    <span className="font-semibold text-gray-800">{v}</span>
+                    <span className="ml-1 font-black text-(--text-primary)">
+                      {v}
+                    </span>
                   </span>
                 ))}
               </div>
@@ -241,7 +258,7 @@ export default function ModelDetailModal() {
           {/* Distribusi prediksi */}
           {m.total_predictions > 0 && m.per_label && (
             <Section title="Distribusi Prediksi">
-              <div className="space-y-2">
+              <div className="space-y-3.5">
                 {Object.entries(m.per_label)
                   .sort((a, b) => b[1] - a[1])
                   .map(([label, count]) => {
@@ -250,17 +267,20 @@ export default function ModelDetailModal() {
                     );
                     return (
                       <div key={label}>
-                        <div className="mb-0.5 flex justify-between text-xs">
-                          <span className="font-medium text-gray-700">
+                        <div className="mb-1 flex justify-between text-[11px] font-medium tracking-wide uppercase">
+                          <span className="text-(--text-secondary)">
                             {label}
                           </span>
-                          <span className="text-gray-500">
-                            {count.toLocaleString("id")} ({pct}%)
+                          <span className="text-(--text-tertiary)">
+                            <strong className="text-(--text-primary)">
+                              {count.toLocaleString("id")}
+                            </strong>{" "}
+                            ({pct}%)
                           </span>
                         </div>
-                        <div className="h-1.5 w-full rounded-full bg-gray-100">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-(--border-strong)">
                           <div
-                            className="h-1.5 rounded-full bg-purple-400"
+                            className="h-1.5 rounded-full bg-(--data-3) transition-all duration-500"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
@@ -273,10 +293,10 @@ export default function ModelDetailModal() {
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 justify-end border-t px-6 py-4">
+        <div className="flex shrink-0 justify-end rounded-b-2xl border-t border-(--border-subtle) bg-(--bg-elevated) px-6 py-4">
           <button
             onClick={closeDetailModal}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            className="rounded-xl border border-(--border-strong) bg-(--bg-surface) px-5 py-2.5 text-sm font-bold tracking-wide text-(--text-secondary) shadow-(--shadow-sm) transition-all hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             Tutup
           </button>

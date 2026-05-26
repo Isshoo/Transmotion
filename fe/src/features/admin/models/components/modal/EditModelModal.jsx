@@ -49,35 +49,43 @@ export default function EditModelModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="text-base font-semibold text-gray-800">Edit Model</h2>
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div
+        className="animate-scale-in flex w-full max-w-md flex-col rounded-2xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-lg)"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between rounded-t-2xl border-b border-(--border-subtle) bg-(--bg-elevated) px-6 py-4">
+          <h2 className="text-lg font-bold tracking-tight text-(--text-primary)">
+            Edit Model
+          </h2>
           <button
             onClick={closeEditModal}
-            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100"
+            className="rounded-lg p-2 text-(--text-tertiary) transition-colors hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 py-5">
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-xs font-bold tracking-wide text-(--text-secondary) uppercase">
               Nama Model
             </label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+              placeholder="Masukkan nama model"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Deskripsi{" "}
-              <span className="font-normal text-gray-400">(opsional)</span>
+            <label className="mb-1.5 flex items-center gap-2 text-xs font-bold tracking-wide text-(--text-secondary) uppercase">
+              Deskripsi
+              <span className="rounded bg-(--bg-overlay) px-1.5 py-0.5 text-[10px] font-normal text-(--text-tertiary) normal-case">
+                opsional
+              </span>
             </label>
             <textarea
               value={form.description}
@@ -85,47 +93,79 @@ export default function EditModelModal() {
                 setForm((p) => ({ ...p, description: e.target.value }))
               }
               rows={3}
-              className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Masukkan deskripsi model..."
+              className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             />
           </div>
 
-          <div className="flex gap-6">
+          <div className="flex flex-col gap-3 rounded-xl border border-(--border-default) bg-(--bg-elevated) p-4">
             {[
-              { key: "is_active", label: "Model Aktif" },
-              { key: "is_public", label: "Publik (dapat digunakan user)" },
-            ].map(({ key, label }) => (
+              {
+                key: "is_active",
+                label: "Model Aktif",
+                desc: "Model dapat diakses di sistem",
+              },
+              {
+                key: "is_public",
+                label: "Publik",
+                desc: "Model dapat digunakan oleh user lain",
+              },
+            ].map(({ key, label, desc }) => (
               <label
                 key={key}
-                className="flex cursor-pointer items-center gap-2 text-sm text-gray-700"
+                className="group flex cursor-pointer items-start gap-3 rounded-lg transition-colors"
               >
-                <input
-                  type="checkbox"
-                  checked={form[key]}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, [key]: e.target.checked }))
-                  }
-                  className="h-4 w-4 rounded accent-blue-600"
-                />
-                {label}
+                <div className="relative flex items-center pt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={form[key]}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, [key]: e.target.checked }))
+                    }
+                    className="peer sr-only"
+                  />
+                  <div className="h-5 w-5 rounded border-2 border-(--border-strong) bg-(--bg-surface) transition-colors peer-checked:border-(--accent) peer-checked:bg-(--accent) peer-focus-visible:ring-2 peer-focus-visible:ring-(--accent-muted)" />
+                  <svg
+                    className="pointer-events-none absolute top-[55%] left-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-(--text-primary) transition-colors group-hover:text-(--accent)">
+                    {label}
+                  </span>
+                  <span className="text-[11px] font-medium text-(--text-tertiary)">
+                    {desc}
+                  </span>
+                </div>
               </label>
             ))}
           </div>
 
-          <div className="flex justify-end gap-3 border-t pt-4">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={closeEditModal}
               disabled={isSubmitting}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-2.5 text-sm font-bold tracking-wide text-(--text-secondary) transition-all hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-xl bg-(--accent) px-4 py-2.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-sm) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:opacity-50"
             >
-              {isSubmitting ? "Menyimpan..." : "Simpan"}
+              {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
             </button>
           </div>
         </form>

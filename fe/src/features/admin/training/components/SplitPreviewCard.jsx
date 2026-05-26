@@ -6,9 +6,11 @@ import { Bar } from "./ui/Bar";
 export default function SplitPreviewCard({ preview, isLoading }) {
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 rounded-xl border border-gray-200 p-4">
-        <Loader2 size={15} className="animate-spin text-blue-500" />
-        <span className="text-sm text-gray-500">Menghitung distribusi...</span>
+      <div className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-surface) p-4 shadow-(--shadow-sm)">
+        <Loader2 size={15} className="animate-spin text-(--accent)" />
+        <span className="text-sm font-medium text-(--text-secondary)">
+          Menghitung distribusi...
+        </span>
       </div>
     );
   }
@@ -19,35 +21,37 @@ export default function SplitPreviewCard({ preview, isLoading }) {
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border ${hasErrors ? "border-red-200" : "border-green-200"}`}
+      className={`animate-scale-in overflow-hidden rounded-xl border bg-(--bg-surface) shadow-(--shadow-sm) ${hasErrors ? "border-(--error)/30" : "border-(--success)/30"}`}
     >
       {/* Header */}
       <div
-        className={`flex items-center gap-2 px-4 py-2.5 ${hasErrors ? "bg-red-50" : "bg-green-50"}`}
+        className={`flex items-center gap-2 px-4 py-2.5 ${hasErrors ? "bg-(--error-muted)/30" : "bg-(--success-muted)/30"}`}
       >
         {hasErrors ? (
-          <AlertCircle size={15} className="shrink-0 text-red-500" />
+          <AlertCircle size={15} className="shrink-0 text-(--error)" />
         ) : (
-          <CheckCircle size={15} className="shrink-0 text-green-600" />
+          <CheckCircle size={15} className="shrink-0 text-(--success)" />
         )}
         <span
-          className={`text-sm font-medium ${hasErrors ? "text-red-700" : "text-green-700"}`}
+          className={`text-sm font-semibold tracking-wide ${hasErrors ? "text-(--error)" : "text-(--success)"}`}
         >
           {hasErrors ? "Data tidak mencukupi" : "Split valid"}
         </span>
       </div>
 
       {/* Ringkasan */}
-      <div className="grid grid-cols-4 divide-x border-t">
+      <div className="grid grid-cols-4 divide-x divide-(--border-subtle) border-t border-(--border-subtle)">
         {[
           ["Total", preview.total],
           ["Train", preview.train_total],
           ["Validation", preview.val_total],
           ["Test", preview.test_total],
         ].map(([label, value]) => (
-          <div key={label} className="px-4 py-2.5 text-center">
-            <p className="text-xs text-gray-400">{label}</p>
-            <p className="mt-0.5 text-base font-semibold text-gray-800">
+          <div key={label} className="bg-(--bg-elevated) px-4 py-3 text-center">
+            <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+              {label}
+            </p>
+            <p className="mt-1 text-base font-bold text-(--text-primary)">
               {(value ?? 0).toLocaleString("id")}
             </p>
           </div>
@@ -57,12 +61,12 @@ export default function SplitPreviewCard({ preview, isLoading }) {
       {/* Per kelas */}
       {preview.train_per_class &&
         Object.keys(preview.train_per_class).length > 0 && (
-          <div className="grid grid-cols-1 gap-4 border-t p-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 border-t border-(--border-default) p-5 sm:grid-cols-3">
             <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+              <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
                 Train set
               </p>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {Object.entries(preview.train_per_class).map(
                   ([label, count]) => (
                     <Bar
@@ -70,17 +74,17 @@ export default function SplitPreviewCard({ preview, isLoading }) {
                       label={label}
                       count={count}
                       total={preview.train_total}
-                      color="bg-blue-400"
+                      color="bg-(--accent)"
                     />
                   )
                 )}
               </div>
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+              <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
                 Validation set
               </p>
-              <div className="space-y-1.5">
+              <div className="space-y-2.5">
                 {Object.entries(preview.val_per_class || {}).map(
                   ([label, count]) => (
                     <Bar
@@ -88,17 +92,17 @@ export default function SplitPreviewCard({ preview, isLoading }) {
                       label={label}
                       count={count}
                       total={preview.val_total}
-                      color="bg-purple-400"
+                      color="bg-(--data-2)"
                     />
                   )
                 )}
               </div>
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+              <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
                 Test set
               </p>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {Object.entries(preview.test_per_class).map(
                   ([label, count]) => (
                     <Bar
@@ -106,7 +110,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
                       label={label}
                       count={count}
                       total={preview.test_total}
-                      color="bg-amber-400"
+                      color="bg-(--warning)"
                     />
                   )
                 )}
@@ -116,15 +120,15 @@ export default function SplitPreviewCard({ preview, isLoading }) {
         )}
 
       {/* Legend */}
-      <div className="flex gap-4 border-t px-4 py-2">
+      <div className="flex gap-4 border-t border-(--border-subtle) bg-(--bg-elevated) px-5 py-3">
         {[
-          ["bg-blue-400", "Train"],
-          ["bg-purple-400", "Validation"],
-          ["bg-amber-400", "Test"],
+          ["bg-(--accent)", "Train"],
+          ["bg-(--data-2)", "Validation"],
+          ["bg-(--warning)", "Test"],
         ].map(([color, label]) => (
           <span
             key={label}
-            className="flex items-center gap-1 text-xs text-gray-500"
+            className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-(--text-secondary) uppercase"
           >
             <span className={`inline-block h-2 w-2 rounded-full ${color}`} />
             {label}
@@ -134,10 +138,10 @@ export default function SplitPreviewCard({ preview, isLoading }) {
 
       {/* Error list */}
       {hasErrors && (
-        <div className="border-t bg-red-50 px-4 py-3">
+        <div className="border-t border-(--error)/20 bg-(--error-muted)/50 px-5 py-3">
           <ul className="space-y-1">
             {preview.validation_errors.map((e, i) => (
-              <li key={i} className="text-xs text-red-600">
+              <li key={i} className="text-xs font-medium text-(--error)">
                 • {e}
               </li>
             ))}

@@ -10,7 +10,8 @@ import ProgressView from "./sub/ProgressView";
 import ResultView from "./sub/ResultView";
 
 export default function TrainingPage() {
-  const { view, activeJob, init, setActiveJob } = useTrainingStore();
+  const { view, activeJob, init, setActiveJob, isCheckingActive } =
+    useTrainingStore();
 
   // Reset dan cek job aktif setiap kali halaman dibuka
   useEffect(() => {
@@ -45,14 +46,14 @@ export default function TrainingPage() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="flex items-center gap-2 text-lg font-semibold text-gray-800">
-          <BrainCircuit size={20} className="text-blue-600" />
+        <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+          <BrainCircuit size={20} className="text-(--accent)" />
           Training Model
         </h1>
-        <p className="mt-0.5 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-(--text-secondary)">
           {view === "form" &&
             "Konfigurasi dan mulai pelatihan model mBERT / XLM-R"}
           {view === "progress" &&
@@ -74,19 +75,19 @@ export default function TrainingPage() {
               <div
                 className={`h-px w-8 ${
                   view === "result" || (view === "progress" && i === 1)
-                    ? "bg-blue-400"
-                    : "bg-gray-200"
+                    ? "bg-(--accent)"
+                    : "bg-(--border-default)"
                 }`}
               />
             )}
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium tracking-wide transition-colors duration-200 ${
                 view === key
-                  ? "bg-blue-600 text-white"
+                  ? "bg-(--accent) text-white shadow-(--shadow-accent)"
                   : (key === "progress" && view === "result") ||
                       (key === "form" && view !== "form")
-                    ? "bg-blue-100 text-blue-600"
-                    : "bg-gray-100 text-gray-400"
+                    ? "bg-(--accent-muted) text-(--accent)"
+                    : "bg-(--bg-elevated) text-(--text-tertiary)"
               }`}
             >
               {label}
@@ -96,9 +97,24 @@ export default function TrainingPage() {
       </div>
 
       {/* Content */}
-      {view === "form" && <FormView />}
-      {view === "progress" && <ProgressView />}
-      {view === "result" && <ResultView />}
+      <div className="animate-fade-in">
+        {isCheckingActive ? (
+          <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
+            <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-(--accent)" />
+              <p className="text-xs font-medium">
+                Memeriksa status training...
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {view === "form" && <FormView />}
+            {view === "progress" && <ProgressView />}
+            {view === "result" && <ResultView />}
+          </>
+        )}
+      </div>
     </div>
   );
 }

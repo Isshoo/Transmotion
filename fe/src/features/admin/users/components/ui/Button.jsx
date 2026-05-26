@@ -1,5 +1,3 @@
-// ── Helper: tombol aksi ────────────────────────────────────────
-
 export function ActionButton({
   onClick,
   disabled,
@@ -12,14 +10,12 @@ export function ActionButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`rounded-md p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
+      className={`rounded-md p-1.5 transition-colors duration-150 focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
     >
       {children}
     </button>
   );
 }
-
-// ── Helper: tombol paginasi ────────────────────────────────────
 
 export function PaginationButton({
   onClick,
@@ -33,10 +29,10 @@ export function PaginationButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+      className={`flex h-7 min-w-7 items-center justify-center rounded-md px-2 text-[11px] font-bold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
         active
-          ? "bg-blue-600 text-white"
-          : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+          ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+          : "border border-(--border-default) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
       }`}
     >
       {children}

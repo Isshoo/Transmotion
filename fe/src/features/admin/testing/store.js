@@ -75,12 +75,18 @@ const useTestingStore = create((set, get) => ({
           return;
         }
 
-        const delimiter = text.includes("\t") ? "\t" : text.includes(";") ? ";" : ",";
-        
+        const delimiter = text.includes("\t")
+          ? "\t"
+          : text.includes(";")
+            ? ";"
+            : ",";
+
         // Parse all rows
         const allRows = lines.map((line) => {
           // Simple CSV split (doesn't handle quoted delimiters perfectly but usually enough)
-          return line.split(delimiter).map(c => c.replace(/^["']|["']$/g, "").trim());
+          return line
+            .split(delimiter)
+            .map((c) => c.replace(/^["']|["']$/g, "").trim());
         });
 
         const headers = allRows[0];
@@ -115,9 +121,9 @@ const useTestingStore = create((set, get) => ({
             return;
           }
           const headers = allRows[0].map((h) => String(h ?? "").trim());
-          const rows = allRows.slice(1).map((row) =>
-            row.map((cell) => String(cell ?? "").trim())
-          );
+          const rows = allRows
+            .slice(1)
+            .map((row) => row.map((cell) => String(cell ?? "").trim()));
           resolve({ headers, rows });
         } catch (err) {
           reject(err);
@@ -130,13 +136,13 @@ const useTestingStore = create((set, get) => ({
 
   setCsvFile: async (file) => {
     if (!file) {
-      set({ 
-        csvTexts: [], 
-        csvFileName: "", 
-        csvHeaders: [], 
-        csvRows: [], 
+      set({
+        csvTexts: [],
+        csvFileName: "",
+        csvHeaders: [],
+        csvRows: [],
         selectedTextColumn: null,
-        results: [] 
+        results: [],
       });
       return;
     }
@@ -145,14 +151,14 @@ const useTestingStore = create((set, get) => ({
     const { headers, rows } = isExcel
       ? await get().parseExcelFile(file)
       : await get().parseCsvFile(file);
-    set({ 
-      csvHeaders: headers, 
-      csvRows: rows, 
-      csvFileName: file.name, 
+    set({
+      csvHeaders: headers,
+      csvRows: rows,
+      csvFileName: file.name,
       results: [],
       selectedTextColumn: headers.length > 0 ? 0 : null,
     });
-    
+
     // Automatically prepare csvTexts if column is selected
     get().updateCsvTexts(0);
   },
@@ -160,12 +166,12 @@ const useTestingStore = create((set, get) => ({
   updateCsvTexts: (columnIndex) => {
     const { csvRows } = get();
     const texts = csvRows
-      .map((row, i) => ({ 
-        row: i + 1, 
-        text: row[columnIndex] || "" 
+      .map((row, i) => ({
+        row: i + 1,
+        text: row[columnIndex] || "",
       }))
-      .filter(item => item.text.length > 0);
-    
+      .filter((item) => item.text.length > 0);
+
     set({ csvTexts: texts, selectedTextColumn: columnIndex });
   },
 
@@ -175,7 +181,13 @@ const useTestingStore = create((set, get) => ({
 
   // ── Classify ───────────────────────────────────────────────
   classify: async () => {
-    const { selectedModelId, inputMode, inputText, csvTexts, selectedTextColumn } = get();
+    const {
+      selectedModelId,
+      inputMode,
+      inputText,
+      csvTexts,
+      selectedTextColumn,
+    } = get();
     if (!selectedModelId) return;
 
     set({ isClassifying: true, results: [], batchErrors: [], error: null });
@@ -193,9 +205,10 @@ const useTestingStore = create((set, get) => ({
         set({ results: [res.data] });
       } else {
         if (csvTexts.length === 0) {
-          const msg = selectedTextColumn === null 
-            ? "Pilih kolom teks terlebih dahulu" 
-            : "Upload file CSV terlebih dahulu atau kolom yang dipilih kosong";
+          const msg =
+            selectedTextColumn === null
+              ? "Pilih kolom teks terlebih dahulu"
+              : "Upload file CSV terlebih dahulu atau kolom yang dipilih kosong";
           set({
             error: msg,
             isClassifying: false,

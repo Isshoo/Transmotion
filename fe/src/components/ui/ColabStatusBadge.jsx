@@ -38,7 +38,7 @@ export default function ColabStatusBadge() {
   // Belum ada data sama sekali
   if (!status && !isReconnecting) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-400">
+      <span className="inline-flex w-full items-center gap-1.5 rounded-md bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-disabled)">
         <Loader2 size={11} className="animate-spin" />
         Colab
       </span>
@@ -49,7 +49,7 @@ export default function ColabStatusBadge() {
   if (isReconnecting) {
     return (
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-500"
+        className="inline-flex w-full items-center gap-1.5 rounded-md bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-tertiary)"
         title="Menyambungkan ulang koneksi status..."
       >
         <Loader2 size={11} className="animate-spin" />
@@ -64,7 +64,7 @@ export default function ColabStatusBadge() {
   if (s === "online") {
     return (
       <span
-        className="inline-flex cursor-default items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700"
+        className="inline-flex w-full cursor-default items-center gap-1.5 rounded-md bg-(--success-muted) px-2.5 py-1.5 text-xs font-medium text-(--success)"
         title={`Colab Online — ping ${secondsAgo}s lalu`}
       >
         <Wifi size={11} />
@@ -76,7 +76,7 @@ export default function ColabStatusBadge() {
   if (s === "degraded") {
     return (
       <span
-        className="inline-flex cursor-default items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700"
+        className="inline-flex w-full cursor-default items-center gap-1.5 rounded-md bg-(--warning-muted) px-2.5 py-1.5 text-xs font-medium text-(--warning)"
         title={`Koneksi tidak stabil — ping terakhir ${secondsAgo}s lalu`}
       >
         <AlertTriangle size={11} />
@@ -87,7 +87,7 @@ export default function ColabStatusBadge() {
 
   return (
     <span
-      className="inline-flex cursor-default items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-500"
+      className="inline-flex w-full cursor-default items-center gap-1.5 rounded-md bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
       title={
         secondsAgo
           ? `Colab Offline — ping terakhir ${secondsAgo}s lalu`

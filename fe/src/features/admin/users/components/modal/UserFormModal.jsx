@@ -104,26 +104,26 @@ export default function UserFormModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="animate-scale-in w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-lg)">
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="text-base font-semibold text-gray-800">
+        <div className="flex items-center justify-between border-b border-(--border-subtle) px-6 py-4">
+          <h2 className="text-base font-bold tracking-tight text-(--text-primary)">
             {isEdit ? "Edit Pengguna" : "Tambah Pengguna Baru"}
           </h2>
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 py-5">
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
           {serverError && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            <div className="rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 p-3.5 text-xs font-bold text-(--error)">
               {serverError}
             </div>
           )}
 
           {/* Nama */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
               Nama Lengkap
             </label>
             <input
@@ -132,20 +132,22 @@ export default function UserFormModal() {
               value={form.name}
               onChange={handleChange}
               placeholder="Nama pengguna"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${
+              className={`w-full rounded-xl border bg-(--bg-surface) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) ${
                 errors.name
-                  ? "border-red-400 focus:ring-red-300"
-                  : "border-gray-300 focus:ring-blue-500"
+                  ? "border-(--error) focus:ring-2 focus:ring-(--error-muted)"
+                  : "border-(--border-strong) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
               }`}
             />
             {errors.name && (
-              <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+              <p className="mt-1.5 text-[11px] font-bold text-(--error)">
+                {errors.name}
+              </p>
             )}
           </div>
 
           {/* Email */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
               Email
             </label>
             <input
@@ -154,23 +156,25 @@ export default function UserFormModal() {
               value={form.email}
               onChange={handleChange}
               placeholder="pengguna@email.com"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${
+              className={`w-full rounded-xl border bg-(--bg-surface) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) ${
                 errors.email
-                  ? "border-red-400 focus:ring-red-300"
-                  : "border-gray-300 focus:ring-blue-500"
+                  ? "border-(--error) focus:ring-2 focus:ring-(--error-muted)"
+                  : "border-(--border-strong) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
               }`}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+              <p className="mt-1.5 text-[11px] font-bold text-(--error)">
+                {errors.email}
+              </p>
             )}
           </div>
 
           {/* Password */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
               Password{" "}
               {isEdit && (
-                <span className="font-normal text-gray-400">
+                <span className="font-normal text-(--text-tertiary) normal-case">
                   (kosongkan jika tidak ingin mengubah)
                 </span>
               )}
@@ -181,27 +185,29 @@ export default function UserFormModal() {
               value={form.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${
+              className={`w-full rounded-xl border bg-(--bg-surface) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) ${
                 errors.password
-                  ? "border-red-400 focus:ring-red-300"
-                  : "border-gray-300 focus:ring-blue-500"
+                  ? "border-(--error) focus:ring-2 focus:ring-(--error-muted)"
+                  : "border-(--border-strong) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
               }`}
             />
             {errors.password && (
-              <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+              <p className="mt-1.5 text-[11px] font-bold text-(--error)">
+                {errors.password}
+              </p>
             )}
           </div>
 
           {/* Role */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
               Role
             </label>
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
@@ -210,25 +216,25 @@ export default function UserFormModal() {
 
           {/* Checkboxes */}
           {isEdit && (
-            <div className="flex gap-6">
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+            <div className="flex gap-6 rounded-xl border border-(--border-subtle) bg-(--bg-surface) p-4">
+              <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-(--text-secondary)">
                 <input
                   type="checkbox"
                   name="is_verified"
                   checked={form.is_verified}
                   onChange={handleChange}
-                  className="h-4 w-4 rounded accent-blue-600"
+                  className="h-4 w-4 rounded border-(--border-strong) accent-(--accent)"
                 />
                 Email Terverifikasi
               </label>
 
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+              <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-(--text-secondary)">
                 <input
                   type="checkbox"
                   name="is_active"
                   checked={form.is_active}
                   onChange={handleChange}
-                  className="h-4 w-4 rounded accent-blue-600"
+                  className="h-4 w-4 rounded border-(--border-strong) accent-(--accent)"
                 />
                 Akun Aktif
               </label>
@@ -236,19 +242,19 @@ export default function UserFormModal() {
           )}
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 border-t pt-4">
+          <div className="flex justify-end gap-3 border-t border-(--border-subtle) pt-5">
             <button
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-2.5 text-sm font-bold text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-bold text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting
                 ? "Menyimpan..."

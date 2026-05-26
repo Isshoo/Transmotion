@@ -40,73 +40,101 @@ export default function ComparisonTable({ mbert, xlmr }) {
   ];
 
   return (
-    <div className="overflow-x-auto">
-      <table className="border-collapse text-sm">
-        <thead>
-          <tr>
-            <th className="w-44 border border-gray-300 bg-blue-800 px-5 py-2.5 font-semibold text-white">
-              {" "}
-              Metrik{" "}
-            </th>
-            <th className="border border-gray-300 bg-blue-600 px-6 py-2.5 text-center font-semibold text-white">
-              XLM-R
-            </th>
-            <th className="border border-gray-300 bg-blue-400 px-6 py-2.5 text-center font-semibold text-white">
-              MBERT
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(({ label, xlmrVal, mbertVal, raw, lowerBetter }) => {
-            const xlmrWins =
-              xlmrVal != null &&
-              mbertVal != null &&
-              (lowerBetter ? xlmrVal < mbertVal : xlmrVal > mbertVal);
-            const mbertWins =
-              xlmrVal != null &&
-              mbertVal != null &&
-              (lowerBetter ? mbertVal < xlmrVal : mbertVal > xlmrVal);
-
-            return (
-              <tr key={label} className="hover:bg-gray-50">
-                <td className="border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-700">
-                  {label}
-                  {lowerBetter && (
-                    <span className="ml-1 text-[10px] text-gray-400">
-                      (↓ lebih baik)
-                    </span>
-                  )}
-                </td>
-                <td
-                  className={`border border-gray-200 px-4 py-2.5 text-center text-sm font-semibold ${
-                    xlmrWins ? "bg-green-50 text-green-700" : "text-gray-800"
-                  }`}
-                >
-                  {fmt(xlmrVal, raw)}
-                  {xlmrWins && (
-                    <span className="ml-1 text-[10px] text-green-500">▲</span>
-                  )}
-                </td>
-                <td
-                  className={`border border-gray-200 px-4 py-2.5 text-center text-sm font-semibold ${
-                    mbertWins ? "bg-green-50 text-green-700" : "text-gray-800"
-                  }`}
-                >
-                  {fmt(mbertVal, raw)}
-                  {mbertWins && (
-                    <span className="ml-1 text-[10px] text-green-500">▲</span>
-                  )}
-                </td>
+    <div>
+      <div className="overflow-hidden rounded-xl border border-(--border-default) shadow-(--shadow-sm)">
+        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                <th className="w-34 border-r border-b border-(--border-default) bg-(--bg-elevated) px-6 py-3.5 text-left text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Metrik
+                </th>
+                <th className="border-r border-b border-(--border-default) bg-(--data-4)/10 px-6 py-3.5 text-center text-[10px] font-black tracking-wider text-(--data-4) uppercase">
+                  XLM-R
+                </th>
+                <th className="border-b border-(--border-default) bg-(--data-1)/10 px-6 py-3.5 text-center text-[10px] font-black tracking-wider text-(--data-1) uppercase">
+                  MBERT
+                </th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <p className="mt-1.5 text-[10px] text-gray-400">
-        ▲ = nilai lebih baik. Best model dipilih berdasarkan Accuracy tertinggi.
-        Mean Std: rata-rata standar deviasi confidence score (lebih rendah =
-        lebih confident).
-      </p>
+            </thead>
+            <tbody className="bg-(--bg-surface)">
+              {rows.map(
+                ({ label, xlmrVal, mbertVal, raw, lowerBetter }, idx) => {
+                  const xlmrWins =
+                    xlmrVal != null &&
+                    mbertVal != null &&
+                    (lowerBetter ? xlmrVal < mbertVal : xlmrVal > mbertVal);
+                  const mbertWins =
+                    xlmrVal != null &&
+                    mbertVal != null &&
+                    (lowerBetter ? mbertVal < xlmrVal : mbertVal > xlmrVal);
+
+                  const isLast = idx === rows.length - 1;
+
+                  return (
+                    <tr
+                      key={label}
+                      className="transition-colors duration-150 hover:bg-(--bg-overlay)"
+                    >
+                      <td
+                        className={`border-r border-(--border-default) ${!isLast ? "border-b" : ""} bg-(--bg-elevated) px-5 py-3 text-[13px] font-bold text-(--text-primary)`}
+                      >
+                        {label}
+                        {lowerBetter && (
+                          <span className="ml-2 inline-flex items-center rounded-md border border-(--border-subtle) bg-(--bg-overlay) px-1.5 py-0.5 text-[9px] font-medium text-(--text-tertiary)">
+                            ↓ lebih baik
+                          </span>
+                        )}
+                      </td>
+                      <td
+                        className={`border-r border-(--border-default) ${!isLast ? "border-b" : ""} px-5 py-3 text-center font-mono text-[13px] font-medium ${
+                          xlmrWins
+                            ? "bg-(--success-muted)/10 font-bold text-(--success)"
+                            : "text-(--text-secondary)"
+                        }`}
+                      >
+                        {fmt(xlmrVal, raw)}
+                        {xlmrWins && (
+                          <span className="ml-1.5 text-[10px] text-(--success)">
+                            ▲
+                          </span>
+                        )}
+                      </td>
+                      <td
+                        className={`border-(--border-default) ${!isLast ? "border-b" : ""} px-5 py-3 text-center font-mono text-[13px] font-medium ${
+                          mbertWins
+                            ? "bg-(--success-muted)/10 font-bold text-(--success)"
+                            : "text-(--text-secondary)"
+                        }`}
+                      >
+                        {fmt(mbertVal, raw)}
+                        {mbertWins && (
+                          <span className="ml-1.5 text-[10px] text-(--success)">
+                            ▲
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                }
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="mt-3 flex items-start gap-2 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3">
+        <span className="text-sm">💡</span>
+        <p className="text-[11px] leading-relaxed text-(--text-tertiary)">
+          <strong className="text-(--success)">▲</strong> menandakan nilai lebih
+          baik. Best model dipilih berdasarkan{" "}
+          <strong className="text-(--text-secondary)">Accuracy</strong>{" "}
+          tertinggi.
+          <br />
+          <strong className="text-(--text-secondary)">Mean Std:</strong>{" "}
+          rata-rata standar deviasi confidence score (lebih rendah = lebih
+          confident).
+        </p>
+      </div>
     </div>
   );
 }

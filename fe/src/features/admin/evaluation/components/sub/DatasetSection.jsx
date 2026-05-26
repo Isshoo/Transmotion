@@ -11,76 +11,84 @@ export default function DatasetSection({ group }) {
   if (!hasData) return null;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Summary counts */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-blue-600 px-3 py-0.5 text-xs font-semibold text-white">
+        <div className="flex items-center gap-2 rounded-full border border-(--border-default) bg-(--bg-surface) py-1 pr-3 pl-1 shadow-(--shadow-sm)">
+          <span className="rounded-full bg-(--data-4)/10 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--data-4) uppercase">
             XLM-R
           </span>
-          <span className="text-sm text-gray-600">{xlmr.length} model</span>
+          <span className="text-xs font-bold text-(--text-primary)">
+            {xlmr.length} model
+          </span>
         </div>
-        <span className="text-gray-300">·</span>
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-blue-400 px-3 py-0.5 text-xs font-semibold text-white">
+
+        <div className="flex items-center gap-2 rounded-full border border-(--border-default) bg-(--bg-surface) py-1 pr-3 pl-1 shadow-(--shadow-sm)">
+          <span className="rounded-full bg-(--data-1)/10 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--data-1) uppercase">
             MBERT
           </span>
-          <span className="text-sm text-gray-600">{mbert.length} model</span>
+          <span className="text-xs font-bold text-(--text-primary)">
+            {mbert.length} model
+          </span>
         </div>
+
         {xlmr.length > 0 && (
-          <>
-            <span className="text-gray-300">·</span>
-            <span className="text-xs text-gray-500">
-              Best XLM-R Accuracy:{" "}
-              <span className="font-semibold text-gray-700">
-                {fmtPct(bestModel(xlmr)?.accuracy)}
-              </span>
+          <div className="flex items-center gap-1.5 rounded-full border border-(--border-default) bg-(--bg-surface) px-3 py-1.5 shadow-(--shadow-sm)">
+            <span className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+              Best XLM-R Accuracy:
             </span>
-          </>
+            <span className="rounded-md border border-(--success-muted)/20 bg-(--success-muted)/10 px-2 py-0.5 text-[11px] font-black text-(--success)">
+              {fmtPct(bestModel(xlmr)?.accuracy)}
+            </span>
+          </div>
         )}
         {mbert.length > 0 && (
-          <>
-            <span className="text-gray-300">·</span>
-            <span className="text-xs text-gray-500">
-              Best MBERT Accuracy:{" "}
-              <span className="font-semibold text-gray-700">
-                {fmtPct(bestModel(mbert)?.accuracy)}
-              </span>
+          <div className="flex items-center gap-1.5 rounded-full border border-(--border-default) bg-(--bg-surface) px-3 py-1.5 shadow-(--shadow-sm)">
+            <span className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+              Best MBERT Accuracy:
             </span>
-          </>
+            <span className="rounded-md border border-(--success-muted)/20 bg-(--success-muted)/10 px-2 py-0.5 text-[11px] font-black text-(--success)">
+              {fmtPct(bestModel(mbert)?.accuracy)}
+            </span>
+          </div>
         )}
       </div>
 
       {/* Tabel iterasi */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-          Tabel Iterasi — Accuracy
-        </p>
-        <p className="mb-4 text-[11px] text-gray-400">
-          Setiap baris = iterasi training ke-N dengan split yang sama. Rata-rata
-          dihitung dari semua iterasi per kolom.
-        </p>
+      <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
+        <div className="mb-5">
+          <p className="text-sm font-bold tracking-tight text-(--text-primary)">
+            Tabel Iterasi — Accuracy
+          </p>
+          <p className="mt-1 text-xs font-medium text-(--text-secondary)">
+            Setiap baris = iterasi training ke-N dengan split yang sama.
+            Rata-rata dihitung dari semua iterasi per kolom.
+          </p>
+        </div>
         <IterationTable mbert={mbert} xlmr={xlmr} metric="accuracy" />
       </div>
 
       {/* Tabel perbandingan */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-          Perbandingan Metrik — Model Terbaik
-        </p>
-        <p className="mb-4 text-[11px] text-gray-400">
-          Dibandingkan dari model dengan Accuracy tertinggi masing-masing tipe.
-        </p>
+      <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
+        <div className="mb-5">
+          <p className="text-sm font-bold tracking-tight text-(--text-primary)">
+            Perbandingan Metrik — Model Terbaik
+          </p>
+          <p className="mt-1 text-xs font-medium text-(--text-secondary)">
+            Dibandingkan dari model dengan Accuracy tertinggi masing-masing
+            tipe.
+          </p>
+        </div>
         <ComparisonTable mbert={mbert} xlmr={xlmr} />
       </div>
 
       {/* Per-class comparison */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
+      <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
         <PerClassComparison mbert={mbert} xlmr={xlmr} />
       </div>
 
       {/* Confusion matrix */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
+      <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
         <ConfusionMatrixSection mbert={mbert} xlmr={xlmr} />
       </div>
     </div>

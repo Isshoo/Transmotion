@@ -55,25 +55,25 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="text-base font-semibold text-gray-800">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="animate-scale-in w-full max-w-lg rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-xl)">
+        <div className="flex items-center justify-between rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
+          <h2 className="text-base font-semibold tracking-tight text-(--text-primary)">
             {isEdit ? "Edit Data" : "Tambah Data"}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100"
+            className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 py-5">
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
           {/* Raw text (hanya saat tambah) */}
           {!isEdit && (
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
                 Teks Asli
               </label>
               <textarea
@@ -84,17 +84,23 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                 }}
                 rows={2}
                 placeholder="Teks sebelum preprocessing..."
-                className={`w-full resize-none rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.raw_text ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+                className={`w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+                  errors.raw_text
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
               />
               {errors.raw_text && (
-                <p className="mt-1 text-xs text-red-500">{errors.raw_text}</p>
+                <p className="mt-1.5 text-xs text-(--error)">
+                  {errors.raw_text}
+                </p>
               )}
             </div>
           )}
 
           {/* Preprocessed text */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
               Teks Preprocessed
             </label>
             <textarea
@@ -105,10 +111,14 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
               }}
               rows={2}
               placeholder="Teks setelah preprocessing..."
-              className={`w-full resize-none rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.preprocessed_text ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+              className={`w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+                errors.preprocessed_text
+                  ? "border-(--error) focus:ring-(--error-muted)"
+                  : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+              }`}
             />
             {errors.preprocessed_text && (
-              <p className="mt-1 text-xs text-red-500">
+              <p className="mt-1.5 text-xs text-(--error)">
                 {errors.preprocessed_text}
               </p>
             )}
@@ -116,7 +126,7 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
 
           {/* Label */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
               Label
             </label>
             {labels.length > 0 ? (
@@ -126,7 +136,11 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                   setForm((p) => ({ ...p, label: e.target.value }));
                   setErrors((p) => ({ ...p, label: undefined }));
                 }}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:ring-2 ${
+                  errors.label
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
               >
                 {labels.map((l) => (
                   <option key={l} value={l}>
@@ -143,27 +157,31 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                   setErrors((p) => ({ ...p, label: undefined }));
                 }}
                 placeholder="Nama label..."
-                className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.label ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+                className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+                  errors.label
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
               />
             )}
             {errors.label && (
-              <p className="mt-1 text-xs text-red-500">{errors.label}</p>
+              <p className="mt-1.5 text-xs text-(--error)">{errors.label}</p>
             )}
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-2.5 border-t border-(--border-default) pt-5">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:opacity-50"
             >
               {isSubmitting
                 ? "Menyimpan..."

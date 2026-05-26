@@ -6,32 +6,32 @@ export function StatusBadge({ status }) {
   const STATUS_CONFIG = {
     queued: {
       label: "Menunggu",
-      cls: "bg-gray-100 text-gray-600",
-      dot: "bg-gray-400",
+      cls: "bg-(--bg-elevated) text-(--text-secondary) border border-(--border-strong)",
+      dot: "bg-(--text-tertiary)",
       icon: Clock,
     },
     running: {
       label: "Berjalan",
-      cls: "bg-blue-100 text-blue-700",
-      dot: "bg-blue-500",
+      cls: "bg-(--accent-muted)/20 text-(--accent) border border-(--accent-muted)/50",
+      dot: "bg-(--accent)",
       icon: Loader2,
     },
     completed: {
       label: "Selesai",
-      cls: "bg-green-100 text-green-700",
-      dot: "bg-green-500",
+      cls: "bg-(--success-muted)/20 text-(--success) border border-(--success-muted)/50",
+      dot: "bg-(--success)",
       icon: CheckCircle,
     },
     failed: {
       label: "Gagal",
-      cls: "bg-red-100 text-red-600",
-      dot: "bg-red-500",
+      cls: "bg-(--error-muted)/20 text-(--error) border border-(--error-muted)/50",
+      dot: "bg-(--error)",
       icon: XCircle,
     },
     cancelled: {
       label: "Dibatalkan",
-      cls: "bg-gray-100 text-gray-400",
-      dot: "bg-gray-300",
+      cls: "bg-(--bg-overlay) text-(--text-tertiary) border border-(--border-subtle)",
+      dot: "bg-(--text-disabled)",
       icon: Ban,
     },
   };
@@ -43,9 +43,9 @@ export function StatusBadge({ status }) {
   } = STATUS_CONFIG[status] ?? STATUS_CONFIG.queued;
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase ${cls}`}
     >
-      <Icon size={11} className={status === "running" ? "animate-spin" : ""} />
+      <Icon size={12} className={status === "running" ? "animate-spin" : ""} />
       {label}
     </span>
   );
@@ -55,23 +55,27 @@ export function DetailStatusBadge({ status }) {
   const STATUS_CONFIG = {
     queued: {
       label: "Menunggu",
-      cls: "bg-gray-100 text-gray-600",
+      cls: "bg-(--bg-elevated) text-(--text-secondary) border border-(--border-strong)",
       icon: Clock,
     },
     running: {
       label: "Berjalan",
-      cls: "bg-blue-100 text-blue-700",
+      cls: "bg-(--accent-muted)/20 text-(--accent) border border-(--accent-muted)/50 shadow-(--shadow-sm)",
       icon: Loader2,
     },
     completed: {
       label: "Selesai",
-      cls: "bg-green-100 text-green-700",
+      cls: "bg-(--success-muted)/20 text-(--success) border border-(--success-muted)/50 shadow-(--shadow-sm)",
       icon: CheckCircle,
     },
-    failed: { label: "Gagal", cls: "bg-red-100 text-red-600", icon: XCircle },
+    failed: {
+      label: "Gagal",
+      cls: "bg-(--error-muted)/20 text-(--error) border border-(--error-muted)/50 shadow-(--shadow-sm)",
+      icon: XCircle,
+    },
     cancelled: {
       label: "Dibatalkan",
-      cls: "bg-gray-100 text-gray-500",
+      cls: "bg-(--bg-overlay) text-(--text-tertiary) border border-(--border-subtle)",
       icon: Ban,
     },
   };
@@ -82,34 +86,38 @@ export function DetailStatusBadge({ status }) {
   } = STATUS_CONFIG[status] ?? STATUS_CONFIG.queued;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${cls}`}
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wider uppercase ${cls}`}
     >
-      <Icon size={12} className={status === "running" ? "animate-spin" : ""} />
+      <Icon size={14} className={status === "running" ? "animate-spin" : ""} />
       {label}
     </span>
   );
 }
 
-const STATUS_CONFIG = {
+const TRAINING_STATUS_CONFIG = {
   queued: {
     label: "Menunggu Colab",
-    cls: "bg-gray-100 text-gray-600",
+    cls: "bg-(--bg-elevated) text-(--text-secondary) border border-(--border-strong)",
     icon: Clock,
   },
   running: {
     label: "Sedang Training",
-    cls: "bg-blue-100 text-blue-700",
+    cls: "bg-(--accent-muted)/20 text-(--accent) border border-(--accent-muted)/50",
     icon: Loader2,
   },
   completed: {
     label: "Selesai",
-    cls: "bg-green-100 text-green-700",
+    cls: "bg-(--success-muted)/20 text-(--success) border border-(--success-muted)/50",
     icon: CheckCircle,
   },
-  failed: { label: "Gagal", cls: "bg-red-100 text-red-600", icon: XCircle },
+  failed: {
+    label: "Gagal",
+    cls: "bg-(--error-muted)/20 text-(--error) border border-(--error-muted)/50",
+    icon: XCircle,
+  },
   cancelled: {
     label: "Dibatalkan",
-    cls: "bg-gray-100 text-gray-500",
+    cls: "bg-(--bg-overlay) text-(--text-tertiary) border border-(--border-subtle)",
     icon: Ban,
   },
 };
@@ -119,10 +127,10 @@ export function TrainingStatusBadge({ status }) {
     label,
     cls,
     icon: Icon,
-  } = STATUS_CONFIG[status] ?? STATUS_CONFIG.queued;
+  } = TRAINING_STATUS_CONFIG[status] ?? TRAINING_STATUS_CONFIG.queued;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${cls}`}
+      className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-bold tracking-wide ${cls}`}
     >
       <Icon size={14} className={status === "running" ? "animate-spin" : ""} />
       {label}

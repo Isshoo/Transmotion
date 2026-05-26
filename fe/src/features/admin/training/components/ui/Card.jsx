@@ -1,20 +1,39 @@
-export function MetricCard({ label, value, suffix = "" }) {
+export function MetricCard({
+  label,
+  value,
+  suffix = "",
+  color = "text-(--text-primary)",
+}) {
   return (
-    <div className="rounded-lg border border-gray-200 px-4 py-3 text-center">
-      <p className="text-xs text-gray-400">{label}</p>
-      <p className="mt-1 text-xl font-semibold text-gray-800">
+    <div className="rounded-xl border border-(--border-default) bg-(--bg-elevated) px-4 py-3.5 text-center shadow-(--shadow-sm)">
+      <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+        {label}
+      </p>
+      <p className={`mt-1.5 text-xl font-black tracking-tight ${color}`}>
         {value !== null ? `${(value * 100).toFixed(2)}${suffix}` : "—"}
       </p>
     </div>
   );
 }
 
-export function MetricsCard({ label, value, color = "text-blue-600" }) {
-  const pct = value !== null ? `${(value * 100).toFixed(2)}%` : "—";
+export function MetricsCard({
+  label,
+  value,
+  color = "text-(--accent)",
+  suffix = "%",
+}) {
+  const pct =
+    value !== null
+      ? `${(suffix === "%" ? value * 100 : value).toFixed(2)}${suffix}`
+      : "—";
   return (
-    <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center">
-      <p className="text-xs text-gray-400">{label}</p>
-      <p className={`mt-1 text-2xl font-bold ${color}`}>{pct}</p>
+    <div className="rounded-xl border border-(--border-default) bg-(--bg-elevated) px-4 py-4 text-center shadow-(--shadow-sm) transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-(--shadow-md)">
+      <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+        {label}
+      </p>
+      <p className={`mt-2 text-3xl font-black tracking-tighter ${color}`}>
+        {pct}
+      </p>
     </div>
   );
 }

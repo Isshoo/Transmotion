@@ -3,27 +3,29 @@ import { BrainCircuit, Database, Zap } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 text-center">
+    <div className="mx-auto max-w-4xl px-4 py-24 text-center">
       {/* Hero */}
-      <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-600">
-        <BrainCircuit size={15} /> Klasifikasi Teks berbasis Transformer
+      <div className="animate-slide-up mb-6 inline-flex items-center gap-2 rounded-full border border-(--accent-muted)/50 bg-(--accent-muted)/20 px-4 py-1.5 text-xs font-bold tracking-wider text-(--accent) shadow-(--shadow-sm)">
+        <BrainCircuit size={14} /> Klasifikasi Teks berbasis Transformer
       </div>
-      <h1 className="mb-4 text-4xl font-bold text-gray-900">Transmotion</h1>
-      <p className="mx-auto mb-8 max-w-xl text-lg text-gray-500">
+      <h1 className="animate-scale-in mb-6 text-5xl font-black tracking-tighter text-(--text-primary) md:text-6xl">
+        Transmotion
+      </h1>
+      <p className="animate-fade-in mx-auto mb-10 max-w-2xl text-lg leading-relaxed font-medium text-(--text-secondary)">
         Platform manajemen dan deployment model mBERT & XLM-R untuk klasifikasi
-        teks multibahasa.
+        teks multibahasa secara real-time.
       </p>
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="animate-slide-up flex flex-wrap justify-center gap-4">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="inline-flex items-center gap-2 rounded-xl bg-(--accent) px-8 py-3.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
-          <Zap size={16} /> Coba Klasifikasi
+          <Zap size={18} className="fill-current" /> Coba Klasifikasi
         </Link>
       </div>
 
       {/* Feature cards */}
-      <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-3">
+      <div className="mt-24 grid grid-cols-1 gap-6 sm:grid-cols-3">
         {[
           {
             icon: Database,
@@ -43,15 +45,17 @@ export default function HomePage() {
         ].map(({ icon: Icon, title, desc }) => (
           <div
             key={title}
-            className="rounded-2xl border border-gray-200 bg-white p-6 text-left"
+            className="group rounded-2xl border border-(--border-default) bg-(--bg-surface) p-8 text-left transition-all duration-300 hover:-translate-y-1 hover:border-(--border-strong) hover:shadow-(--shadow-md)"
           >
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
-              <Icon size={20} className="text-blue-600" />
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-(--accent-muted)/20 shadow-(--shadow-sm) transition-transform group-hover:scale-110">
+              <Icon size={22} className="text-(--accent)" />
             </div>
-            <h3 className="mb-1 text-sm font-semibold text-gray-800">
+            <h3 className="mb-2 text-base font-bold tracking-tight text-(--text-primary)">
               {title}
             </h3>
-            <p className="text-sm text-gray-500">{desc}</p>
+            <p className="text-sm leading-relaxed font-medium text-(--text-secondary)">
+              {desc}
+            </p>
           </div>
         ))}
       </div>

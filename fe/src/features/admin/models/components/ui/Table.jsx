@@ -1,15 +1,15 @@
 export function PerClassTable({ perClass }) {
   if (!perClass || Object.keys(perClass).length === 0) return null;
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200">
+    <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b bg-gray-50">
+          <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
             {["Kelas", "Precision", "Recall", "F1-Score", "Support"].map(
               (h) => (
                 <th
                   key={h}
-                  className="px-3 py-2 text-left font-semibold text-gray-500"
+                  className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
                 >
                   {h}
                 </th>
@@ -17,20 +17,27 @@ export function PerClassTable({ perClass }) {
             )}
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="divide-y divide-(--border-subtle) bg-(--bg-surface)">
           {Object.entries(perClass).map(([cls, m]) => (
-            <tr key={cls} className="hover:bg-gray-50">
-              <td className="px-3 py-2 font-semibold text-gray-700">{cls}</td>
-              <td className="px-3 py-2 text-gray-600">
+            <tr
+              key={cls}
+              className="transition-colors duration-150 hover:bg-(--bg-overlay)"
+            >
+              <td className="px-4 py-3 font-bold text-(--text-primary)">
+                {cls}
+              </td>
+              <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
                 {(m.precision * 100).toFixed(2)}%
               </td>
-              <td className="px-3 py-2 text-gray-600">
+              <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
                 {(m.recall * 100).toFixed(2)}%
               </td>
-              <td className="px-3 py-2 text-gray-600">
+              <td className="px-4 py-3 font-mono font-bold text-(--accent)">
                 {(m.f1 * 100).toFixed(2)}%
               </td>
-              <td className="px-3 py-2 text-gray-500">{m.support}</td>
+              <td className="px-4 py-3 font-mono font-medium text-(--text-tertiary)">
+                {m.support}
+              </td>
             </tr>
           ))}
         </tbody>

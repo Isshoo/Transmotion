@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, BrainCircuit, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  X,
+  BrainCircuit,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  CheckCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import useTrainingStore from "../../store";
 import datasetsApi from "@/features/admin/datasets/api";
@@ -11,11 +18,13 @@ const MODEL_OPTIONS = [
   {
     value: "mbert",
     label: "mBERT",
+    badge: "bg-(--data-1)/20 text-(--data-1) border border-(--data-1)/30",
     desc: "bert-base-multilingual-cased — cocok untuk dataset multibahasa & Bahasa Indonesia",
   },
   {
     value: "xlmr",
     label: "XLM-R",
+    badge: "bg-(--data-4)/20 text-(--data-4) border border-(--data-4)/30",
     desc: "xlm-roberta-base — performa lebih baik untuk teks Bahasa Indonesia & rendah sumber daya",
   },
 ];
@@ -135,26 +144,26 @@ export default function CreateJobModal() {
   const selectedDataset = datasets.find((d) => d.id === datasetId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-xl">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="animate-scale-in flex max-h-[92vh] w-full max-w-2xl flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-xl)">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b px-6 py-4">
+        <div className="flex shrink-0 items-center justify-between rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
           <div className="flex items-center gap-2">
-            <BrainCircuit size={18} className="text-blue-600" />
-            <h2 className="text-base font-semibold text-gray-800">
+            <BrainCircuit size={18} className="text-(--accent)" />
+            <h2 className="text-base font-semibold tracking-tight text-(--text-primary)">
               Buat Training Job Baru
             </h2>
           </div>
           <button
             onClick={handleClose}
-            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100"
+            className="rounded-md p-1.5 text-(--text-tertiary) transition-colors duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Step indicator */}
-        <div className="flex shrink-0 border-b">
+        <div className="flex shrink-0 border-b border-(--border-default) bg-(--bg-elevated)">
           {[
             { n: 1, label: "Dataset & Split" },
             { n: 2, label: "Model & Hyperparameter" },
@@ -164,21 +173,21 @@ export default function CreateJobModal() {
               onClick={() =>
                 n < step || (n === 2 && canProceedStep1) ? setStep(n) : null
               }
-              className={`flex-1 border-b-2 px-4 py-3 text-sm font-medium transition ${
+              className={`flex-1 border-b-2 px-4 py-3.5 text-sm font-medium tracking-wide transition-colors duration-150 ${
                 step === n
-                  ? "border-blue-600 text-blue-600"
+                  ? "border-(--accent) text-(--accent)"
                   : n < step
-                    ? "cursor-pointer border-transparent text-gray-500 hover:text-gray-700"
-                    : "cursor-not-allowed border-transparent text-gray-400"
+                    ? "cursor-pointer border-transparent text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
+                    : "cursor-not-allowed border-transparent text-(--text-disabled)"
               }`}
             >
               <span
-                className={`mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold ${
+                className={`mr-2.5 inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
                   step === n
-                    ? "bg-blue-600 text-white"
+                    ? "bg-(--accent) text-white shadow-(--shadow-accent)"
                     : n < step
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-500"
+                      ? "bg-(--success) text-white"
+                      : "bg-(--bg-overlay) text-(--text-tertiary)"
                 }`}
               >
                 {n < step ? "✓" : n}
@@ -189,59 +198,76 @@ export default function CreateJobModal() {
         </div>
 
         {/* Body */}
-        <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
           {/* ── STEP 1 ─────────────────────────────────────── */}
           {step === 1 && (
-            <>
+            <div className="animate-fade-in space-y-6">
               {/* Pilih dataset */}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
                   Dataset
                 </label>
-                <p className="mb-2 text-xs text-gray-400">
+                <p className="mb-3 text-xs text-(--text-tertiary)">
                   Hanya menampilkan dataset yang sudah melewati preprocessing.
                 </p>
                 {isLoadingDatasets ? (
-                  <div className="rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-400">
+                  <div className="flex items-center gap-2 rounded-md border border-(--border-default) bg-(--bg-elevated) px-4 py-3 text-sm text-(--text-tertiary)">
+                    <Loader2
+                      size={16}
+                      className="animate-spin text-(--accent)"
+                    />{" "}
                     Memuat daftar dataset...
                   </div>
                 ) : datasets.length === 0 ? (
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                  <div className="rounded-md border border-(--warning-muted) bg-(--warning-muted) px-4 py-3 text-sm text-(--warning) opacity-90">
                     Belum ada dataset yang siap. Lakukan preprocessing dataset
                     terlebih dahulu.
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {datasets.map((ds) => (
                       <button
                         key={ds.id}
                         type="button"
                         onClick={() => setDatasetId(ds.id)}
-                        className={`w-full rounded-xl border px-4 py-3 text-left transition ${
+                        className={`w-full rounded-xl border p-4 text-left transition-all duration-200 ${
                           datasetId === ds.id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                            ? "border-(--accent) bg-(--accent-muted)/30 ring-1 ring-(--accent)"
+                            : "border-(--border-default) bg-(--bg-elevated) hover:border-(--accent) hover:bg-(--bg-overlay)"
                         }`}
                       >
                         <p
-                          className={`text-sm font-medium ${datasetId === ds.id ? "text-blue-700" : "text-gray-800"}`}
+                          className={`text-sm font-semibold tracking-tight ${datasetId === ds.id ? "text-(--accent)" : "text-(--text-primary)"}`}
                         >
                           {ds.name}
                         </p>
-                        <div className="mt-0.5 flex flex-wrap gap-3 text-xs text-gray-500">
+                        <div className="mt-1.5 flex flex-wrap gap-4 text-[11px] font-medium tracking-wide text-(--text-tertiary) uppercase">
                           <span>
-                            {ds.num_rows_preprocessed?.toLocaleString("id")}{" "}
+                            <strong className="text-(--text-secondary)">
+                              {ds.num_rows_preprocessed?.toLocaleString("id")}
+                            </strong>{" "}
                             baris preprocessed
                           </span>
+                          <span>|</span>
                           <span>
-                            {ds.num_labels ??
-                              Object.keys(
-                                ds.class_distribution_preprocessed ?? {}
-                              ).length}{" "}
+                            <strong className="text-(--text-secondary)">
+                              {ds.num_labels ??
+                                Object.keys(
+                                  ds.class_distribution_preprocessed ?? {}
+                                ).length}
+                            </strong>{" "}
                             kelas
                           </span>
+                          <span>|</span>
                           <span>
-                            Teks: {ds.text_column} · Label: {ds.label_column}
+                            Teks:{" "}
+                            <strong className="text-(--text-secondary)">
+                              {ds.text_column}
+                            </strong>{" "}
+                            · Label:{" "}
+                            <strong className="text-(--text-secondary)">
+                              {ds.label_column}
+                            </strong>
                           </span>
                         </div>
                       </button>
@@ -252,14 +278,20 @@ export default function CreateJobModal() {
 
               {/* Test size slider */}
               {datasetId && (
-                <div>
-                  <div className="mb-1 flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-700">
+                <div className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-xs font-medium text-(--text-secondary)">
                       Ukuran Test Set
                     </label>
-                    <span className="text-sm font-semibold text-blue-600">
-                      {Math.round(testSize * 100)}% test /{" "}
-                      {Math.round((1 - testSize) * 100)}% train
+                    <span className="text-[11px] font-semibold tracking-wide text-(--accent) uppercase">
+                      <span className="text-(--warning)">
+                        {Math.round(testSize * 100)}%
+                      </span>{" "}
+                      test /{" "}
+                      <span className="text-(--accent)">
+                        {Math.round((1 - testSize) * 100)}%
+                      </span>{" "}
+                      train
                     </span>
                   </div>
                   <input
@@ -269,9 +301,9 @@ export default function CreateJobModal() {
                     step="5"
                     value={Math.round(testSize * 100)}
                     onChange={(e) => setTestSize(e.target.value / 100)}
-                    className="w-full accent-blue-600"
+                    className="mt-1 w-full cursor-pointer accent-(--accent)"
                   />
-                  <div className="mt-0.5 flex justify-between text-xs text-gray-400">
+                  <div className="mt-1.5 flex justify-between text-[10px] font-medium text-(--text-tertiary)">
                     <span>5%</span>
                     <span>40%</span>
                   </div>
@@ -285,163 +317,200 @@ export default function CreateJobModal() {
                   isLoading={isLoadingPreview}
                 />
               )}
-            </>
+            </div>
           )}
 
           {/* ── STEP 2 ─────────────────────────────────────── */}
           {step === 2 && (
-            <>
+            <div className="animate-fade-in space-y-6">
               {/* Ringkasan dataset */}
               {selectedDataset && splitPreview && (
-                <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-                  <p className="mb-1 text-xs text-gray-400">
-                    Dataset yang dipilih
-                  </p>
-                  <p className="text-sm font-medium text-gray-800">
-                    {selectedDataset.name}
-                  </p>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    Train: {splitPreview.train_total?.toLocaleString("id")} ·
-                    Test: {splitPreview.test_total?.toLocaleString("id")} ·
-                    {splitPreview.num_labels} kelas
-                  </p>
+                <div className="flex flex-col gap-3 rounded-xl border border-(--border-default) bg-(--bg-elevated) px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="mb-1 text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+                      Dataset Terpilih
+                    </p>
+                    <p className="text-sm font-semibold tracking-tight text-(--text-primary)">
+                      {selectedDataset.name}
+                    </p>
+                  </div>
+                  <div className="flex gap-4 rounded-md border border-(--border-subtle) bg-(--bg-surface) px-3 py-1.5 text-[11px] font-medium tracking-wide text-(--text-secondary) uppercase">
+                    <span>
+                      Train:{" "}
+                      <strong className="text-(--accent)">
+                        {splitPreview.train_total?.toLocaleString("id")}
+                      </strong>
+                    </span>
+                    <span>
+                      Test:{" "}
+                      <strong className="text-(--warning)">
+                        {splitPreview.test_total?.toLocaleString("id")}
+                      </strong>
+                    </span>
+                    <span>
+                      Kelas:{" "}
+                      <strong className="text-(--text-primary)">
+                        {splitPreview.num_labels}
+                      </strong>
+                    </span>
+                  </div>
                 </div>
               )}
 
               {/* Nama job */}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
                   Nama Job{" "}
-                  <span className="font-normal text-gray-400">(opsional)</span>
+                  <span className="font-normal text-(--text-tertiary)">
+                    (opsional)
+                  </span>
                 </label>
                 <input
                   type="text"
                   value={jobName}
                   onChange={(e) => setJobName(e.target.value)}
                   placeholder={`cth. mBERT Sentiment v1`}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                 />
               </div>
 
               {/* Pilih model */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2.5 block text-sm font-medium text-(--text-secondary)">
                   Arsitektur Model
                 </label>
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {MODEL_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
                       onClick={() => setModelType(opt.value)}
-                      className={`w-full rounded-xl border px-4 py-3 text-left transition ${
+                      className={`rounded-xl border p-4 text-left transition-all duration-200 ${
                         modelType === opt.value
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200 hover:border-blue-300"
+                          ? "border-(--accent) bg-(--accent-muted)/30 ring-1 ring-(--accent)"
+                          : "border-(--border-default) bg-(--bg-surface) hover:border-(--accent) hover:bg-(--bg-overlay)"
                       }`}
                     >
-                      <p
-                        className={`text-sm font-semibold ${modelType === opt.value ? "text-blue-700" : "text-gray-800"}`}
-                      >
-                        {opt.label}
+                      <div className="mb-2 flex items-center justify-between">
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase ${opt.badge}`}
+                        >
+                          {opt.label}
+                        </span>
+                        {modelType === opt.value && (
+                          <CheckCircle
+                            size={16}
+                            className="animate-scale-in text-(--accent)"
+                          />
+                        )}
+                      </div>
+                      <p className="text-xs leading-relaxed text-(--text-secondary)">
+                        {opt.desc}
                       </p>
-                      <p className="mt-0.5 text-xs text-gray-500">{opt.desc}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Hyperparameter dasar */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-600">
-                    Epochs
-                  </label>
-                  <select
-                    value={hp.epochs}
-                    onChange={(e) =>
-                      setHp((p) => ({ ...p, epochs: Number(e.target.value) }))
-                    }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  >
-                    {[1, 2, 3, 4, 5, 8, 10].map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-600">
-                    Batch Size
-                  </label>
-                  <select
-                    value={hp.batch_size}
-                    onChange={(e) =>
-                      setHp((p) => ({
-                        ...p,
-                        batch_size: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  >
-                    {[8, 16, 32].map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-600">
-                    Max Length (token)
-                  </label>
-                  <select
-                    value={hp.max_length}
-                    onChange={(e) =>
-                      setHp((p) => ({
-                        ...p,
-                        max_length: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  >
-                    {[64, 128, 256, 512].map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-600">
-                    Learning Rate
-                  </label>
-                  <select
-                    value={hp.learning_rate}
-                    onChange={(e) =>
-                      setHp((p) => ({
-                        ...p,
-                        learning_rate: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  >
-                    {[1e-5, 2e-5, 3e-5, 5e-5].map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
+              <div>
+                <p className="mb-2.5 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Konfigurasi Dasar
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                      Epochs
+                    </label>
+                    <select
+                      value={hp.epochs}
+                      onChange={(e) =>
+                        setHp((p) => ({ ...p, epochs: Number(e.target.value) }))
+                      }
+                      className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                    >
+                      {[1, 2, 3, 4, 5, 8, 10].map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                      Batch Size
+                    </label>
+                    <select
+                      value={hp.batch_size}
+                      onChange={(e) =>
+                        setHp((p) => ({
+                          ...p,
+                          batch_size: Number(e.target.value),
+                        }))
+                      }
+                      className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                    >
+                      {[8, 16, 32].map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                      Max Length{" "}
+                      <span className="font-normal text-(--text-tertiary)">
+                        (token)
+                      </span>
+                    </label>
+                    <select
+                      value={hp.max_length}
+                      onChange={(e) =>
+                        setHp((p) => ({
+                          ...p,
+                          max_length: Number(e.target.value),
+                        }))
+                      }
+                      className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                    >
+                      {[64, 128, 256, 512].map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                      Learning Rate
+                    </label>
+                    <select
+                      value={hp.learning_rate}
+                      onChange={(e) =>
+                        setHp((p) => ({
+                          ...p,
+                          learning_rate: Number(e.target.value),
+                        }))
+                      }
+                      className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                    >
+                      {[1e-5, 2e-5, 3e-5, 5e-5].map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
               {/* Advanced hyperparams */}
-              <div>
+              <div className="pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                  className="flex items-center gap-1.5 text-[11px] font-medium tracking-wide text-(--text-tertiary) uppercase transition-colors hover:text-(--text-primary)"
                 >
                   {showAdvanced ? (
                     <ChevronUp size={13} />
@@ -453,9 +522,9 @@ export default function CreateJobModal() {
                 </button>
 
                 {showAdvanced && (
-                  <div className="mt-3 grid grid-cols-2 gap-4">
+                  <div className="animate-fade-in mt-4 grid grid-cols-2 gap-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-gray-600">
+                      <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
                         Warmup Steps
                       </label>
                       <input
@@ -470,11 +539,11 @@ export default function CreateJobModal() {
                             warmup_steps: Number(e.target.value),
                           }))
                         }
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-gray-600">
+                      <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
                         Weight Decay
                       </label>
                       <input
@@ -489,23 +558,23 @@ export default function CreateJobModal() {
                             weight_decay: Number(e.target.value),
                           }))
                         }
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                       />
                     </div>
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 justify-between gap-3 border-t px-6 py-4">
+        <div className="flex shrink-0 justify-between gap-3 rounded-b-xl border-t border-(--border-default) bg-(--bg-elevated) px-6 py-4">
           <button
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
           >
             Batal
           </button>
@@ -515,7 +584,7 @@ export default function CreateJobModal() {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
               >
                 ← Kembali
               </button>
@@ -525,7 +594,7 @@ export default function CreateJobModal() {
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={!canProceedStep1}
-                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               >
                 Lanjutkan →
               </button>
@@ -534,7 +603,7 @@ export default function CreateJobModal() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !canSubmit}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               >
                 {isSubmitting ? "Membuat Job..." : "Mulai Training"}
               </button>

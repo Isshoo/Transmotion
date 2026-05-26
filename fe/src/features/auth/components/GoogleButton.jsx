@@ -30,7 +30,7 @@ export default function GoogleButton({ intent = "login" }) {
   return (
     <div className="w-full">
       {error && (
-        <div className="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+        <div className="mb-3 rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 px-4 py-3 text-[11px] font-medium text-(--error)">
           {error}
         </div>
       )}
@@ -38,10 +38,10 @@ export default function GoogleButton({ intent = "login" }) {
         onClick={() => handleGoogleLogin()}
         disabled={isLoading}
         type="button"
-        className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-3 rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-3 text-sm font-bold tracking-wide text-(--text-primary) shadow-(--shadow-sm) transition-all duration-200 hover:bg-(--bg-overlay) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isLoading ? (
-          <span>Memproses...</span>
+          <span className="text-(--text-tertiary)">Memproses...</span>
         ) : (
           <>
             {/* Google Icon SVG */}

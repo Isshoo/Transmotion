@@ -8,39 +8,41 @@ export default function ConfusionMatrix({ data }) {
   const maxVal = Math.max(...matrix.flat());
 
   const getBg = (val, isCorrect) => {
-    if (val === 0) return "bg-gray-50 text-gray-300";
+    if (val === 0) return "bg-(--bg-elevated) text-(--text-tertiary)";
     const intensity = val / maxVal;
     if (isCorrect) {
-      // Diagonal — biru
-      if (intensity > 0.7) return "bg-blue-600 text-white";
-      if (intensity > 0.4) return "bg-blue-400 text-white";
-      return "bg-blue-200 text-blue-800";
+      // Diagonal — biru/accent
+      if (intensity > 0.7)
+        return "bg-(--accent) text-white font-bold ring-1 ring-inset ring-(--accent-hover)";
+      if (intensity > 0.4) return "bg-(--accent)/70 text-white font-bold";
+      return "bg-(--accent-muted) text-(--accent)";
     } else {
-      // Off-diagonal — merah
-      if (intensity > 0.3) return "bg-red-400 text-white";
-      if (intensity > 0.1) return "bg-red-200 text-red-800";
-      return "bg-red-50 text-red-500";
+      // Off-diagonal — merah/error
+      if (intensity > 0.3)
+        return "bg-(--error) text-white font-bold ring-1 ring-inset ring-[#dc2626]";
+      if (intensity > 0.1) return "bg-(--error)/70 text-white font-bold";
+      return "bg-(--error-muted) text-(--error)";
     }
   };
 
   return (
     <div>
-      <div className="overflow-x-auto">
-        <table className="border-collapse text-xs">
+      <div className="overflow-x-auto rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
+        <table className="w-full border-collapse text-xs">
           <thead>
             <tr>
-              <th className="w-20 px-2 py-1 text-right text-[10px] text-gray-400">
+              <th className="w-28 bg-(--bg-surface) px-3 py-2 text-right text-[10px] font-medium tracking-wider text-(--text-tertiary) uppercase">
                 Aktual ↓ / Prediksi →
               </th>
               {labels.map((l) => (
                 <th
                   key={l}
-                  className="border border-gray-200 bg-gray-100 px-3 py-2 text-center font-semibold text-gray-700"
+                  className="border border-(--border-default) bg-(--bg-elevated) px-4 py-3 text-center font-semibold tracking-wide whitespace-nowrap text-(--text-primary)"
                 >
                   {l}
                 </th>
               ))}
-              <th className="border border-gray-200 bg-gray-50 px-3 py-2 text-center font-semibold text-gray-500">
+              <th className="border border-(--border-default) bg-(--bg-overlay) px-4 py-3 text-center font-semibold tracking-wide text-(--text-secondary)">
                 Total
               </th>
             </tr>
@@ -50,23 +52,23 @@ export default function ConfusionMatrix({ data }) {
               const rowTotal = row.reduce((a, b) => a + b, 0);
               return (
                 <tr key={i}>
-                  <td className="border border-gray-200 bg-gray-100 px-2 py-2 text-right font-semibold whitespace-nowrap text-gray-700">
+                  <td className="border border-(--border-default) bg-(--bg-elevated) px-3 py-3 text-right font-semibold whitespace-nowrap text-(--text-primary)">
                     {labels[i]}
                   </td>
                   {row.map((val, j) => (
                     <td
                       key={j}
-                      className={`border border-gray-200 px-3 py-2 text-center font-semibold ${getBg(val, i === j)}`}
+                      className={`border border-(--border-default) px-3 py-2 text-center transition-colors duration-200 ${getBg(val, i === j)}`}
                     >
-                      <div>{val}</div>
+                      <div className="text-sm">{val}</div>
                       {rowTotal > 0 && (
-                        <div className="text-[10px] font-normal opacity-75">
+                        <div className="mt-0.5 text-[10px] font-medium opacity-75">
                           {((val / rowTotal) * 100).toFixed(0)}%
                         </div>
                       )}
                     </td>
                   ))}
-                  <td className="border border-gray-200 bg-gray-50 px-3 py-2 text-center font-medium text-gray-500">
+                  <td className="border border-(--border-default) bg-(--bg-overlay) px-3 py-3 text-center font-bold text-(--text-secondary)">
                     {rowTotal}
                   </td>
                 </tr>
@@ -75,7 +77,10 @@ export default function ConfusionMatrix({ data }) {
           </tbody>
         </table>
       </div>
-      <p className="mt-1 text-[10px] text-gray-400">Total sampel: {total}</p>
+      <p className="mt-2 text-right text-[10px] font-medium tracking-wide text-(--text-tertiary) uppercase">
+        Total sampel:{" "}
+        <span className="font-bold text-(--text-secondary)">{total}</span>
+      </p>
     </div>
   );
 }

@@ -7,16 +7,16 @@ import { AverageTable, PerClassTable } from "./ui/Table";
 
 function TabSection({ tabs, activeTab, setActiveTab, children }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-      <div className="flex border-b">
+    <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
+      <div className="no-scrollbar flex overflow-x-auto border-b border-(--border-default) bg-(--bg-elevated)">
         {tabs.map(({ key, label, color }) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
-            className={`border-b-2 px-5 py-3 text-xs font-semibold transition ${
+            className={`border-b-2 px-5 py-3.5 text-xs font-semibold tracking-wide whitespace-nowrap transition-all duration-150 ${
               activeTab === key
                 ? `border-current ${color}`
-                : "border-transparent text-gray-400 hover:text-gray-600"
+                : "border-transparent text-(--text-tertiary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             }`}
           >
             {label}
@@ -41,20 +41,20 @@ export default function EvaluationResults({ job }) {
   const hasEvalMetrics = job.val_accuracy != null || job.val_f1 != null;
 
   const splitTabs = [
-    { key: "test", label: "Test Set (Final)", color: "text-amber-600" },
+    { key: "test", label: "Test Set (Final)", color: "text-(--warning)" },
     ...(hasEvalMetrics
       ? [
           {
             key: "eval",
             label: "Val Set (Validation)",
-            color: "text-purple-600",
+            color: "text-(--data-2)",
           },
         ]
       : []),
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="animate-fade-in space-y-6">
       {/* ── Metrik Utama (dengan tab eval/test) ─────────────── */}
       <TabSection
         tabs={splitTabs}
@@ -62,126 +62,78 @@ export default function EvaluationResults({ job }) {
         setActiveTab={setActiveMetricTab}
       >
         {activeMetricTab === "test" ? (
-          <div className="space-y-5">
+          <div className="animate-fade-in space-y-6">
             {/* Kartu metrik utama */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <MetricsCard
                 label="Accuracy"
                 value={job.final_accuracy}
-                color="text-blue-600"
+                color="text-(--accent)"
               />
               <MetricsCard
                 label="F1 Score"
                 value={job.final_f1}
-                color="text-green-600"
+                color="text-(--success)"
               />
               <MetricsCard
                 label="Precision"
                 value={job.final_precision}
-                color="text-purple-600"
+                color="text-(--data-2)"
               />
               <MetricsCard
                 label="Recall"
                 value={job.final_recall}
-                color="text-amber-600"
-              />
-            </div>
-
-            {/* Metrik lanjutan */}
-            <div className="grid grid-cols-3 gap-3">
-              <MetricsCard
-                label="MCC"
-                value={job.final_mcc}
-                suffix="raw"
-                color="text-blue-800"
-              />
-              <MetricsCard
-                label="ROC-AUC"
-                value={job.final_roc_auc}
-                suffix="raw"
-                color="text-green-800"
-              />
-              <MetricsCard
-                label="Mean Std"
-                value={job.final_mean_std}
-                suffix="raw"
-                color="text-gray-600"
+                color="text-(--warning)"
               />
             </div>
 
             {/* Bar chart */}
-            <div className="space-y-2.5">
+            <div className="space-y-3.5 pt-2">
               <MetricBar
-                label="Accuracy"
-                value={job.final_accuracy}
-                color="bg-blue-500"
+                label="MCC"
+                value={job.final_mcc}
+                color="bg-(--accent)"
               />
               <MetricBar
-                label="F1 Score"
-                value={job.final_f1}
-                color="bg-green-500"
+                label="ROC-AUC"
+                value={job.final_roc_auc}
+                color="bg-(--success)"
               />
               <MetricBar
-                label="Precision"
-                value={job.final_precision}
-                color="bg-purple-500"
-              />
-              <MetricBar
-                label="Recall"
-                value={job.final_recall}
-                color="bg-amber-500"
+                label="Mean Std"
+                value={job.final_mean_std}
+                color="bg-(--warning)"
               />
             </div>
           </div>
         ) : (
-          <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="animate-fade-in space-y-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <MetricsCard
                 label="Accuracy"
                 value={job.val_accuracy}
-                color="text-blue-600"
+                color="text-(--accent)"
               />
               <MetricsCard
                 label="F1 Score"
                 value={job.val_f1}
-                color="text-green-600"
+                color="text-(--success)"
               />
               <MetricsCard
                 label="Precision"
                 value={job.val_precision}
-                color="text-purple-600"
+                color="text-(--data-2)"
               />
               <MetricsCard
                 label="Recall"
                 value={job.val_recall}
-                color="text-amber-600"
+                color="text-(--warning)"
               />
             </div>
-            <div className="space-y-2.5">
-              <MetricBar
-                label="Accuracy"
-                value={job.val_accuracy}
-                color="bg-blue-400"
-              />
-              <MetricBar
-                label="F1 Score"
-                value={job.val_f1}
-                color="bg-green-400"
-              />
-              <MetricBar
-                label="Precision"
-                value={job.val_precision}
-                color="bg-purple-400"
-              />
-              <MetricBar
-                label="Recall"
-                value={job.val_recall}
-                color="bg-amber-400"
-              />
-            </div>
-            <p className="text-xs text-gray-400">
-              Metrik eval set dihitung dari validation set selama training,
-              bukan test set akhir.
+
+            <p className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
+              💡 Metrik validation set dihitung dari validation set selama
+              training per epoch, bukan test set akhir.
             </p>
           </div>
         )}
@@ -191,20 +143,28 @@ export default function EvaluationResults({ job }) {
       {(job.confusion_matrix || job.val_confusion_matrix) && (
         <TabSection
           tabs={[
-            { key: "test", label: "Test Set", color: "text-amber-600" },
+            { key: "test", label: "Test Set", color: "text-(--warning)" },
             ...(job.val_confusion_matrix
-              ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
+              ? [
+                  {
+                    key: "eval",
+                    label: "Val Set",
+                    color: "text-(--data-2)",
+                  },
+                ]
               : []),
           ]}
           activeTab={activeCMTab}
           setActiveTab={setActiveCMTab}
         >
-          {activeCMTab === "test" && job.confusion_matrix && (
-            <ConfusionMatrix data={job.confusion_matrix} />
-          )}
-          {activeCMTab === "eval" && job.val_confusion_matrix && (
-            <ConfusionMatrix data={job.val_confusion_matrix} />
-          )}
+          <div className="animate-fade-in">
+            {activeCMTab === "test" && job.confusion_matrix && (
+              <ConfusionMatrix data={job.confusion_matrix} />
+            )}
+            {activeCMTab === "eval" && job.val_confusion_matrix && (
+              <ConfusionMatrix data={job.val_confusion_matrix} />
+            )}
+          </div>
         </TabSection>
       )}
 
@@ -212,59 +172,67 @@ export default function EvaluationResults({ job }) {
       {(job.per_class_metrics || job.val_per_class_metrics) && (
         <TabSection
           tabs={[
-            { key: "test", label: "Test Set", color: "text-amber-600" },
+            { key: "test", label: "Test Set", color: "text-(--warning)" },
             ...(job.val_per_class_metrics
-              ? [{ key: "eval", label: "Val Set", color: "text-purple-600" }]
+              ? [
+                  {
+                    key: "eval",
+                    label: "Val Set",
+                    color: "text-(--data-2)",
+                  },
+                ]
               : []),
           ]}
           activeTab={activePerClassTab}
           setActiveTab={setActivePerClassTab}
         >
-          {activePerClassTab === "test" && (
-            <>
-              <PerClassTable
-                perClass={job.per_class_metrics}
-                labels={testLabels}
-              />
-              {(job.macro_avg || job.weighted_avg) && (
-                <div className="mt-4">
-                  <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                    Average Metrics
-                  </p>
-                  <AverageTable
-                    macroAvg={job.macro_avg}
-                    weightedAvg={job.weighted_avg}
-                  />
-                </div>
-              )}
-            </>
-          )}
-          {activePerClassTab === "eval" && (
-            <>
-              <PerClassTable
-                perClass={job.val_per_class_metrics}
-                labels={evalLabels}
-              />
-              {(job.val_macro_avg || job.val_weighted_avg) && (
-                <div className="mt-4">
-                  <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                    Average Metrics
-                  </p>
-                  <AverageTable
-                    macroAvg={job.val_macro_avg}
-                    weightedAvg={job.val_weighted_avg}
-                  />
-                </div>
-              )}
-            </>
-          )}
+          <div className="animate-fade-in">
+            {activePerClassTab === "test" && (
+              <>
+                <PerClassTable
+                  perClass={job.per_class_metrics}
+                  labels={testLabels}
+                />
+                {(job.macro_avg || job.weighted_avg) && (
+                  <div className="mt-6 border-t border-(--border-default) pt-5">
+                    <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                      Average Metrics
+                    </p>
+                    <AverageTable
+                      macroAvg={job.macro_avg}
+                      weightedAvg={job.weighted_avg}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+            {activePerClassTab === "eval" && (
+              <>
+                <PerClassTable
+                  perClass={job.val_per_class_metrics}
+                  labels={evalLabels}
+                />
+                {(job.val_macro_avg || job.val_weighted_avg) && (
+                  <div className="mt-6 border-t border-(--border-default) pt-5">
+                    <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                      Average Metrics
+                    </p>
+                    <AverageTable
+                      macroAvg={job.val_macro_avg}
+                      weightedAvg={job.val_weighted_avg}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </TabSection>
       )}
 
       {/* ── Epoch Logs ────────────────────────────────────────── */}
       {job.epoch_logs?.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
+          <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Epoch Logs
           </p>
           <EpochLogsTable logs={job.epoch_logs} />

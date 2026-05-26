@@ -6,22 +6,22 @@ export function PreprocessStatusBadge({ status }) {
   const map = {
     idle: {
       label: "Belum diproses",
-      cls: "bg-gray-100 text-gray-600",
+      cls: "bg-(--bg-elevated) text-(--text-tertiary)",
       icon: Clock,
     },
     running: {
       label: "Sedang memproses",
-      cls: "bg-yellow-100 text-yellow-700",
+      cls: "bg-(--warning-muted) text-(--warning)",
       icon: Loader2,
     },
     completed: {
       label: "Selesai",
-      cls: "bg-green-100 text-green-700",
+      cls: "bg-(--success-muted) text-(--success)",
       icon: CheckCircle,
     },
     error: {
       label: "Gagal",
-      cls: "bg-red-100 text-red-600",
+      cls: "bg-(--error-muted) text-(--error)",
       icon: AlertCircle,
     },
   };
@@ -38,10 +38,10 @@ export function PreprocessStatusBadge({ status }) {
 
 export function PreprocessBadge({ status }) {
   const PREPROCESS_STYLE = {
-    idle: "bg-gray-100 text-gray-500",
-    running: "bg-yellow-100 text-yellow-700",
-    completed: "bg-blue-100 text-blue-700",
-    error: "bg-red-100 text-red-600",
+    idle: "bg-(--bg-elevated) text-(--text-tertiary)",
+    running: "bg-(--warning-muted) text-(--warning)",
+    completed: "bg-(--accent-muted) text-(--accent)",
+    error: "bg-(--error-muted) text-(--error)",
   };
   const PREPROCESS_LABEL = {
     idle: "Belum diproses",
@@ -51,7 +51,7 @@ export function PreprocessBadge({ status }) {
   };
   return (
     <span
-      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${PREPROCESS_STYLE[status] ?? "bg-gray-100 text-gray-500"}`}
+      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${PREPROCESS_STYLE[status] ?? "bg-(--bg-elevated) text-(--text-tertiary)"}`}
     >
       {PREPROCESS_LABEL[status] ?? status}
     </span>

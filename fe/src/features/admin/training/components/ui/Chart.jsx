@@ -28,9 +28,6 @@ export function EpochChart({ logs }) {
 
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-        Training Progress
-      </p>
       <svg
         width="100%"
         viewBox={`0 0 ${chartW} ${chartH}`}
@@ -46,15 +43,17 @@ export function EpochChart({ logs }) {
                 y1={y}
                 x2={chartW}
                 y2={y}
-                stroke="#e5e7eb"
+                stroke="var(--border-strong)"
                 strokeWidth="0.5"
+                strokeDasharray="2,2"
               />
               <text
                 x={padLeft - 4}
-                y={y + 4}
-                fontSize="8"
-                fill="#9ca3af"
+                y={y + 3}
+                fontSize="7"
+                fill="var(--text-disabled)"
                 textAnchor="end"
+                className="font-medium"
               >
                 {v}
               </text>
@@ -63,38 +62,50 @@ export function EpochChart({ logs }) {
         })}
 
         {/* Epoch labels */}
-        {logs.map((l, i) => (
-          <text
-            key={i}
-            x={toX(i)}
-            y={chartH - 4}
-            fontSize="8"
-            fill="#9ca3af"
-            textAnchor="middle"
-          >
-            {l.epoch}
-          </text>
-        ))}
+        {logs.map((l, i) => {
+          // Culling label agar tidak menumpuk jika epoch banyak
+          if (
+            logs.length > 10 &&
+            i % Math.ceil(logs.length / 10) !== 0 &&
+            i !== logs.length - 1
+          )
+            return null;
+          return (
+            <text
+              key={i}
+              x={toX(i)}
+              y={chartH - 2}
+              fontSize="7"
+              fill="var(--text-disabled)"
+              textAnchor="middle"
+              className="font-medium"
+            >
+              {l.epoch}
+            </text>
+          );
+        })}
 
         {/* Lines */}
         {accPath && (
           <path
             d={accPath}
             fill="none"
-            stroke="#3b82f6"
+            stroke="var(--accent)"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="drop-shadow-[0_2px_4px_rgba(37,99,235,0.2)]"
           />
         )}
         {lossPath && (
           <path
             d={lossPath}
             fill="none"
-            stroke="#f59e0b"
+            stroke="var(--warning)"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="drop-shadow-[0_2px_4px_rgba(245,158,11,0.2)]"
           />
         )}
 
@@ -108,16 +119,20 @@ export function EpochChart({ logs }) {
                 <circle
                   cx={toX(logs.length - 1)}
                   cy={accY}
-                  r="3"
-                  fill="#3b82f6"
+                  r="2.5"
+                  fill="var(--bg-surface)"
+                  stroke="var(--accent)"
+                  strokeWidth="1.5"
                 />
               )}
               {lossY !== null && (
                 <circle
                   cx={toX(logs.length - 1)}
                   cy={lossY}
-                  r="3"
-                  fill="#f59e0b"
+                  r="2.5"
+                  fill="var(--bg-surface)"
+                  stroke="var(--warning)"
+                  strokeWidth="1.5"
                 />
               )}
             </g>
@@ -126,19 +141,16 @@ export function EpochChart({ logs }) {
       </svg>
 
       {/* Legend */}
-      <div className="mt-1 flex gap-4">
+      <div className="mt-4 flex justify-center gap-4 rounded-md border border-(--border-subtle) bg-(--bg-elevated) p-1.5">
         {[
-          ["#3b82f6", "Val Accuracy"],
-          ["#f59e0b", "Val Loss"],
+          ["bg-(--accent)", "Val Accuracy"],
+          ["bg-(--warning)", "Val Loss"],
         ].map(([color, label]) => (
           <span
             key={label}
-            className="flex items-center gap-1 text-xs text-gray-500"
+            className="flex items-center gap-1.5 text-[9px] font-bold tracking-wider text-(--text-secondary) uppercase"
           >
-            <span
-              className="inline-block h-2 w-4 rounded-full"
-              style={{ backgroundColor: color }}
-            />
+            <span className={`inline-block h-2 w-4 rounded-full ${color}`} />
             {label}
           </span>
         ))}

@@ -37,29 +37,11 @@ const useTrainingStore = create((set, get) => ({
 
   // ── UI ─────────────────────────────────────────────────────
   isSubmitting: false,
+  isCheckingActive: true,
 
   // ── Init: cek apakah ada job aktif saat masuk halaman ──────
   init: async () => {
-    // Selalu reset form ke default
-    set({
-      view: "form",
-      selectedDatasetId: "",
-      testSize: 0.2,
-      evalSize: 0.1,
-      modelType: "mbert",
-      jobName: "",
-      splitPreview: null,
-      hyperparams: {
-        learning_rate: 2e-5,
-        epochs: 3,
-        batch_size: 16,
-        max_length: "auto",
-        warmup_steps: 0.1,
-        weight_decay: 0.01,
-        dropout: 0.1,
-        optimizer: "adamw",
-      },
-    });
+    set({ isCheckingActive: true });
 
     // Load datasets
     get().fetchDatasets();
@@ -69,14 +51,20 @@ const useTrainingStore = create((set, get) => ({
       const { data: res } = await trainingApi.getActive();
       const job = res.data;
       if (job && ["queued", "running"].includes(job.status)) {
-        set({ activeJob: job, view: "progress" });
+        set({ activeJob: job, view: "progress", isCheckingActive: false });
       } else if (job && job.status === "completed") {
-        // Ada job selesai — tampilkan result tapi tetap bisa reset
-        // (opsional: comment baris ini jika tidak mau tampilkan result lama)
-        // set({ activeJob: job, view: "result" });
+        // Ada job selesai — bisa tampilkan result jika mau
+        // set({ activeJob: job, view: "result", isCheckingActive: false });
+        get().resetToForm();
+        set({ isCheckingActive: false });
+      } else {
+        get().resetToForm();
+        set({ isCheckingActive: false });
       }
     } catch {
-      // Tidak ada job aktif, tetap di form
+      // Tidak ada job aktif, reset ke form
+      get().resetToForm();
+      set({ isCheckingActive: false });
     }
   },
 

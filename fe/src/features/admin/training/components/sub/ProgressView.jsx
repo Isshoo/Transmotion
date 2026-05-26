@@ -25,54 +25,79 @@ export default function ProgressView() {
   return (
     <div className="space-y-5">
       {/* Status utama */}
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-6">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="relative overflow-hidden rounded-xl border border-(--accent-muted) bg-(--accent-muted)/20 p-6">
+        {/* Glow effect background */}
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-(--accent)/10 blur-3xl" />
+
+        <div className="relative mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="mb-1 flex items-center gap-2">
-              <Loader2 size={18} className="animate-spin text-blue-600" />
-              <p className="text-base font-semibold text-blue-800">
+            <div className="mb-1.5 flex items-center gap-2">
+              <Loader2 size={18} className="animate-spin text-(--accent)" />
+              <p className="text-base font-semibold tracking-tight text-(--text-primary)">
                 Training Berjalan...
               </p>
             </div>
-            <p className="text-sm text-blue-600">{job.display_name}</p>
+            <p className="text-sm font-medium text-(--accent) opacity-90">
+              {job.display_name}
+            </p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-blue-700">
+            <p className="text-3xl font-bold tracking-tight text-(--accent)">
               {pct !== 100 ? pct + "%" : "Finishing..."}
             </p>
-            <p className="text-xs text-blue-500">
+            <p className="text-xs font-medium tracking-wider text-(--accent) uppercase opacity-70">
               Epoch {job.current_epoch} / {job.total_epochs}
             </p>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-blue-200">
+        <div className="relative mb-5 h-2 w-full overflow-hidden rounded-full bg-(--border-strong)">
           <div
-            className="h-3 rounded-full bg-blue-600 transition-all duration-700"
+            className="absolute top-0 left-0 h-full rounded-full bg-(--accent) shadow-(--shadow-accent) transition-all duration-700"
             style={{ width: `${pct}%` }}
           />
         </div>
 
         {/* Info dataset & model */}
-        <div className="flex flex-wrap gap-3 text-xs text-blue-600">
-          <span>
-            Dataset: <strong>{job.dataset_name}</strong>
+        <div className="relative flex flex-wrap gap-4 text-[11px] font-medium tracking-wide text-(--text-secondary) uppercase">
+          <span className="flex items-center gap-1.5">
+            <span className="text-(--text-tertiary)">Dataset</span>
+            <strong className="text-(--text-primary)">
+              {job.dataset_name}
+            </strong>
           </span>
-          <span>
-            Model: <strong>{job.model_type?.toUpperCase()}</strong>
+          <span className="text-(--border-strong)">|</span>
+          <span className="flex items-center gap-1.5">
+            <span className="text-(--text-tertiary)">Model</span>
+            <strong className="text-(--text-primary)">
+              {job.model_type?.toUpperCase()}
+            </strong>
           </span>
           {job.split_info && (
-            <span>
-              Train:{" "}
-              <strong>
-                {job.split_info.train_total?.toLocaleString("id")}
-              </strong>{" "}
-              / Validasi:{" "}
-              <strong>{job.split_info.val_total?.toLocaleString("id")}</strong>{" "}
-              / Test:{" "}
-              <strong>{job.split_info.test_total?.toLocaleString("id")}</strong>
-            </span>
+            <>
+              <span className="text-(--border-strong)">|</span>
+              <span className="flex items-center gap-2">
+                <span className="text-(--accent)">
+                  Train{" "}
+                  <strong className="text-(--text-primary)">
+                    {job.split_info.train_total?.toLocaleString("id")}
+                  </strong>
+                </span>
+                <span className="text-(--data-2)">
+                  Val{" "}
+                  <strong className="text-(--text-primary)">
+                    {job.split_info.val_total?.toLocaleString("id")}
+                  </strong>
+                </span>
+                <span className="text-(--warning)">
+                  Test{" "}
+                  <strong className="text-(--text-primary)">
+                    {job.split_info.test_total?.toLocaleString("id")}
+                  </strong>
+                </span>
+              </span>
+            </>
           )}
         </div>
       </div>
@@ -101,10 +126,12 @@ export default function ProgressView() {
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center"
+                  className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-4 py-3 text-center shadow-(--shadow-sm)"
                 >
-                  <p className="text-xs text-gray-400">{label}</p>
-                  <p className="mt-0.5 text-lg font-bold text-gray-800">
+                  <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+                    {label}
+                  </p>
+                  <p className="mt-1 text-lg font-semibold text-(--text-primary)">
                     {value ?? "—"}
                   </p>
                 </div>
@@ -115,16 +142,16 @@ export default function ProgressView() {
 
       {/* Log per epoch */}
       {job.epoch_logs?.length > 0 && (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <div className="border-b bg-gray-50 px-5 py-3">
-            <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">
+        <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
+          <div className="border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3">
+            <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
               Log Per Epoch
             </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b bg-gray-50">
+                <tr className="border-b border-(--border-default) bg-(--bg-surface)">
                   {[
                     "Epoch",
                     "Train Loss",
@@ -136,48 +163,48 @@ export default function ProgressView() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-2.5 text-left font-semibold text-gray-500"
+                      className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-(--border-subtle)">
                 {job.epoch_logs.map((log, i) => (
                   <tr
                     key={i}
-                    className={
+                    className={`transition-colors ${
                       i === job.epoch_logs.length - 1
-                        ? "bg-blue-50"
-                        : "hover:bg-gray-50"
-                    }
+                        ? "bg-(--accent-muted)/20"
+                        : "hover:bg-(--bg-overlay)"
+                    }`}
                   >
-                    <td className="px-4 py-2.5 font-semibold text-gray-700">
+                    <td className="px-4 py-3 font-semibold text-(--text-primary)">
                       {log.epoch}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-600">
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.train_loss?.toFixed(4) ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-600">
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_loss?.toFixed(4) ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-600">
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_accuracy !== null
                         ? `${(log.val_accuracy * 100).toFixed(2)}%`
                         : "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-600">
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_precision !== null
                         ? `${(log.val_precision * 100).toFixed(2)}%`
                         : "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-600">
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_recall !== null
                         ? `${(log.val_recall * 100).toFixed(2)}%`
                         : "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-600">
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_f1 !== null
                         ? `${(log.val_f1 * 100).toFixed(2)}%`
                         : "—"}
@@ -192,8 +219,8 @@ export default function ProgressView() {
 
       {/* Hyperparameter */}
       {job.hyperparams && (
-        <div className="rounded-xl border border-gray-200 bg-white px-5 py-4">
-          <p className="mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
+          <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Konfigurasi Training
           </p>
           <div className="flex flex-wrap gap-2">
@@ -209,9 +236,10 @@ export default function ProgressView() {
             ].map(([l, v]) => (
               <span
                 key={l}
-                className="rounded-md bg-gray-100 px-2.5 py-1 text-xs text-gray-600"
+                className="flex items-center gap-1.5 rounded-md border border-(--border-subtle) bg-(--bg-elevated) px-2.5 py-1 text-[11px] text-(--text-tertiary)"
               >
-                {l}: <span className="font-semibold text-gray-800">{v}</span>
+                {l}{" "}
+                <span className="font-semibold text-(--text-primary)">{v}</span>
               </span>
             ))}
           </div>
@@ -223,27 +251,27 @@ export default function ProgressView() {
         <div className="flex justify-end">
           <button
             onClick={() => setShowCancelConfirm(true)}
-            className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-(--error)/30 px-4 py-2 text-sm font-medium text-(--error) transition-all duration-150 hover:bg-(--error-muted)"
           >
             <Ban size={15} /> Batalkan Training
           </button>
         </div>
       ) : (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-          <p className="mb-3 text-sm font-medium text-red-800">
+        <div className="animate-scale-in rounded-xl border border-(--error)/30 bg-(--error-muted)/50 p-4">
+          <p className="mb-3 text-sm font-medium text-(--error)">
             Yakin ingin membatalkan training?
           </p>
           <div className="flex gap-2">
             <button
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+              className="rounded-lg bg-(--error) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-[#dc2626] disabled:opacity-50"
             >
               {isSubmitting ? "Membatalkan..." : "Ya, Batalkan"}
             </button>
             <button
               onClick={() => setShowCancelConfirm(false)}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              className="rounded-lg border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             >
               Tidak
             </button>

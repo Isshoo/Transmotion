@@ -36,7 +36,6 @@ export default function ModelTable() {
     setModelTypeFilter,
     setIsActiveFilter,
     setSortBy,
-    openDetailModal,
     openEditModal,
     openDeleteModal,
     updateModel,
@@ -67,14 +66,14 @@ export default function ModelTable() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="animate-fade-in space-y-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg font-semibold text-gray-800">
+          <h1 className="text-xl font-semibold tracking-tight text-(--text-primary)">
             Model Terlatih
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="mt-1 text-sm text-(--text-secondary)">
             Kelola model hasil fine-tuning
           </p>
         </div>
@@ -85,7 +84,7 @@ export default function ModelTable() {
         <select
           value={modelTypeFilter}
           onChange={(e) => setModelTypeFilter(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
           <option value="">Semua Arsitektur</option>
           <option value="mbert">mBERT</option>
@@ -94,7 +93,7 @@ export default function ModelTable() {
         <select
           value={isActiveFilter}
           onChange={(e) => setIsActiveFilter(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
           <option value="">Semua Status</option>
           <option value="true">Aktif</option>
@@ -103,7 +102,7 @@ export default function ModelTable() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
           <option value="created_at">Terbaru</option>
           <option value="accuracy">Accuracy</option>
@@ -113,11 +112,11 @@ export default function ModelTable() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50">
+              <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
                 {[
                   "Nama Model",
                   "Arsitektur",
@@ -130,38 +129,37 @@ export default function ModelTable() {
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-gray-500 uppercase"
+                    className="px-4 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-(--border-subtle)">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     {[...Array(8)].map((_, j) => (
-                      <td key={j} className="px-4 py-3">
-                        <div className="h-3 w-20 rounded bg-gray-100" />
+                      <td key={j} className="px-4 py-4">
+                        <div className="h-3.5 w-20 rounded-md bg-(--bg-elevated)" />
                       </td>
                     ))}
-                    <td className="px-4 py-3">
-                      <div className="h-7 w-16 rounded bg-gray-100" />
-                    </td>
                   </tr>
                 ))
               ) : models.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-14 text-center">
-                    <BrainCircuit
-                      size={32}
-                      className="mx-auto mb-3 text-gray-300"
-                    />
-                    <p className="text-sm font-medium text-gray-500">
+                  <td colSpan={8} className="px-4 py-16 text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
+                      <BrainCircuit
+                        size={32}
+                        className="text-(--text-tertiary)"
+                      />
+                    </div>
+                    <p className="text-sm font-semibold text-(--text-primary)">
                       Belum ada model
                     </p>
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-1 text-xs text-(--text-tertiary)">
                       Model akan muncul setelah training selesai
                     </p>
                   </td>
@@ -170,88 +168,96 @@ export default function ModelTable() {
                 models.map((model) => (
                   <tr
                     key={model.id}
-                    className="transition-colors hover:bg-gray-50"
+                    className="group transition-colors duration-150 hover:bg-(--bg-overlay)"
                   >
-                    <td className="px-4 py-3">
-                      <p className="max-w-[180px] truncate leading-tight font-medium text-gray-800">
+                    <td className="px-4 py-4">
+                      <p className="max-w-[180px] truncate leading-tight font-semibold text-(--text-primary) transition-colors group-hover:text-(--accent)">
                         {model.name}
                       </p>
                       {model.description && (
-                        <p className="max-w-[180px] truncate text-xs text-gray-400">
+                        <p className="mt-1 max-w-[180px] truncate font-mono text-[11px] text-(--text-tertiary)">
                           {model.description}
                         </p>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-4">
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${model.model_type === "xlmr" ? "bg-purple-100 text-purple-700" : "bg-teal-100 text-teal-700"}`}
+                        className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase ${
+                          model.model_type === "xlmr"
+                            ? "border-(--data-4)/20 bg-(--data-4)/10 text-(--data-4)"
+                            : "border-(--data-1)/20 bg-(--data-1)/10 text-(--data-1)"
+                        }`}
                       >
                         {model.model_type?.toUpperCase()}
                       </span>
                     </td>
-                    <td className="max-w-[120px] truncate px-4 py-3 text-xs text-gray-600">
+                    <td className="max-w-[120px] truncate px-4 py-4 text-[11px] font-medium tracking-wide text-(--text-secondary) uppercase">
                       {model.job?.dataset_name ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-600">
+                    <td className="px-4 py-4 text-xs font-semibold text-(--text-secondary)">
                       {model.num_labels ?? "—"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-4">
                       <MetricPill
                         value={model.accuracy}
-                        color="text-blue-600"
+                        color="text-(--accent)"
                       />
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-4">
                       {model.is_active ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-(--success-muted)/50 bg-(--success-muted)/20 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--success) uppercase">
                           <CheckCircle size={10} /> Aktif
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-(--border-strong) bg-(--bg-elevated) px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
                           <XCircle size={10} /> Nonaktif
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-500">
+                    <td className="px-4 py-4 text-[11px] font-medium text-(--text-tertiary)">
                       {model.created_at
                         ? formatDate(model.created_at, "dd MMM yyyy")
                         : "—"}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-start gap-1">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center justify-start gap-1.5 opacity-50 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
                         <Link
                           href={`/admin/models/${model.id}`}
                           title="Detail"
-                          className="rounded-md p-1.5 text-gray-400 transition hover:bg-blue-50 hover:text-blue-600"
+                          className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--accent-muted)/30 hover:text-(--accent) focus:ring-2 focus:ring-(--accent-muted) focus:outline-none"
                         >
-                          <Eye size={14} />
+                          <Eye size={16} />
                         </Link>
                         <button
                           onClick={() => openEditModal(model)}
                           title="Edit"
-                          className="rounded-md p-1.5 text-gray-400 transition hover:bg-amber-50 hover:text-amber-600"
+                          className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--warning-muted)/30 hover:text-(--warning) focus:ring-2 focus:ring-(--warning-muted) focus:outline-none"
                         >
-                          <Pencil size={14} />
+                          <Pencil size={16} />
                         </button>
                         <button
                           onClick={() => handleToggleActive(model)}
                           disabled={pendingToggleId === model.id}
                           title={model.is_active ? "Nonaktifkan" : "Aktifkan"}
-                          className={`rounded-md p-1.5 transition ${model.is_active ? "text-gray-400 hover:bg-orange-50 hover:text-orange-500" : "text-gray-400 hover:bg-green-50 hover:text-green-600"}`}
+                          className={`rounded-md p-1.5 transition-colors focus:ring-2 focus:outline-none disabled:opacity-50 ${
+                            model.is_active
+                              ? "text-(--text-tertiary) hover:bg-(--warning-muted)/30 hover:text-(--warning) focus:ring-(--warning-muted)"
+                              : "text-(--text-tertiary) hover:bg-(--success-muted)/30 hover:text-(--success) focus:ring-(--success-muted)"
+                          }`}
                         >
                           {model.is_active ? (
-                            <XCircle size={14} />
+                            <XCircle size={16} />
                           ) : (
-                            <CheckCircle size={14} />
+                            <CheckCircle size={16} />
                           )}
                         </button>
                         <button
                           onClick={() => openDeleteModal(model)}
                           title="Hapus"
-                          className="rounded-md p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                          className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--error-muted)/30 hover:text-(--error) focus:ring-2 focus:ring-(--error-muted) focus:outline-none"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -263,26 +269,28 @@ export default function ModelTable() {
         </div>
 
         {!isLoading && total > 0 && (
-          <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-xs text-gray-500">
+          <div className="flex items-center justify-between border-t border-(--border-default) bg-(--bg-elevated) px-4 py-3">
+            <p className="text-[11px] font-medium tracking-wide text-(--text-tertiary)">
               {from}–{to} dari{" "}
-              <span className="font-medium text-gray-700">{total}</span> model
+              <span className="font-bold text-(--text-primary)">{total}</span>{" "}
+              model
             </p>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page <= 1}
-                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) bg-(--bg-surface) text-(--text-secondary) transition-colors hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-40 disabled:hover:bg-(--bg-surface)"
               >
                 <ChevronLeft size={14} />
               </button>
-              <span className="px-2 text-xs text-gray-600">
-                {page} / {totalPages}
+              <span className="px-2 text-[11px] font-semibold text-(--text-secondary)">
+                {page}{" "}
+                <span className="text-(--text-tertiary)">/ {totalPages}</span>
               </span>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page >= totalPages}
-                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) bg-(--bg-surface) text-(--text-secondary) transition-colors hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-40 disabled:hover:bg-(--bg-surface)"
               >
                 <ChevronRight size={14} />
               </button>

@@ -129,17 +129,17 @@ export default function DatasetUploadModal() {
   const isValid = file && preview && !previewError && !isParsing;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-xl">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="animate-scale-in flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-xl)">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b px-6 py-4">
-          <h2 className="text-base font-semibold text-gray-800">
+        <div className="flex shrink-0 items-center justify-between rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
+          <h2 className="text-base font-semibold tracking-tight text-(--text-primary)">
             Upload Dataset
           </h2>
           <button
             onClick={handleClose}
             aria-label="Tutup modal upload dataset"
-            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-md p-1.5 text-(--text-tertiary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             <X size={18} />
           </button>
@@ -149,7 +149,7 @@ export default function DatasetUploadModal() {
         <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
           {/* Nama */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
               Nama Dataset
             </label>
             <input
@@ -160,31 +160,37 @@ export default function DatasetUploadModal() {
                 setErrors((p) => ({ ...p, name: undefined }));
               }}
               placeholder="cth. Sentiment Twitter Indonesia 2024"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none ${errors.name ? "border-red-400 focus:ring-red-300" : "border-gray-300 focus:ring-blue-500"}`}
+              className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+                errors.name
+                  ? "border-(--error) focus:ring-(--error-muted)"
+                  : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+              }`}
             />
             {errors.name && (
-              <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+              <p className="mt-1.5 text-xs text-(--error)">{errors.name}</p>
             )}
           </div>
 
           {/* Deskripsi */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
               Deskripsi{" "}
-              <span className="font-normal text-gray-400">(opsional)</span>
+              <span className="font-normal text-(--text-tertiary)">
+                (opsional)
+              </span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Deskripsi singkat tentang dataset ini..."
               rows={2}
-              className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full resize-none rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             />
           </div>
 
           {/* Upload area */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
               File Dataset
             </label>
             {!file ? (
@@ -204,36 +210,48 @@ export default function DatasetUploadModal() {
                     fileInputRef.current?.click();
                   }
                 }}
-                className={`cursor-pointer rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${dragOver ? "border-blue-500 bg-blue-50" : errors.file ? "border-red-400 bg-red-50" : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"}`}
+                className={`cursor-pointer rounded-xl border-2 border-dashed px-6 py-10 text-center transition-all duration-200 ${
+                  dragOver
+                    ? "border-(--accent) bg-(--accent-muted)"
+                    : errors.file
+                      ? "border-(--error) bg-(--error-muted)"
+                      : "border-(--border-default) hover:border-(--accent) hover:bg-(--bg-overlay)"
+                }`}
               >
-                <UploadCloud size={30} className="mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-600">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-(--bg-elevated) shadow-(--shadow-sm)">
+                  <UploadCloud size={24} className="text-(--text-tertiary)" />
+                </div>
+                <p className="text-sm text-(--text-secondary)">
                   Drag & drop atau{" "}
-                  <span className="font-medium text-blue-600">
+                  <span className="font-medium text-(--accent)">
                     klik untuk pilih file
                   </span>
                 </p>
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-(--text-tertiary)">
                   CSV, TSV, TXT, XLS, atau XLSX — minimal 100 baris, 2 kolom
                 </p>
               </div>
             ) : (
               <div
-                className={`rounded-xl border px-4 py-3 ${previewError ? "border-red-300 bg-red-50" : "border-green-300 bg-green-50"}`}
+                className={`rounded-xl border px-4 py-3 ${
+                  previewError
+                    ? "border-(--error) bg-(--error-muted)"
+                    : "border-(--success) bg-(--success-muted)"
+                }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <FileText
-                      size={18}
+                      size={20}
                       className={
-                        previewError ? "text-red-500" : "text-green-600"
+                        previewError ? "text-(--error)" : "text-(--success)"
                       }
                     />
                     <div>
-                      <p className="text-sm font-medium text-gray-800">
+                      <p className="text-sm font-medium text-(--text-primary)">
                         {file.name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-(--text-tertiary)">
                         {formatSize(file.size)}
                       </p>
                     </div>
@@ -246,7 +264,7 @@ export default function DatasetUploadModal() {
                       setPreviewError(null);
                       if (fileInputRef.current) fileInputRef.current.value = "";
                     }}
-                    className="rounded-lg p-1 text-gray-400 hover:bg-white hover:text-gray-600"
+                    className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--bg-surface) hover:text-(--text-primary)"
                   >
                     <X size={15} />
                   </button>
@@ -261,47 +279,58 @@ export default function DatasetUploadModal() {
               onChange={handleFileInput}
             />
             {errors.file && (
-              <p className="mt-1 text-xs text-red-500">{errors.file}</p>
+              <p className="mt-1.5 text-xs text-(--error)">{errors.file}</p>
             )}
           </div>
 
           {/* Preview panel */}
           {isParsing && (
-            <div className="flex items-center gap-2 rounded-xl border border-gray-200 p-4">
-              <Loader2 size={16} className="animate-spin text-blue-500" />
-              <span className="text-sm text-gray-500">Membaca file...</span>
+            <div className="flex items-center gap-3 rounded-xl border border-(--border-default) bg-(--bg-elevated) p-4">
+              <Loader2 size={18} className="animate-spin text-(--accent)" />
+              <span className="text-sm font-medium text-(--text-secondary)">
+                Membaca file...
+              </span>
             </div>
           )}
 
           {preview && !isParsing && (
-            <div className="overflow-hidden rounded-xl border border-gray-200">
+            <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface)">
               {/* Header preview */}
               <div
-                className={`flex items-center gap-2 px-4 py-3 ${previewError ? "bg-red-50" : "bg-green-50"}`}
+                className={`flex items-center gap-2 border-b border-(--border-default) px-4 py-3 ${
+                  previewError ? "bg-(--error-muted)" : "bg-(--success-muted)"
+                }`}
               >
                 {previewError ? (
-                  <AlertCircle size={16} className="shrink-0 text-red-500" />
+                  <AlertCircle size={16} className="shrink-0 text-(--error)" />
                 ) : (
-                  <CheckCircle size={16} className="shrink-0 text-green-600" />
+                  <CheckCircle
+                    size={16}
+                    className="shrink-0 text-(--success)"
+                  />
                 )}
                 <span
-                  className={`text-sm font-medium ${previewError ? "text-red-700" : "text-green-700"}`}
+                  className={`text-sm font-medium ${
+                    previewError ? "text-(--error)" : "text-(--success)"
+                  }`}
                 >
                   {previewError ? "Validasi gagal" : "File valid"}
                 </span>
               </div>
 
               {/* Statistik */}
-              <div className="grid grid-cols-2 gap-0 divide-x divide-y border-t sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-px bg-(--border-subtle) sm:grid-cols-4">
                 {[
                   ["Baris Data", preview.rowCount.toLocaleString("id")],
                   ["Jumlah Kolom", preview.columnCount],
                   ["Ukuran File", formatSize(file?.size)],
                   ["Format", file?.name.split(".").pop().toUpperCase()],
                 ].map(([label, value]) => (
-                  <div key={label} className="px-4 py-3">
-                    <p className="text-xs text-gray-400">{label}</p>
-                    <p className="mt-0.5 text-sm font-semibold text-gray-800">
+                  <div key={label} className="bg-(--bg-surface) px-4 py-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
+                      {label}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-(--text-primary)">
                       {value}
                     </p>
                   </div>
@@ -310,15 +339,15 @@ export default function DatasetUploadModal() {
 
               {/* Nama kolom */}
               {preview.columns.length > 0 && (
-                <div className="border-t px-4 py-3">
-                  <p className="mb-1.5 text-xs text-gray-400">
+                <div className="border-t border-(--border-default) px-4 py-3">
+                  <p className="mb-2 text-xs font-medium text-(--text-secondary)">
                     Kolom yang ditemukan
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {preview.columns.map((col) => (
                       <span
                         key={col}
-                        className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700"
+                        className="rounded-full bg-(--accent-muted) px-2.5 py-0.5 text-[10px] font-medium tracking-wide text-(--accent)"
                       >
                         {col}
                       </span>
@@ -329,31 +358,31 @@ export default function DatasetUploadModal() {
 
               {/* Tabel preview 5 baris */}
               {preview.previewRows.length > 0 && !previewError && (
-                <div className="border-t">
-                  <p className="px-4 pt-3 pb-1.5 text-xs text-gray-400">
+                <div className="border-t border-(--border-default)">
+                  <p className="border-b border-(--border-default) bg-(--bg-elevated) px-4 py-2 text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
                     Preview 5 baris pertama
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="border-y bg-gray-50">
+                        <tr className="border-b border-(--border-default) bg-(--bg-surface)">
                           {preview.columns.map((col) => (
                             <th
                               key={col}
-                              className="px-3 py-2 text-left font-medium whitespace-nowrap text-gray-600"
+                              className="px-4 py-2.5 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
                             >
                               {col}
                             </th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y">
+                      <tbody className="divide-y divide-(--border-subtle)">
                         {preview.previewRows.map((row, i) => (
-                          <tr key={i} className="hover:bg-gray-50">
+                          <tr key={i} className="hover:bg-(--bg-overlay)">
                             {preview.columns.map((col) => (
                               <td
                                 key={col}
-                                className="max-w-[200px] truncate px-3 py-2 text-gray-600"
+                                className="max-w-[200px] truncate px-4 py-2.5 text-(--text-secondary)"
                               >
                                 {row[col] ?? ""}
                               </td>
@@ -368,8 +397,8 @@ export default function DatasetUploadModal() {
 
               {/* Error detail */}
               {previewError && (
-                <div className="border-t px-4 py-3">
-                  <p className="text-xs text-red-600">{previewError}</p>
+                <div className="border-t border-(--border-default) bg-(--error-muted) px-4 py-3">
+                  <p className="text-xs text-(--error)">{previewError}</p>
                 </div>
               )}
             </div>
@@ -377,7 +406,8 @@ export default function DatasetUploadModal() {
 
           {/* Info validasi server */}
           {isValid && (
-            <div className="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">
+            <div className="rounded-md border border-(--border-default) bg-(--accent-muted) px-3 py-2.5 text-xs leading-relaxed text-(--text-secondary)">
+              <span className="mr-1 font-medium text-(--accent)">Info:</span>
               Setelah diupload, server akan menghapus baris kosong dan duplikat
               secara otomatis, kemudian memvalidasi ulang sebelum menyimpan.
             </div>
@@ -385,19 +415,19 @@ export default function DatasetUploadModal() {
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 justify-end gap-3 border-t px-6 py-4">
+        <div className="flex shrink-0 justify-end gap-2.5 rounded-b-xl border-t border-(--border-default) bg-(--bg-elevated) px-6 py-4">
           <button
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
           >
             Batal
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !isValid}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Mengupload..." : "Upload Dataset"}
           </button>

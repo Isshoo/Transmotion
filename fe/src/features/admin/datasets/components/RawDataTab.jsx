@@ -42,20 +42,20 @@ export default function RawDataTab({ dataset }) {
   const to = Math.min(rawPage * rawPerPage, rawTotal);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-0 flex-1 sm:max-w-xs">
           <Search
             size={14}
-            className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-(--text-tertiary)"
           />
           <input
             type="text"
             value={localSearch}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Cari teks..."
-            className="w-full rounded-lg border border-gray-300 py-1.5 pr-8 pl-8 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) py-1.5 pr-8 pl-8 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           {localSearch && (
             <button
@@ -63,7 +63,7 @@ export default function RawDataTab({ dataset }) {
                 setLocalSearch("");
                 setRawSearch(datasetId, "");
               }}
-              className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 text-(--text-tertiary) transition-colors hover:text-(--text-primary)"
             >
               <X size={13} />
             </button>
@@ -73,7 +73,7 @@ export default function RawDataTab({ dataset }) {
           <select
             value={rawFilterLabel}
             onChange={(e) => setRawFilterLabel(datasetId, e.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           >
             <option value="">Semua Label</option>
             {labels.map((l) => (
@@ -83,46 +83,46 @@ export default function RawDataTab({ dataset }) {
             ))}
           </select>
         )}
-        <span className="ml-auto text-xs text-gray-400">
+        <span className="ml-auto text-xs text-(--text-tertiary)">
           {rawTotal.toLocaleString("id")} baris
         </span>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-gray-200">
+      <div className="overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-surface)">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+              <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold tracking-wider text-(--text-tertiary) uppercase">
                   #
                 </th>
                 {columns.map((col) => (
                   <th
                     key={col}
-                    className="px-3 py-2 text-left text-xs font-semibold whitespace-nowrap text-gray-500 uppercase"
+                    className="px-4 py-2.5 text-left text-xs font-semibold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase"
                   >
                     {col}
                     {col === dataset.text_column && (
-                      <span className="ml-1 text-blue-400">(teks)</span>
+                      <span className="ml-1 text-(--accent)">(teks)</span>
                     )}
                     {col === dataset.label_column && (
-                      <span className="ml-1 text-green-500">(label)</span>
+                      <span className="ml-1 text-(--success)">(label)</span>
                     )}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-(--border-subtle)">
               {isLoadingRaw ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td className="px-3 py-2">
-                      <div className="h-3 w-6 rounded bg-gray-200" />
+                  <tr key={i}>
+                    <td className="px-4 py-3">
+                      <div className="h-3 w-6 animate-pulse rounded bg-(--bg-elevated)" />
                     </td>
                     {columns.map((c) => (
-                      <td key={c} className="px-3 py-2">
-                        <div className="h-3 w-32 rounded bg-gray-100" />
+                      <td key={c} className="px-4 py-3">
+                        <div className="h-3 w-32 animate-pulse rounded bg-(--bg-elevated)" />
                       </td>
                     ))}
                   </tr>
@@ -131,21 +131,24 @@ export default function RawDataTab({ dataset }) {
                 <tr>
                   <td
                     colSpan={columns.length + 1}
-                    className="px-3 py-10 text-center text-sm text-gray-400"
+                    className="px-4 py-12 text-center text-sm text-(--text-disabled)"
                   >
                     Tidak ada data ditemukan
                   </td>
                 </tr>
               ) : (
                 rawRows.map((row, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="px-3 py-2 text-xs text-gray-400">
+                  <tr
+                    key={i}
+                    className="transition-colors duration-100 hover:bg-(--bg-overlay)"
+                  >
+                    <td className="px-4 py-2.5 text-xs text-(--text-tertiary) tabular-nums">
                       {from + i}
                     </td>
                     {columns.map((col) => (
                       <td
                         key={col}
-                        className="max-w-[300px] px-3 py-2 text-gray-700"
+                        className="max-w-[300px] px-4 py-2.5 text-(--text-primary)"
                       >
                         <span className="line-clamp-2 text-xs">
                           {row[col] ?? ""}
@@ -163,41 +166,47 @@ export default function RawDataTab({ dataset }) {
       {/* Pagination */}
       {rawTotal > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500">
-            {from}–{to} dari {rawTotal.toLocaleString("id")}
+          <p className="text-xs text-(--text-tertiary)">
+            <span className="font-medium text-(--text-secondary)">
+              {from}–{to}
+            </span>{" "}
+            dari{" "}
+            <span className="font-medium text-(--text-secondary)">
+              {rawTotal.toLocaleString("id")}
+            </span>
           </p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setRawPage(datasetId, 1)}
               disabled={rawPage <= 1}
-              className="flex h-7 items-center justify-center rounded-md border border-gray-200 px-2 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+              className="flex h-7 items-center justify-center rounded-md border border-(--border-default) px-2 text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronLeft size={13} />
-              <ChevronLeft size={13} />
+              <ChevronLeft size={13} className="-ml-1.5" />
             </button>
             <button
               onClick={() => setRawPage(datasetId, rawPage - 1)}
               disabled={rawPage <= 1}
-              className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+              className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronLeft size={13} />
             </button>
-            <span className="px-2 text-xs text-gray-600">
+            <span className="min-w-12 text-center text-xs text-(--text-tertiary)">
               {rawPage} / {totalPages || 1}
             </span>
             <button
               onClick={() => setRawPage(datasetId, rawPage + 1)}
               disabled={rawPage >= totalPages}
-              className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+              className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronRight size={13} />
             </button>
             <button
               onClick={() => setRawPage(datasetId, totalPages)}
               disabled={rawPage >= totalPages}
-              className="flex h-7 items-center justify-center rounded-md border border-gray-200 px-2 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+              className="flex h-7 items-center justify-center rounded-md border border-(--border-default) px-2 text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
             >
-              <ChevronRight size={13} />
+              <ChevronRight size={13} className="-mr-1.5" />
               <ChevronRight size={13} />
             </button>
           </div>

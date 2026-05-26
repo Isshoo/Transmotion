@@ -58,21 +58,23 @@ export default function JobDetailModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-xl">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="animate-scale-in flex max-h-[92vh] w-full max-w-2xl flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-xl)">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b px-6 py-4">
+        <div className="flex shrink-0 items-center justify-between rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
           <div>
-            <h2 className="text-base font-semibold text-gray-800">
+            <h2 className="text-base font-semibold tracking-tight text-(--text-primary)">
               {job.display_name}
             </h2>
-            <p className="mt-0.5 text-xs text-gray-400">{job.id}</p>
+            <p className="mt-0.5 font-mono text-[11px] text-(--text-tertiary)">
+              ID: {job.id}
+            </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <DetailStatusBadge status={job.status} />
             <button
               onClick={closeDetailModal}
-              className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100"
+              className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             >
               <X size={18} />
             </button>
@@ -80,19 +82,19 @@ export default function JobDetailModal() {
         </div>
 
         {/* Body */}
-        <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
           {/* Progress bar — running */}
           {job.status === "running" && (
-            <div>
-              <div className="mb-1 flex justify-between text-xs text-gray-500">
+            <div className="rounded-lg border border-(--accent-muted)/50 bg-(--accent-muted)/10 p-4">
+              <div className="mb-2 flex justify-between text-xs font-semibold tracking-wide text-(--accent) uppercase opacity-80">
                 <span>
                   Epoch {job.current_epoch} / {job.total_epochs}
                 </span>
                 <span>{job.progress}%</span>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-(--border-strong)">
                 <div
-                  className="h-2.5 rounded-full bg-blue-500 transition-all duration-500"
+                  className="h-2 rounded-full bg-(--accent) shadow-(--shadow-accent) transition-all duration-500"
                   style={{ width: `${job.progress}%` }}
                 />
               </div>
@@ -101,13 +103,16 @@ export default function JobDetailModal() {
 
           {/* Error */}
           {job.status === "failed" && job.error_message && (
-            <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-              <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-500" />
+            <div className="flex items-start gap-2.5 rounded-xl border border-(--error)/20 bg-(--error-muted)/50 px-4 py-3">
+              <AlertCircle
+                size={16}
+                className="mt-0.5 shrink-0 text-(--error)"
+              />
               <div>
-                <p className="text-sm font-medium text-red-700">
+                <p className="text-sm font-semibold text-(--error)">
                   Training gagal
                 </p>
-                <p className="mt-0.5 text-xs text-red-600">
+                <p className="mt-1 font-mono text-xs leading-relaxed text-(--error) opacity-80">
                   {job.error_message}
                 </p>
               </div>
@@ -121,19 +126,38 @@ export default function JobDetailModal() {
                 label="Accuracy"
                 value={job.final_accuracy}
                 suffix="%"
+                color="text-(--accent)"
               />
-              <MetricCard label="F1 Score" value={job.final_f1} suffix="%" />
+              <MetricCard
+                label="F1 Score"
+                value={job.final_f1}
+                suffix="%"
+                color="text-(--success)"
+              />
               <MetricCard
                 label="Precision"
                 value={job.final_precision}
                 suffix="%"
+                color="text-(--data-2)"
               />
-              <MetricCard label="Recall" value={job.final_recall} suffix="%" />
+              <MetricCard
+                label="Recall"
+                value={job.final_recall}
+                suffix="%"
+                color="text-(--warning)"
+              />
             </div>
           )}
 
           {/* Epoch chart */}
-          {job.epoch_logs?.length > 0 && <EpochChart logs={job.epoch_logs} />}
+          {job.epoch_logs?.length > 0 && (
+            <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-4 shadow-(--shadow-sm)">
+              <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                Learning Curve
+              </p>
+              <EpochChart logs={job.epoch_logs} />
+            </div>
+          )}
 
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -147,10 +171,12 @@ export default function JobDetailModal() {
             ].map(([label, value]) => (
               <div
                 key={label}
-                className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5"
+                className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) px-3 py-2.5"
               >
-                <p className="text-xs text-gray-400">{label}</p>
-                <p className="mt-0.5 text-sm font-medium text-gray-700">
+                <p className="text-[10px] font-medium tracking-wide text-(--text-tertiary) uppercase">
+                  {label}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-(--text-primary)">
                   {value}
                 </p>
               </div>
@@ -158,11 +184,11 @@ export default function JobDetailModal() {
           </div>
 
           {/* Hyperparameters */}
-          <div>
-            <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+          <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-4 shadow-(--shadow-sm)">
+            <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
               Hyperparameter
             </p>
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
               {[
                 ["Epochs", hp.epochs],
                 ["Batch", hp.batch_size],
@@ -173,10 +199,12 @@ export default function JobDetailModal() {
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-lg border border-gray-200 px-2 py-2 text-center"
+                  className="rounded-md border border-(--border-subtle) bg-(--bg-elevated) px-2 py-2 text-center"
                 >
-                  <p className="text-[10px] text-gray-400">{label}</p>
-                  <p className="mt-0.5 text-xs font-semibold text-gray-700">
+                  <p className="text-[9px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+                    {label}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-(--text-primary)">
                     {value}
                   </p>
                 </div>
@@ -187,83 +215,88 @@ export default function JobDetailModal() {
           {/* Epoch log table */}
           {job.epoch_logs?.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+              <p className="mb-2.5 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
                 Log Per Epoch
               </p>
-              <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b bg-gray-50">
-                      {[
-                        "Epoch",
-                        "Train Loss",
-                        "Val Loss",
-                        "Val Acc",
-                        "Val F1",
-                      ].map((h) => (
-                        <th
-                          key={h}
-                          className="px-3 py-2 text-left font-semibold text-gray-500"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {job.epoch_logs.map((log, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
-                        <td className="px-3 py-2 font-medium text-gray-700">
-                          {log.epoch}
-                        </td>
-                        <td className="px-3 py-2 text-gray-600">
-                          {log.train_loss?.toFixed(4) ?? "—"}
-                        </td>
-                        <td className="px-3 py-2 text-gray-600">
-                          {log.val_loss?.toFixed(4) ?? "—"}
-                        </td>
-                        <td className="px-3 py-2 text-gray-600">
-                          {log.val_accuracy !== null
-                            ? `${(log.val_accuracy * 100).toFixed(2)}%`
-                            : "—"}
-                        </td>
-                        <td className="px-3 py-2 text-gray-600">
-                          {log.val_f1 !== null
-                            ? `${(log.val_f1 * 100).toFixed(2)}%`
-                            : "—"}
-                        </td>
+              <div className="overflow-hidden rounded-lg border border-(--border-default)">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
+                        {[
+                          "Epoch",
+                          "Train Loss",
+                          "Val Loss",
+                          "Val Acc",
+                          "Val F1",
+                        ].map((h) => (
+                          <th
+                            key={h}
+                            className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
+                          >
+                            {h}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-(--border-subtle) bg-(--bg-surface)">
+                      {job.epoch_logs.map((log, i) => (
+                        <tr
+                          key={i}
+                          className="transition-colors hover:bg-(--bg-overlay)"
+                        >
+                          <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                            {log.epoch}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                            {log.train_loss?.toFixed(4) ?? "—"}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                            {log.val_loss?.toFixed(4) ?? "—"}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                            {log.val_accuracy !== null
+                              ? `${(log.val_accuracy * 100).toFixed(2)}%`
+                              : "—"}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                            {log.val_f1 !== null
+                              ? `${(log.val_f1 * 100).toFixed(2)}%`
+                              : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 justify-between border-t px-6 py-4">
-          <div className="text-xs text-gray-400">
+        <div className="flex shrink-0 items-center justify-between rounded-b-xl border-t border-(--border-default) bg-(--bg-elevated) px-6 py-4">
+          <div className="text-[10px] font-medium tracking-wide text-(--text-tertiary) uppercase">
             Dibuat:{" "}
             {job.created_at
               ? new Date(job.created_at).toLocaleString("id-ID")
               : "—"}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2.5">
             {["queued", "running"].includes(job.status) && (
               <button
                 onClick={() => {
                   closeDetailModal();
                   openCancelModal(job);
                 }}
-                className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                className="rounded-md border border-(--error)/30 px-4 py-2 text-sm font-medium text-(--error) transition-all duration-150 hover:bg-(--error-muted)"
               >
                 Batalkan Job
               </button>
             )}
             <button
               onClick={closeDetailModal}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             >
               Tutup
             </button>
