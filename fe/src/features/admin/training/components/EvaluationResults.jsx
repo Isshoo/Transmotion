@@ -124,7 +124,7 @@ export default function EvaluationResults({ job }) {
                     <p className="text-[9px] font-bold tracking-wider text-(--text-tertiary) uppercase">
                       {label}
                     </p>
-                    <p className="mt-1 text-lg font-black tabular-nums text-(--text-primary)">
+                    <p className="mt-1 text-lg font-black text-(--text-primary) tabular-nums">
                       {value !== null && value !== undefined
                         ? typeof value === "number" && value <= 1
                           ? `${(value * 100).toFixed(2)}%`
@@ -146,115 +146,112 @@ export default function EvaluationResults({ job }) {
           </div>
 
           {/* Metrik Per Kelas + Rata-rata (footer tabel) */}
-          {metrics.perClass &&
-            Object.keys(metrics.perClass).length > 0 && (
-              <div>
-                <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Metrik Per Kelas
-                </p>
-                <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
-                      <thead>
-                        <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                          {[
-                            "Kelas",
-                            "Precision",
-                            "Recall",
-                            "F1-Score",
-                            "Support",
-                          ].map((h) => (
-                            <th
-                              key={h}
-                              className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
-                            >
-                              {h}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-(--border-subtle) bg-(--bg-surface)">
-                        {(metrics.labels.length > 0
-                          ? metrics.labels
-                          : Object.keys(metrics.perClass)
-                        ).map((cls) => {
-                          const pc = metrics.perClass[cls];
-                          if (!pc) return null;
-                          return (
-                            <tr
-                              key={cls}
-                              className="transition-colors duration-150 hover:bg-(--bg-overlay)"
-                            >
-                              <td className="px-4 py-3 font-semibold text-(--text-primary)">
-                                {cls}
-                              </td>
-                              <td className="px-4 py-3 font-mono text-(--text-secondary)">
-                                {(pc.precision * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 font-mono text-(--text-secondary)">
-                                {(pc.recall * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
-                                {(pc.f1 * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 font-mono text-(--text-tertiary)">
-                                {pc.support}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                      {/* Rata-rata sebagai tfoot */}
-                      {(metrics.macroAvg || metrics.weightedAvg) && (
-                        <tfoot className="border-t-2 border-(--border-default) bg-(--bg-elevated)">
-                          {metrics.macroAvg && (
-                            <tr className="border-b border-(--border-subtle)">
-                              <td className="px-4 py-3 text-xs font-bold text-(--text-primary)">
-                                Macro Avg
-                              </td>
-                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
-                                {(metrics.macroAvg.precision * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
-                                {(metrics.macroAvg.recall * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 font-mono text-xs font-bold text-(--accent)">
-                                {(metrics.macroAvg.f1 * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 text-(--text-tertiary)">
-                                —
-                              </td>
-                            </tr>
-                          )}
-                          {metrics.weightedAvg && (
-                            <tr>
-                              <td className="px-4 py-3 text-xs font-bold text-(--text-primary)">
-                                Weighted Avg
-                              </td>
-                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
-                                {(metrics.weightedAvg.precision * 100).toFixed(
-                                  2
-                                )}
-                                %
-                              </td>
-                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
-                                {(metrics.weightedAvg.recall * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 font-mono text-xs font-bold text-(--accent)">
-                                {(metrics.weightedAvg.f1 * 100).toFixed(2)}%
-                              </td>
-                              <td className="px-4 py-3 text-(--text-tertiary)">
-                                —
-                              </td>
-                            </tr>
-                          )}
-                        </tfoot>
-                      )}
-                    </table>
-                  </div>
+          {metrics.perClass && Object.keys(metrics.perClass).length > 0 && (
+            <div>
+              <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                Metrik Per Kelas
+              </p>
+              <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
+                        {[
+                          "Kelas",
+                          "Precision",
+                          "Recall",
+                          "F1-Score",
+                          "Support",
+                        ].map((h) => (
+                          <th
+                            key={h}
+                            className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-(--border-subtle) bg-(--bg-surface)">
+                      {(metrics.labels.length > 0
+                        ? metrics.labels
+                        : Object.keys(metrics.perClass)
+                      ).map((cls) => {
+                        const pc = metrics.perClass[cls];
+                        if (!pc) return null;
+                        return (
+                          <tr
+                            key={cls}
+                            className="transition-colors duration-150 hover:bg-(--bg-overlay)"
+                          >
+                            <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                              {cls}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                              {(pc.precision * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                              {(pc.recall * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
+                              {(pc.f1 * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 font-mono text-(--text-tertiary)">
+                              {pc.support}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    {/* Rata-rata sebagai tfoot */}
+                    {(metrics.macroAvg || metrics.weightedAvg) && (
+                      <tfoot className="border-t-2 border-(--border-default) bg-(--bg-elevated)">
+                        {metrics.macroAvg && (
+                          <tr className="border-b border-(--border-subtle)">
+                            <td className="px-4 py-3 text-xs font-bold text-(--text-primary)">
+                              Macro Avg
+                            </td>
+                            <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                              {(metrics.macroAvg.precision * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                              {(metrics.macroAvg.recall * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 font-mono text-xs font-bold text-(--accent)">
+                              {(metrics.macroAvg.f1 * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 text-(--text-tertiary)">
+                              —
+                            </td>
+                          </tr>
+                        )}
+                        {metrics.weightedAvg && (
+                          <tr>
+                            <td className="px-4 py-3 text-xs font-bold text-(--text-primary)">
+                              Weighted Avg
+                            </td>
+                            <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                              {(metrics.weightedAvg.precision * 100).toFixed(2)}
+                              %
+                            </td>
+                            <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                              {(metrics.weightedAvg.recall * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 font-mono text-xs font-bold text-(--accent)">
+                              {(metrics.weightedAvg.f1 * 100).toFixed(2)}%
+                            </td>
+                            <td className="px-4 py-3 text-(--text-tertiary)">
+                              —
+                            </td>
+                          </tr>
+                        )}
+                      </tfoot>
+                    )}
+                  </table>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
           {/* Confusion Matrix */}
           {metrics.cm && (

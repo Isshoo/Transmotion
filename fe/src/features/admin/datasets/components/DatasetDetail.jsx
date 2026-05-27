@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Database,
@@ -22,12 +22,11 @@ import { useSSE } from "@/hooks/useSSE";
 
 // ── Komponen utama ─────────────────────────────────────────────
 
-export default function DatasetDetail() {
+export default function DatasetDetail({ datasetId }) {
   const router = useRouter();
-  const { id: datasetId } = useParams();
   const {
     currentDataset,
-    isLoadingDetail,
+    // isLoadingDetail,
     isSubmitting,
     fetchDataset,
     setColumns,
@@ -109,7 +108,7 @@ export default function DatasetDetail() {
     }
   };
 
-  if (isLoadingDetail) {
+  if (!currentDataset || String(currentDataset.id) !== String(datasetId)) {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-3">

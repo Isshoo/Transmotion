@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import {
   BrainCircuit,
-  Eye,
   Pencil,
   Trash2,
   ChevronLeft,
@@ -19,9 +18,10 @@ import ModelDetailModal from "./modal/ModelDetailModal";
 import EditModelModal from "./modal/EditModelModal";
 import DeleteConfirmModal from "./modal/EditConfirmModal";
 import { MetricPill } from "./ui/Pill";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ModelTable() {
+  const router = useRouter();
   const {
     models,
     total,
@@ -173,7 +173,8 @@ export default function ModelTable() {
                 models.map((model) => (
                   <tr
                     key={model.id}
-                    className="group transition-colors duration-150 hover:bg-(--bg-overlay)"
+                    onClick={() => router.push(`/admin/models/${model.id}`)}
+                    className="group cursor-pointer transition-colors duration-150 hover:bg-(--bg-overlay)"
                   >
                     <td className="px-4 py-4">
                       <p
@@ -236,22 +237,21 @@ export default function ModelTable() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-start gap-1.5 opacity-50 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
-                        <Link
-                          href={`/admin/models/${model.id}`}
-                          title="Detail"
-                          className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--accent-muted)/30 hover:text-(--accent) focus:ring-2 focus:ring-(--accent-muted) focus:outline-none"
-                        >
-                          <Eye size={16} />
-                        </Link>
                         <button
-                          onClick={() => openEditModal(model)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(model);
+                          }}
                           title="Edit"
                           className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--warning-muted)/30 hover:text-(--warning) focus:ring-2 focus:ring-(--warning-muted) focus:outline-none"
                         >
                           <Pencil size={16} />
                         </button>
                         <button
-                          onClick={() => handleToggleActive(model)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleActive(model);
+                          }}
                           disabled={pendingToggleId === model.id}
                           title={model.is_active ? "Nonaktifkan" : "Aktifkan"}
                           className={`rounded-md p-1.5 transition-colors focus:ring-2 focus:outline-none disabled:opacity-50 ${
@@ -267,7 +267,10 @@ export default function ModelTable() {
                           )}
                         </button>
                         <button
-                          onClick={() => openDeleteModal(model)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteModal(model);
+                          }}
                           title="Hapus"
                           className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--error-muted)/30 hover:text-(--error) focus:ring-2 focus:ring-(--error-muted) focus:outline-none"
                         >

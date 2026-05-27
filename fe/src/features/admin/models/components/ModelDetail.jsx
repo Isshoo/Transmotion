@@ -27,7 +27,7 @@ export default function ModelDetail({ modelId }) {
   const router = useRouter();
   const {
     currentModel,
-    isLoadingDetail,
+    // isLoadingDetail,
     isSubmitting,
     fetchModel,
     updateModel,
@@ -42,7 +42,7 @@ export default function ModelDetail({ modelId }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelId]);
 
-  if (isLoadingDetail || !currentModel) {
+  if (!currentModel || String(currentModel.id) !== String(modelId)) {
     return (
       <div className="flex items-center justify-center py-24">
         <Loader2 size={28} className="animate-spin text-(--accent)" />
