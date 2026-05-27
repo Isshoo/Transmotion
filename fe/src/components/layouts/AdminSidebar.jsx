@@ -37,7 +37,7 @@ export default function AdminSidebar({ onClose }) {
       {/* Brand */}
       <div className="flex h-16 shrink-0 items-center justify-between border-b border-(--border-subtle) px-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-(--accent) shadow-[0_0_12px_rgba(99,102,241,0.35)]">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-(--accent) shadow-(--shadow-glow-accent)">
             <BrainCircuit size={14} className="text-white" />
           </div>
           <div className="flex flex-col leading-tight">

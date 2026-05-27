@@ -15,7 +15,7 @@ export default function Navbar() {
         href="/"
         className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
       >
-        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-(--accent) shadow-[0_0_10px_rgba(99,102,241,0.3)]">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-(--accent) shadow-(--shadow-glow-accent)">
           <BrainCircuit size={13} className="text-white" />
         </div>
         <span className="text-md font-semibold tracking-tight text-(--text-primary)">

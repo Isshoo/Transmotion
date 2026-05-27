@@ -134,7 +134,7 @@ export function BatchResults({ results, errors, csvTexts }) {
                     </div>
                     <div className="h-2 w-full overflow-hidden rounded-full border border-(--border-subtle) bg-(--bg-elevated)">
                       <div
-                        className="h-full rounded-full bg-(--accent) shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                        className="h-full rounded-full bg-(--accent) shadow-(--shadow-glow-accent)"
                         style={{ width: `${pct}%` }}
                       />
                     </div>

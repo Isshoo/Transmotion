@@ -5,7 +5,14 @@ export default function ConfidenceRing({ value }) {
   const r = 30;
   const circ = 2 * Math.PI * r;
   const offset = circ - (pct / 100) * circ;
-  const color = pct >= 80 ? "#22c55e" : pct >= 60 ? "#f59e0b" : "#ef4444";
+
+  // Use CSS variable names for semantic colors
+  const colorVar =
+    pct >= 80
+      ? "var(--success)"
+      : pct >= 60
+        ? "var(--warning)"
+        : "var(--error)";
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -15,7 +22,7 @@ export default function ConfidenceRing({ value }) {
           cy="40"
           r={r}
           fill="none"
-          stroke="#e5e7eb"
+          stroke="var(--border-default)"
           strokeWidth="6"
         />
         <circle
@@ -23,7 +30,7 @@ export default function ConfidenceRing({ value }) {
           cy="40"
           r={r}
           fill="none"
-          stroke={color}
+          stroke={colorVar}
           strokeWidth="6"
           strokeDasharray={circ}
           strokeDashoffset={offset}
@@ -37,12 +44,12 @@ export default function ConfidenceRing({ value }) {
           textAnchor="middle"
           fontSize="16"
           fontWeight="600"
-          fill={color}
+          fill={colorVar}
         >
           {pct}%
         </text>
       </svg>
-      <p className="text-xs text-gray-400">Confidence</p>
+      <p className="text-xs text-(--text-tertiary)">Confidence</p>
     </div>
   );
 }

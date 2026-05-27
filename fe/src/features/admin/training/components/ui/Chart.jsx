@@ -94,7 +94,7 @@ export function EpochChart({ logs }) {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="drop-shadow-[0_2px_4px_rgba(37,99,235,0.2)]"
+            className="drop-shadow-(--shadow-accent)"
           />
         )}
         {lossPath && (
@@ -105,7 +105,7 @@ export function EpochChart({ logs }) {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="drop-shadow-[0_2px_4px_rgba(245,158,11,0.2)]"
+            className="drop-shadow-(--shadow-sm)"
           />
         )}
 

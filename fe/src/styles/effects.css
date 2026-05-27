@@ -11,4 +11,10 @@
   --transition-fast: 100ms ease;
   --transition-base: 150ms ease;
   --transition-slow: 250ms ease;
+
+  /* Semantic */
+  --error-hover: #dc2626;
+
+  /* Shadow */
+  --shadow-glow-accent: 0 0 12px rgba(16, 185, 129, 0.35);
 }

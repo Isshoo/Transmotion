@@ -89,36 +89,36 @@ export default function DashboardPage() {
           title="Total Pengguna"
           value={data.totals.users}
           icon={Users}
-          color="text-blue-500"
-          bg="bg-blue-500/10"
+          color="text-(--data-2)"
+          bg="bg-(--data-2)/10"
         />
         <StatCard
           title="Total Dataset"
           value={data.totals.datasets}
           icon={Database}
-          color="text-emerald-500"
-          bg="bg-emerald-500/10"
+          color="text-(--data-1)"
+          bg="bg-(--data-1)/10"
         />
         <StatCard
           title="Model Dilatih"
           value={data.totals.models}
           icon={BrainCircuit}
-          color="text-purple-500"
-          bg="bg-purple-500/10"
+          color="text-(--data-7)"
+          bg="bg-(--data-7)/10"
         />
         <StatCard
           title="Total Prediksi"
           value={data.totals.predictions}
           icon={MessageSquareText}
-          color="text-cyan-500"
-          bg="bg-cyan-500/10"
+          color="text-(--data-5)"
+          bg="bg-(--data-5)/10"
         />
         <StatCard
           title="Total Jobs"
           value={data.totals.training_jobs}
           icon={Activity}
-          color="text-orange-500"
-          bg="bg-orange-500/10"
+          color="text-(--data-6)"
+          bg="bg-(--data-6)/10"
         />
       </div>
 
@@ -143,16 +143,16 @@ export default function DashboardPage() {
                   label="mBERT"
                   count={mbertCount}
                   avgF1={mbertF1}
-                  color="text-blue-500"
-                  bgBar="bg-blue-500"
+                  color="text-(--data-2)"
+                  bgBar="bg-(--data-2)"
                   total={mbertCount + xlmrCount}
                 />
                 <ModelTypeColumn
                   label="XLM-R"
                   count={xlmrCount}
                   avgF1={xlmrF1}
-                  color="text-purple-500"
-                  bgBar="bg-purple-500"
+                  color="text-(--data-7)"
+                  bgBar="bg-(--data-7)"
                   total={mbertCount + xlmrCount}
                 />
               </div>
@@ -164,7 +164,7 @@ export default function DashboardPage() {
             {best_model && (
               <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
-                  <Trophy size={16} className="text-amber-500" />
+                  <Trophy size={16} className="text-(--warning)" />
                   <p className="text-xs font-semibold tracking-wider uppercase">
                     Model Terbaik (F1)
                   </p>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
             {most_used_model && (
               <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
-                  <Star size={16} className="text-cyan-500" />
+                  <Star size={16} className="text-(--data-5)" />
                   <p className="text-xs font-semibold tracking-wider uppercase">
                     Paling Banyak Digunakan
                   </p>

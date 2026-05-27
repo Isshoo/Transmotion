@@ -40,7 +40,7 @@ export default function AdminLayoutWrapper({ children }) {
         {/* Mobile Header */}
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-(--border-default) bg-(--bg-surface) px-5 md:hidden">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--accent) shadow-[0_0_12px_rgba(99,102,241,0.35)]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--accent) shadow-(--shadow-glow-accent)">
               <BrainCircuit size={16} className="text-white" />
             </div>
             <span className="text-base font-bold tracking-tight text-(--text-primary)">

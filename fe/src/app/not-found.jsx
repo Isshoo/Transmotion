@@ -13,7 +13,7 @@ export default function NotFound() {
           <div className="absolute inset-0 -z-10 flex items-center justify-center opacity-20 blur-2xl">
             <div className="h-32 w-32 rounded-full bg-(--accent)"></div>
           </div>
-          <p className="text-9xl font-black tracking-tighter text-(--text-primary) drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] select-none">
+          <p className="text-9xl font-black tracking-tighter text-(--text-primary) drop-shadow-(--shadow-sm) select-none">
             404
           </p>
         </div>

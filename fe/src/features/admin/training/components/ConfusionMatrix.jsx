@@ -19,7 +19,7 @@ export default function ConfusionMatrix({ data }) {
     } else {
       // Off-diagonal — merah/error
       if (intensity > 0.3)
-        return "bg-(--error) text-white font-bold ring-1 ring-inset ring-[#dc2626]";
+        return "bg-(--error) text-white font-bold ring-1 ring-inset ring-(--error-hover)";
       if (intensity > 0.1) return "bg-(--error)/70 text-white font-bold";
       return "bg-(--error-muted) text-(--error)";
     }
