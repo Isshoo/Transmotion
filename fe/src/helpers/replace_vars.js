@@ -37,7 +37,7 @@ let totalReplacements = 0;
 
 files.forEach((file) => {
   const content = fs.readFileSync(file, "utf8");
-  // Mencari pola seperti -[var(--nama-variabel)]
+  // Mencari pola seperti -(--nama-variabel)
   // dan menggantinya menjadi -(--nama-variabel)
   let count = 0;
   const newContent = content.replace(
