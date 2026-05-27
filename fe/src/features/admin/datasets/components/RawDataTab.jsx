@@ -45,7 +45,7 @@ export default function RawDataTab({ dataset }) {
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-0 flex-1 sm:max-w-xs">
+        <div className="relative min-w-xs flex-1 sm:max-w-md">
           <Search
             size={14}
             className="absolute top-1/2 left-3 -translate-y-1/2 text-(--text-tertiary)"
@@ -73,7 +73,7 @@ export default function RawDataTab({ dataset }) {
           <select
             value={rawFilterLabel}
             onChange={(e) => setRawFilterLabel(datasetId, e.target.value)}
-            className="rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+            className="w-full max-w-[160px] rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           >
             <option value="">Semua Label</option>
             {labels.map((l) => (
@@ -148,6 +148,7 @@ export default function RawDataTab({ dataset }) {
                     {columns.map((col) => (
                       <td
                         key={col}
+                        title={row[col]}
                         className="max-w-[300px] px-4 py-2.5 text-(--text-primary)"
                       >
                         <span className="line-clamp-2 text-xs">

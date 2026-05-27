@@ -29,7 +29,7 @@ const useTestingStore = create((set, get) => ({
   history: [],
   historyTotal: 0,
   historyPage: 1,
-  historyPerPage: 15,
+  historyPerPage: 10,
   isLoadingHistory: false,
 
   // ── Fetch models ───────────────────────────────────────────

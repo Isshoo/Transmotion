@@ -62,7 +62,7 @@ export default function AdminSidebar({ onClose }) {
 
       {/* Navigation */}
       <nav className="scrollbar-thin scrollbar-thumb-(--border-strong) flex-1 overflow-y-auto px-3 py-3">
-        <ul className="space-y-1">
+        <ul className="space-y-0.5">
           {navItems.map(({ label, href, icon: Icon }) => {
             const isActive =
               pathname === href ||

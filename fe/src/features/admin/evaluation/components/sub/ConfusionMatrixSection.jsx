@@ -18,7 +18,10 @@ export default function ConfusionMatrixSection({ mbert, xlmr }) {
               <span className="rounded-md border border-(--data-4)/20 bg-(--data-4)/10 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--data-4) uppercase shadow-(--shadow-sm)">
                 XLM-R
               </span>
-              <span title={bXlmr.name} className="truncate text-xs font-bold text-(--text-secondary)">
+              <span
+                title={bXlmr.name}
+                className="truncate text-xs font-bold text-(--text-secondary)"
+              >
                 {bXlmr.name}
               </span>
             </div>
@@ -31,7 +34,10 @@ export default function ConfusionMatrixSection({ mbert, xlmr }) {
               <span className="rounded-md border border-(--data-1)/20 bg-(--data-1)/10 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--data-1) uppercase shadow-(--shadow-sm)">
                 MBERT
               </span>
-              <span title={bMbert.name} className="truncate text-xs font-bold text-(--text-secondary)">
+              <span
+                title={bMbert.name}
+                className="truncate text-xs font-bold text-(--text-secondary)"
+              >
                 {bMbert.name}
               </span>
             </div>

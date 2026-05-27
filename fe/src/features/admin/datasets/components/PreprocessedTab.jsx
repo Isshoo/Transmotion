@@ -144,7 +144,7 @@ export default function PreprocessedTab({ dataset }) {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-0 flex-1 sm:max-w-xs">
+        <div className="relative min-w-xs flex-1 sm:max-w-md">
           <Search
             size={14}
             className="absolute top-1/2 left-3 -translate-y-1/2 text-(--text-tertiary)"
@@ -153,7 +153,7 @@ export default function PreprocessedTab({ dataset }) {
             type="text"
             value={localSearch}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Cari teks..."
+            placeholder="Cari teks asli atau preprocessed..."
             className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) py-1.5 pr-8 pl-8 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           {localSearch && (
@@ -174,7 +174,7 @@ export default function PreprocessedTab({ dataset }) {
             onChange={(e) =>
               setPreprocessedFilterLabel(datasetId, e.target.value)
             }
-            className="rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+            className="w-full max-w-[160px] rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           >
             <option value="">Semua Label</option>
             {labels.map((l) => (
@@ -184,21 +184,23 @@ export default function PreprocessedTab({ dataset }) {
             ))}
           </select>
         )}
-        <div className="ml-auto flex items-center gap-2">
-          <span className="mr-2 text-xs text-(--text-tertiary)">
-            {preprocessedTotal.toLocaleString("id")} baris
-          </span>
+        <span className="ml-auto text-xs text-(--text-tertiary)">
+          {preprocessedTotal.toLocaleString("id")} baris
+        </span>
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setShowPreprocessModal(true)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) px-3 py-1.5 text-xs font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
+            className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-1.5 text-xs font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
-            <RefreshCw size={12} /> Preprocess Ulang
+            <RefreshCw size={12} />{" "}
+            <span className="max-md:hidden">Preprocess Ulang</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="inline-flex items-center gap-1.5 rounded-md bg-(--accent) px-3 py-1.5 text-xs font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
-            <Plus size={12} /> Tambah Data
+            <Plus size={12} />{" "}
+            <span className="max-md:hidden">Tambah Data</span>
           </button>
         </div>
       </div>
@@ -255,17 +257,23 @@ export default function PreprocessedTab({ dataset }) {
                     <td className="px-4 py-2.5 text-xs text-(--text-tertiary) tabular-nums">
                       {from + i}
                     </td>
-                    <td className="max-w-[220px] px-4 py-2.5">
-                      <span className="line-clamp-2 text-xs text-(--text-secondary)">
+                    <td
+                      className="max-w-[280px] px-4 py-2.5"
+                      title={row.raw_text}
+                    >
+                      <span className="line-clamp-2 text-[11.5px] text-(--text-secondary)">
                         {row.raw_text}
                       </span>
                     </td>
-                    <td className="max-w-[220px] px-4 py-2.5">
-                      <span className="line-clamp-2 text-xs font-medium text-(--text-primary)">
+                    <td
+                      className="max-w-[280px] px-4 py-2.5"
+                      title={row.preprocessed_text}
+                    >
+                      <span className="line-clamp-2 text-[11.5px] font-medium text-(--text-primary)">
                         {row.preprocessed_text}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5">
+                    <td className="px-4 py-2.5" title={row.label}>
                       <span className="rounded-full bg-(--accent-muted) px-2 py-0.5 text-[10px] font-semibold tracking-wider text-(--accent) uppercase">
                         {row.label}
                       </span>

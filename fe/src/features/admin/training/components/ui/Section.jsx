@@ -13,7 +13,10 @@ export function ProgressSection({ job }) {
           <div className="mt-1 flex items-center gap-2 text-[11px] font-medium tracking-wide text-(--accent) uppercase opacity-80">
             <span>{job.model_type?.toUpperCase()}</span>
             <span>•</span>
-            <span title={`DS: ${job.dataset_name}`} className="max-w-[200px] truncate">
+            <span
+              title={`DS: ${job.dataset_name}`}
+              className="max-w-[200px] truncate"
+            >
               DS: {job.dataset_name}
             </span>
           </div>

@@ -84,7 +84,7 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                 }}
                 rows={2}
                 placeholder="Teks sebelum preprocessing..."
-                className={`w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+                className={`min-h-[100px] w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
                   errors.raw_text
                     ? "border-(--error) focus:ring-(--error-muted)"
                     : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
@@ -111,7 +111,7 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
               }}
               rows={2}
               placeholder="Teks setelah preprocessing..."
-              className={`w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+              className={`min-h-[100px] w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
                 errors.preprocessed_text
                   ? "border-(--error) focus:ring-(--error-muted)"
                   : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"

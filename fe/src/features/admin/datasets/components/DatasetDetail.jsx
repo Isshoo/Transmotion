@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Database, Save, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Database,
+  Loader2,
+  FileText,
+  User,
+  Columns,
+} from "lucide-react";
 import { toast } from "sonner";
 import useDatasetStore from "../store";
 import RawDataTab from "./RawDataTab";
 import PreprocessedTab from "./PreprocessedTab";
 import { PreprocessStatusBadge } from "./ui/Badge";
 import ClassDistribution from "./ClassDistribution";
+import PreprocessModal from "./modal/PreprocessModal";
 
 import { useSSE } from "@/hooks/useSSE";
 
@@ -26,6 +34,8 @@ export default function DatasetDetail() {
   } = useDatasetStore();
 
   const [activeTab, setActiveTab] = useState("raw");
+  const [showPreprocessModal, setShowPreprocessModal] = useState(false);
+
   const [textCol, setTextCol] = useState("");
   const [labelCol, setLabelCol] = useState("");
   const [colChanged, setColChanged] = useState(false);
@@ -43,8 +53,12 @@ export default function DatasetDetail() {
       setLabelCol(currentDataset.label_column ?? "");
       setColChanged(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDataset?.id]);
+  }, [
+    currentDataset,
+    currentDataset?.id,
+    currentDataset?.text_column,
+    currentDataset?.label_column,
+  ]);
 
   // ── SSE: replace polling preprocessing ────────────────────────────────────
   const isPreprocessingRunning =
@@ -144,141 +158,178 @@ export default function DatasetDetail() {
               <Database size={18} className="text-(--accent)" />
               {ds.name}
             </h1>
+            <div className="mt-3 flex flex-wrap items-center gap-2.5">
+              <span
+                className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
+                title="Nama File"
+              >
+                <FileText size={13} className="text-(--text-tertiary)" />
+                {ds.file_name}
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
+                title="Diupload Oleh"
+              >
+                <User size={13} className="text-(--text-tertiary)" />
+                {ds.uploader_name || "admin"}
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
+                title="Kolom"
+              >
+                <Columns size={13} className="text-(--text-tertiary)" />
+                {availableColumns.length} Kolom
+                {/* {hasColumnConfig && (
+                  <span className="ml-0.5 opacity-70">
+                    (Teks: {ds.text_column}, Label: {ds.label_column})
+                  </span>
+                )} */}
+              </span>
+            </div>
             {ds.description && (
-              <p className="mt-1 text-sm text-(--text-secondary)">
+              <p className="mt-3 text-sm text-(--text-secondary)">
                 {ds.description}
               </p>
             )}
           </div>
-          <PreprocessStatusBadge status={ds.preprocessing_status} />
+          <div className="flex flex-col items-end gap-2">
+            <PreprocessStatusBadge status={ds.preprocessing_status} />
+          </div>
         </div>
       </div>
 
-      {/* Info Umum */}
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-(--border-default) bg-(--border-subtle) sm:grid-cols-4">
-        {[
-          ["File", ds.file_name],
-          ["Baris Raw", ds.num_rows_raw?.toLocaleString("id") ?? "—"],
-          [
-            "Baris Preprocessed",
-            ds.num_rows_preprocessed?.toLocaleString("id") ?? "—",
-          ],
-          [
-            "Ukuran File",
-            ds.file_size
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
+          <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
+            Baris Raw
+          </p>
+          <p className="mt-1 text-2xl font-bold tracking-tight text-(--text-primary)">
+            {ds.num_rows_raw?.toLocaleString("id") ?? "—"}
+          </p>
+        </div>
+        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
+          <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
+            Baris Preprocessed
+          </p>
+          <p className="mt-1 text-2xl font-bold tracking-tight text-(--text-primary)">
+            {ds.num_rows_preprocessed?.toLocaleString("id") ?? "—"}
+          </p>
+        </div>
+        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
+          <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
+            Ukuran File
+          </p>
+          <p className="mt-1 text-2xl font-bold tracking-tight text-(--text-primary)">
+            {ds.file_size
               ? ds.file_size < 1024 * 1024
                 ? `${(ds.file_size / 1024).toFixed(1)} KB`
                 : `${(ds.file_size / 1024 / 1024).toFixed(1)} MB`
-              : "—",
-          ],
-          ["Jumlah Kolom", availableColumns.length || "—"],
-          ["Kolom Teks", ds.text_column ?? "Belum diatur"],
-          ["Kolom Label", ds.label_column ?? "Belum diatur"],
-          ["Diupload Oleh", ds.uploader_name ?? "—"],
-        ].map(([label, value]) => (
-          <div key={label} className="bg-(--bg-surface) px-4 py-3.5">
-            <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
-              {label}
-            </p>
-            <p title={value} className="mt-1 truncate text-sm font-medium text-(--text-primary)">
-              {value}
-            </p>
-          </div>
-        ))}
+              : "—"}
+          </p>
+        </div>
       </div>
 
-      {/* Pengaturan Kolom */}
-      <div className="rounded-lg border border-(--border-default) bg-(--bg-surface) p-5">
-        <h2 className="mb-0.5 text-sm font-semibold text-(--text-primary)">
-          Pengaturan Kolom
-        </h2>
-        <p className="mb-4 text-xs text-(--text-secondary)">
-          Tentukan kolom mana yang berisi teks dan kolom mana yang berisi label
-          kelas. Pengaturan ini akan digunakan saat preprocessing dan training.
-        </p>
-
-        {availableColumns.length === 0 ? (
-          <p className="text-sm text-(--text-tertiary)">
-            Tidak ada informasi kolom.
+      {/* 2-Column Grid: Pengaturan Kolom & Distribusi Kelas */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch">
+        {/* Kolom Kiri: Pengaturan Kolom */}
+        <div className="flex flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
+          <h2 className="mb-1 text-sm font-semibold text-(--text-primary)">
+            Pengaturan Kolom
+          </h2>
+          <p className="mb-4 text-xs text-(--text-secondary)">
+            Tentukan kolom mana yang berisi teks dan kolom mana yang berisi
+            label kelas.
           </p>
-        ) : (
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="min-w-[180px] flex-1">
-              <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
-                Kolom Teks
-              </label>
-              <select
-                value={textCol}
-                onChange={(e) => {
-                  setTextCol(e.target.value);
-                  setColChanged(true);
-                }}
-                className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
-              >
-                <option value="">-- Pilih kolom --</option>
-                {availableColumns.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+
+          {availableColumns.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center text-sm text-(--text-tertiary)">
+              Tidak ada informasi kolom.
             </div>
-            <div className="min-w-[180px] flex-1">
-              <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
-                Kolom Label
-              </label>
-              <select
-                value={labelCol}
-                onChange={(e) => {
-                  setLabelCol(e.target.value);
-                  setColChanged(true);
-                }}
-                className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
-              >
-                <option value="">-- Pilih kolom --</option>
-                {availableColumns
-                  .filter((c) => c !== textCol)
-                  .map((c) => (
+          ) : (
+            <div className="flex flex-1 flex-col space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                  Kolom Teks
+                </label>
+                <select
+                  value={textCol}
+                  onChange={(e) => {
+                    setTextCol(e.target.value);
+                    setColChanged(true);
+                  }}
+                  className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                >
+                  <option value="">-- Pilih kolom --</option>
+                  {availableColumns.map((c) => (
                     <option key={c} value={c}>
                       {c}
                     </option>
                   ))}
-              </select>
-            </div>
-            <button
-              onClick={handleSaveColumns}
-              disabled={isSubmitting || !colChanged || !textCol || !labelCol}
-              className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <Save size={13} />
-              {isSubmitting ? "Menyimpan..." : "Simpan Pengaturan"}
-            </button>
-          </div>
-        )}
-      </div>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                  Kolom Label
+                </label>
+                <select
+                  value={labelCol}
+                  onChange={(e) => {
+                    setLabelCol(e.target.value);
+                    setColChanged(true);
+                  }}
+                  className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                >
+                  <option value="">-- Pilih kolom --</option>
+                  {availableColumns
+                    .filter((c) => c !== textCol)
+                    .map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                </select>
+              </div>
 
-      {/* Distribusi Kelas */}
-      {showDistribution && (
-        <div className="rounded-lg border border-(--border-default) bg-(--bg-surface) p-5">
+              <div className="mt-auto flex justify-end pt-4">
+                <button
+                  onClick={handleSaveColumns}
+                  disabled={
+                    isSubmitting || !colChanged || !textCol || !labelCol
+                  }
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+                >
+                  {isSubmitting ? "Menyimpan..." : "Simpan Pengaturan"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Kolom Kanan: Distribusi Kelas */}
+        <div className="flex flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
           <h2 className="mb-4 text-sm font-semibold text-(--text-primary)">
-            Distribusi Kelas
+            Distribusi Kelas (Raw vs Preprocessed)
           </h2>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <ClassDistribution
-              title="Dataset Raw"
-              distribution={ds.class_distribution_raw}
-              colorClass="bg-(--data-1)"
-            />
-            {ds.preprocessing_status === "completed" && (
+          <div className="flex flex-1 flex-col justify-center">
+            {showDistribution ? (
               <ClassDistribution
-                title="Dataset Preprocessed"
-                distribution={ds.class_distribution_preprocessed}
-                colorClass="bg-(--data-2)"
+                rawDistribution={ds.class_distribution_raw}
+                preprocessedDistribution={ds.class_distribution_preprocessed}
+                status={ds.preprocessing_status}
               />
+            ) : (
+              <div className="flex h-full min-h-[200px] flex-col items-center justify-center text-center text-(--text-tertiary)">
+                <Database size={32} className="mb-3 text-(--border-strong)" />
+                <p className="text-sm">Belum ada distribusi data.</p>
+                <p className="mt-1 text-xs">
+                  Silakan simpan Pengaturan Kolom terlebih dahulu.
+                </p>
+              </div>
             )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Tabs */}
       <div className="overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-surface)">
@@ -312,6 +363,14 @@ export default function DatasetDetail() {
           )}
         </div>
       </div>
+
+      {showPreprocessModal && (
+        <PreprocessModal
+          datasetId={datasetId}
+          dataset={ds}
+          onClose={() => setShowPreprocessModal(false)}
+        />
+      )}
     </div>
   );
 }
