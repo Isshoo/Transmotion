@@ -1,12 +1,12 @@
 import { ConfidenceBar } from "./Bar";
 
-export function SingleResult({ result, selectedModel }) {
+export function SingleResult({ result }) {
   if (!result) return null;
   const scores = result.all_scores || {};
   const entries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="animate-scale-in overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
+    <div className="animate-scale-in overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-md)">
       {/* Header */}
       <div className="border-b border-(--border-subtle) bg-linear-to-br from-(--accent-muted)/10 to-(--bg-surface) px-5 py-5">
         <p className="mb-2 text-[10px] font-bold tracking-wider text-(--accent) uppercase">
@@ -15,26 +15,21 @@ export function SingleResult({ result, selectedModel }) {
         <p className="text-3xl font-black tracking-tight text-(--text-primary)">
           {result.predicted_label}
         </p>
-        <div className="mt-3 flex items-center gap-3">
-          <p className="text-sm font-medium text-(--text-secondary)">
-            Confidence:{" "}
-            <span className="font-bold text-(--text-primary)">
-              {result.confidence !== null
-                ? `${(result.confidence * 100).toFixed(1)}%`
-                : "—"}
-            </span>
+        <div className="mt-3 flex items-center gap-2">
+          <p className="text-[11px] font-bold tracking-wide text-(--text-tertiary) uppercase">
+            Confidence:
           </p>
-          {selectedModel && (
-            <span className="rounded-md border border-(--border-strong) bg-(--bg-elevated) px-2 py-0.5 text-[10px] font-bold text-(--text-tertiary)">
-              Model: {selectedModel.name}
-            </span>
-          )}
+          <span className="inline-flex items-center rounded-md bg-(--accent) px-2 py-0.5 text-[11px] font-bold text-white shadow-(--shadow-sm)">
+            {result.confidence !== null
+              ? `${(result.confidence * 100).toFixed(1)}%`
+              : "—"}
+          </span>
         </div>
       </div>
 
       {/* Skor semua kelas */}
       {entries.length > 1 && (
-        <div className="space-y-3 bg-(--bg-elevated) px-5 py-5">
+        <div className="m-2 space-y-3 rounded-2xl bg-(--bg-elevated) px-5 py-5">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Distribusi Skor Probabilitas
           </p>
@@ -61,14 +56,14 @@ export function SingleResult({ result, selectedModel }) {
       )}
 
       {/* Teks input */}
-      <div className="border-t border-(--border-subtle) bg-(--bg-surface) px-5 py-4">
+      {/* <div className="border-t border-(--border-subtle) bg-(--bg-surface) px-5 py-4">
         <p className="mb-1.5 text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
           Teks Input
         </p>
         <p className="line-clamp-4 text-sm leading-relaxed font-medium text-(--text-secondary)">
           {result.input_text}
         </p>
-      </div>
+      </div> */}
     </div>
   );
 }
@@ -152,7 +147,7 @@ export function BatchResults({ results, errors, csvTexts }) {
 
       {/* Tabel hasil */}
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
-        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) max-h-94 overflow-x-auto">
+        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) max-h-99 overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="sticky top-0 z-10 border-b border-(--border-default) bg-(--bg-elevated)">
               <tr>

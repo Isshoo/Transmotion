@@ -15,7 +15,7 @@ export function SingleResult({ result }) {
         <p className="text-3xl font-black tracking-tight text-(--text-primary)">
           {result.predicted_label}
         </p>
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-2">
           <p className="text-[11px] font-bold tracking-wide text-(--text-tertiary) uppercase">
             Confidence:
           </p>
@@ -29,9 +29,9 @@ export function SingleResult({ result }) {
 
       {/* Skor semua kelas */}
       {entries.length > 1 && (
-        <div className="space-y-3 bg-(--bg-elevated) px-6 py-5">
+        <div className="m-2 space-y-3 rounded-2xl bg-(--bg-elevated) px-6 py-5">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Skor Per Kelas
+            Distribusi Skor Probabilitas
           </p>
           <div className="space-y-3">
             {entries.map(([label, score]) => (
@@ -42,8 +42,8 @@ export function SingleResult({ result }) {
                 <span
                   className={`min-w-[80px] text-xs font-semibold ${
                     label === result.predicted_label
-                      ? "text-(--text-primary)"
-                      : "text-(--text-tertiary)"
+                      ? "text-(--accent)"
+                      : "text-(--text-secondary)"
                   }`}
                 >
                   {label}
@@ -56,14 +56,12 @@ export function SingleResult({ result }) {
       )}
 
       {/* Teks input */}
-      <div className="border-t border-(--border-default) bg-(--bg-surface) px-6 py-4">
-        <p className="mb-1.5 text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+      {/* <div className="border-t border-(--border-default) bg-(--bg-surface) px-6 py-4">
+        <p className="mb-1.5 text-[10px] font-semibold text-(--text-tertiary)">
           Teks input
         </p>
-        <p className="font-mono text-sm leading-relaxed text-(--text-secondary)">
-          {result.input_text}
-        </p>
-      </div>
+        <p className="text-sm text-(--text-secondary)">{result.input_text}</p>
+      </div> */}
     </div>
   );
 }
@@ -83,7 +81,7 @@ export function BatchResults({ results, errors, csvTexts }) {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="rounded-xl border border-(--border-subtle) bg-(--bg-elevated) px-4 py-4 text-center shadow-(--shadow-sm)">
           <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-            Total Input
+            Total
           </p>
           <p className="mt-1.5 text-2xl font-black text-(--text-primary)">
             {csvTexts.length}
@@ -107,7 +105,7 @@ export function BatchResults({ results, errors, csvTexts }) {
         </div>
         <div className="rounded-xl border border-(--accent-muted)/50 bg-(--accent-muted)/10 px-4 py-4 text-center shadow-(--shadow-sm)">
           <p className="text-[10px] font-bold tracking-wider text-(--accent) uppercase">
-            Kelas Unik
+            Kelas
           </p>
           <p className="mt-1.5 text-2xl font-black text-(--accent)">
             {Object.keys(dist).length}
@@ -152,7 +150,7 @@ export function BatchResults({ results, errors, csvTexts }) {
 
       {/* Tabel hasil */}
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
-        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) scrollbar-track-transparent max-h-122 overflow-y-auto">
+        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) scrollbar-track-transparent max-h-108 overflow-y-auto">
           <table className="w-full text-xs">
             <thead className="sticky top-0 z-10 border-b border-(--border-default) bg-(--bg-elevated) shadow-sm">
               <tr>

@@ -377,6 +377,22 @@ export default function ClassifyForm() {
             )}
           </div>
 
+          {error && (
+            <div className="animate-scale-in relative rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 px-4 py-3 text-xs font-bold text-(--error) shadow-(--shadow-sm)">
+              {error}
+              <span className="absolute -top-2 -right-2">
+                <button
+                  onClick={() => {
+                    clearResult();
+                  }}
+                  className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-white focus:outline-none"
+                >
+                  <X size={16} />
+                </button>
+              </span>
+            </div>
+          )}
+
           {/* Tombol klasifikasi */}
           <button
             onClick={classify}
@@ -402,25 +418,22 @@ export default function ClassifyForm() {
 
         {/* Result panel (2/5) */}
         <div className="space-y-5 lg:col-span-2">
-          {error && (
-            <div className="animate-scale-in rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 px-4 py-3 text-xs font-bold text-(--error) shadow-(--shadow-sm)">
-              {error}
-            </div>
-          )}
-
           {!isClassifying && !result && batchResults.length === 0 && (
             <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-surface) px-6 py-16 text-center transition-colors hover:border-(--border-default)">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
                 <BrainCircuit size={32} className="text-(--text-tertiary)" />
               </div>
               <p className="text-sm font-bold text-(--text-secondary)">
-                Hasil akan muncul di sini
+                Belum ada hasil
+              </p>
+              <p className="mx-auto mt-1.5 max-w-[200px] text-xs font-medium text-(--text-tertiary)">
+                Hasil klasifikasi teks Anda akan muncul di sini
               </p>
             </div>
           )}
 
           {isClassifying && (
-            <div className="flex h-[320px] animate-pulse flex-col items-center justify-center rounded-2xl border border-(--accent-muted)/50 bg-(--accent-muted)/10 px-6 text-center shadow-(--shadow-sm)">
+            <div className="flex h-full animate-pulse flex-col items-center justify-center overflow-y-auto rounded-2xl border border-(--accent-muted)/50 bg-(--accent-muted)/10 px-6 text-center shadow-(--shadow-sm)">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-surface) shadow-(--shadow-sm)">
                 <Loader2 size={32} className="animate-spin text-(--accent)" />
               </div>
@@ -435,7 +448,7 @@ export default function ClassifyForm() {
           {!isClassifying && (
             <div className="animate-slide-up">
               {inputMode === "single" && result && (
-                <SingleResult result={result} selectedModel={selectedModel} />
+                <SingleResult result={result} />
               )}
               {inputMode === "csv" &&
                 (batchResults.length > 0 || batchErrors.length > 0) && (

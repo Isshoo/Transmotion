@@ -29,7 +29,7 @@ export default function HistoryTable() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["Teks", "Prediksi", "Confidence", "Waktu"].map((h) => (
+                {["No", "Teks", "Prediksi", "Confidence", "Waktu"].map((h) => (
                   <th
                     key={h}
                     className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
@@ -40,21 +40,26 @@ export default function HistoryTable() {
               </tr>
             </thead>
             <tbody className="divide-y divide-(--border-subtle)">
-              {isLoadingHistory
+              {isLoadingHistory && historyTotal === 0
                 ? Array.from({ length: 3 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      {[...Array(4)].map((_, j) => (
+                      {[...Array(5)].map((_, j) => (
                         <td key={j} className="px-5 py-4">
                           <div className="h-3 w-24 rounded-md bg-(--bg-elevated)" />
                         </td>
                       ))}
                     </tr>
                   ))
-                : history.map((item) => (
+                : history.map((item, index) => (
                     <tr
                       key={item.id}
                       className="transition-colors hover:bg-(--bg-overlay)"
                     >
+                      <td className="max-w-[10px] px-5 py-3.5 whitespace-nowrap">
+                        <span className="text-(--text-secondary)">
+                          {(historyPage - 1) * historyPerPage + index + 1}
+                        </span>
+                      </td>
                       <td className="max-w-[280px] px-5 py-3.5">
                         <span className="line-clamp-2 text-[13px] leading-relaxed font-medium text-(--text-primary)">
                           {item.input_text}

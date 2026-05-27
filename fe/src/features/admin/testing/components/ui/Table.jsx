@@ -25,7 +25,7 @@ export function HistoryTable() {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["Teks", "Prediksi", "Confidence", "Model", "Waktu"].map(
+                {["No", "Teks", "Prediksi", "Confidence", "Model", "Waktu"].map(
                   (h) => (
                     <th
                       key={h}
@@ -38,21 +38,26 @@ export function HistoryTable() {
               </tr>
             </thead>
             <tbody className="divide-y divide-(--border-subtle)">
-              {isLoadingHistory
+              {isLoadingHistory && historyTotal === 0
                 ? Array.from({ length: 3 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      {[...Array(5)].map((_, j) => (
+                      {[...Array(6)].map((_, j) => (
                         <td key={j} className="px-4 py-4">
                           <div className="h-3.5 w-24 rounded-md bg-(--bg-elevated)" />
                         </td>
                       ))}
                     </tr>
                   ))
-                : history.map((item) => (
+                : history.map((item, index) => (
                     <tr
                       key={item.id}
                       className="transition-colors hover:bg-(--bg-overlay)"
                     >
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-(--text-secondary)">
+                          {(historyPage - 1) * historyPerPage + index + 1}
+                        </span>
+                      </td>
                       <td className="max-w-[280px] px-4 py-3">
                         <span className="line-clamp-2 font-mono text-[11px] leading-relaxed text-(--text-secondary)">
                           {item.input_text}

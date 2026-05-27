@@ -385,15 +385,24 @@ export default function TestingPage() {
               </div>
             )}
 
-            {/* Error */}
-            {error && (
-              <div className="mt-4 flex items-start gap-2 rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 px-4 py-3 text-sm font-medium text-(--error)">
-                <span className="mt-0.5 text-[16px]">⚠️</span> {error}
-              </div>
-            )}
-
             {/* Tombol klasifikasi */}
             <div className="mt-5 border-t border-(--border-subtle) pt-5">
+              {/* Error */}
+              {error && (
+                <div className="animate-scale-in relative mb-4 rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 px-4 py-3 text-xs font-bold text-(--error) shadow-(--shadow-sm)">
+                  {error}
+                  <span className="absolute -top-2 -right-2">
+                    <button
+                      onClick={() => {
+                        clearResults();
+                      }}
+                      className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-white focus:outline-none"
+                    >
+                      <X size={16} />
+                    </button>
+                  </span>
+                </div>
+              )}
               <button
                 onClick={classify}
                 disabled={!canClassify}
