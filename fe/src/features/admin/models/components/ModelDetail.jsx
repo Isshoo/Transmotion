@@ -167,7 +167,7 @@ export default function ModelDetail({ modelId }) {
               disabled={isSubmitting}
               className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium tracking-wide shadow-(--shadow-sm) transition-all duration-150 disabled:opacity-50 ${
                 m.is_active
-                  ? "border-(--warning-muted) bg-(--bg-surface) text-(--warning) hover:bg-(--warning-muted)/20"
+                  ? "border-(--error-muted) bg-(--bg-surface) text-(--error) hover:bg-(--error-muted)/20"
                   : "border-(--success-muted) bg-(--bg-surface) text-(--success) hover:bg-(--success-muted)/20"
               }`}
             >
@@ -209,7 +209,10 @@ export default function ModelDetail({ modelId }) {
                 <p className="text-[9px] font-bold tracking-wider text-(--text-tertiary) uppercase">
                   {label}
                 </p>
-                <p title={value} className="mt-1.5 truncate text-sm font-bold text-(--text-primary)">
+                <p
+                  title={value}
+                  className="mt-1.5 truncate text-sm font-bold text-(--text-primary)"
+                >
                   {value}
                 </p>
               </div>
