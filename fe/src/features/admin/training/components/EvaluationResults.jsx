@@ -1,241 +1,286 @@
 import { useState } from "react";
 import ConfusionMatrix from "./ConfusionMatrix";
 import EpochLogsTable from "./EpochLogsTable";
-import { MetricBar } from "./ui/Bar";
 import { MetricsCard } from "./ui/Card";
-import { AverageTable, PerClassTable } from "./ui/Table";
-
-function TabSection({ tabs, activeTab, setActiveTab, children }) {
-  return (
-    <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
-      <div className="no-scrollbar flex overflow-x-auto border-b border-(--border-default) bg-(--bg-elevated)">
-        {tabs.map(({ key, label, color }) => (
-          <button
-            key={key}
-            onClick={() => setActiveTab(key)}
-            className={`border-b-2 px-5 py-3.5 text-xs font-semibold tracking-wide whitespace-nowrap transition-all duration-150 ${
-              activeTab === key
-                ? `border-current ${color}`
-                : "border-transparent text-(--text-tertiary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <div className="p-5">{children}</div>
-    </div>
-  );
-}
 
 export default function EvaluationResults({ job }) {
-  const [activeMetricTab, setActiveMetricTab] = useState("test");
-  const [activeCMTab, setActiveCMTab] = useState("test");
-  const [activePerClassTab, setActivePerClassTab] = useState("test");
+  const [activeSplit, setActiveSplit] = useState("test");
 
   if (!job) return null;
 
   const testLabels = job.confusion_matrix?.labels || [];
   const evalLabels = job.val_confusion_matrix?.labels || [];
-
   const hasEvalMetrics = job.val_accuracy != null || job.val_f1 != null;
 
-  const splitTabs = [
-    { key: "test", label: "Test Set (Final)", color: "text-(--warning)" },
-    ...(hasEvalMetrics
-      ? [
-          {
-            key: "eval",
-            label: "Val Set (Validation)",
-            color: "text-(--data-2)",
-          },
-        ]
-      : []),
-  ];
+  // Metrik aktif berdasarkan tab
+  const metrics =
+    activeSplit === "test"
+      ? {
+          accuracy: job.final_accuracy,
+          f1: job.final_f1,
+          precision: job.final_precision,
+          recall: job.final_recall,
+          mcc: job.final_mcc,
+          roc_auc: job.final_roc_auc,
+          mean_std: job.final_mean_std,
+          perClass: job.per_class_metrics,
+          macroAvg: job.macro_avg,
+          weightedAvg: job.weighted_avg,
+          cm: job.confusion_matrix,
+          labels: testLabels,
+        }
+      : {
+          accuracy: job.val_accuracy,
+          f1: job.val_f1,
+          precision: job.val_precision,
+          recall: job.val_recall,
+          mcc: null,
+          roc_auc: null,
+          mean_std: null,
+          perClass: job.val_per_class_metrics,
+          macroAvg: job.val_macro_avg,
+          weightedAvg: job.val_weighted_avg,
+          cm: job.val_confusion_matrix,
+          labels: evalLabels,
+        };
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* ── Metrik Utama (dengan tab eval/test) ─────────────── */}
-      <TabSection
-        tabs={splitTabs}
-        activeTab={activeMetricTab}
-        setActiveTab={setActiveMetricTab}
-      >
-        {activeMetricTab === "test" ? (
-          <div className="animate-fade-in space-y-6">
-            {/* Kartu metrik utama */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <MetricsCard
-                label="Accuracy"
-                value={job.final_accuracy}
-                color="text-(--accent)"
-              />
-              <MetricsCard
-                label="F1 Score"
-                value={job.final_f1}
-                color="text-(--success)"
-              />
-              <MetricsCard
-                label="Precision"
-                value={job.final_precision}
-                color="text-(--data-2)"
-              />
-              <MetricsCard
-                label="Recall"
-                value={job.final_recall}
-                color="text-(--warning)"
-              />
-            </div>
-
-            {/* Bar chart */}
-            <div className="space-y-3.5 pt-2">
-              <MetricBar
-                label="MCC"
-                value={job.final_mcc}
-                color="bg-(--accent)"
-              />
-              <MetricBar
-                label="ROC-AUC"
-                value={job.final_roc_auc}
-                color="bg-(--success)"
-              />
-              <MetricBar
-                label="Mean Std"
-                value={job.final_mean_std}
-                color="bg-(--warning)"
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="animate-fade-in space-y-6">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <MetricsCard
-                label="Accuracy"
-                value={job.val_accuracy}
-                color="text-(--accent)"
-              />
-              <MetricsCard
-                label="F1 Score"
-                value={job.val_f1}
-                color="text-(--success)"
-              />
-              <MetricsCard
-                label="Precision"
-                value={job.val_precision}
-                color="text-(--data-2)"
-              />
-              <MetricsCard
-                label="Recall"
-                value={job.val_recall}
-                color="text-(--warning)"
-              />
-            </div>
-
-            <p className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-              💡 Metrik validation set dihitung dari validation set selama
-              training per epoch, bukan test set akhir.
-            </p>
+      {/* ── Satu container dengan tab global Test/Val ─────── */}
+      <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
+        {/* Tab switcher */}
+        {hasEvalMetrics && (
+          <div className="flex border-b border-(--border-default)">
+            {[
+              {
+                key: "test",
+                label: "Test Set (Final)",
+                color: "text-(--warning)",
+              },
+              {
+                key: "eval",
+                label: "Val Set (Validation)",
+                color: "text-(--data-2)",
+              },
+            ].map(({ key, label, color }) => (
+              <button
+                key={key}
+                onClick={() => setActiveSplit(key)}
+                className={`border-b-2 px-5 py-3.5 text-xs font-semibold tracking-wide whitespace-nowrap transition-all duration-150 ${
+                  activeSplit === key
+                    ? `border-current ${color}`
+                    : "border-transparent text-(--text-tertiary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         )}
-      </TabSection>
 
-      {/* ── Confusion Matrix ─────────────────────────────────── */}
-      {(job.confusion_matrix || job.val_confusion_matrix) && (
-        <TabSection
-          tabs={[
-            { key: "test", label: "Test Set", color: "text-(--warning)" },
-            ...(job.val_confusion_matrix
-              ? [
-                  {
-                    key: "eval",
-                    label: "Val Set",
-                    color: "text-(--data-2)",
-                  },
-                ]
-              : []),
-          ]}
-          activeTab={activeCMTab}
-          setActiveTab={setActiveCMTab}
-        >
-          <div className="animate-fade-in">
-            {activeCMTab === "test" && job.confusion_matrix && (
-              <ConfusionMatrix data={job.confusion_matrix} />
-            )}
-            {activeCMTab === "eval" && job.val_confusion_matrix && (
-              <ConfusionMatrix data={job.val_confusion_matrix} />
-            )}
-          </div>
-        </TabSection>
-      )}
+        <div className="space-y-8 p-6">
+          {/* Metrik KPI Cards */}
+          <div>
+            <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+              Metrik Evaluasi
+            </p>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <MetricsCard
+                label="Accuracy"
+                value={metrics.accuracy}
+                color="text-(--accent)"
+              />
+              <MetricsCard
+                label="F1 Score"
+                value={metrics.f1}
+                color="text-(--success)"
+              />
+              <MetricsCard
+                label="Precision"
+                value={metrics.precision}
+                color="text-(--data-2)"
+              />
+              <MetricsCard
+                label="Recall"
+                value={metrics.recall}
+                color="text-(--warning)"
+              />
+            </div>
 
-      {/* ── Per-Class Metrics ─────────────────────────────────── */}
-      {(job.per_class_metrics || job.val_per_class_metrics) && (
-        <TabSection
-          tabs={[
-            { key: "test", label: "Test Set", color: "text-(--warning)" },
-            ...(job.val_per_class_metrics
-              ? [
-                  {
-                    key: "eval",
-                    label: "Val Set",
-                    color: "text-(--data-2)",
-                  },
-                ]
-              : []),
-          ]}
-          activeTab={activePerClassTab}
-          setActiveTab={setActivePerClassTab}
-        >
-          <div className="animate-fade-in">
-            {activePerClassTab === "test" && (
-              <>
-                <PerClassTable
-                  perClass={job.per_class_metrics}
-                  labels={testLabels}
-                />
-                {(job.macro_avg || job.weighted_avg) && (
-                  <div className="mt-6 border-t border-(--border-default) pt-5">
-                    <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                      Average Metrics
+            {/* MCC, ROC-AUC, Mean Std sebagai KPI card kecil */}
+            {(metrics.mcc != null ||
+              metrics.roc_auc != null ||
+              metrics.mean_std != null) && (
+              <div className="mt-4 grid grid-cols-3 gap-4">
+                {[
+                  ["MCC", metrics.mcc],
+                  ["ROC-AUC", metrics.roc_auc],
+                  ["Mean Std", metrics.mean_std],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) px-4 py-3 text-center"
+                  >
+                    <p className="text-[9px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+                      {label}
                     </p>
-                    <AverageTable
-                      macroAvg={job.macro_avg}
-                      weightedAvg={job.weighted_avg}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-            {activePerClassTab === "eval" && (
-              <>
-                <PerClassTable
-                  perClass={job.val_per_class_metrics}
-                  labels={evalLabels}
-                />
-                {(job.val_macro_avg || job.val_weighted_avg) && (
-                  <div className="mt-6 border-t border-(--border-default) pt-5">
-                    <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                      Average Metrics
+                    <p className="mt-1 text-lg font-black tabular-nums text-(--text-primary)">
+                      {value !== null && value !== undefined
+                        ? typeof value === "number" && value <= 1
+                          ? `${(value * 100).toFixed(2)}%`
+                          : value
+                        : "—"}
                     </p>
-                    <AverageTable
-                      macroAvg={job.val_macro_avg}
-                      weightedAvg={job.val_weighted_avg}
-                    />
                   </div>
-                )}
-              </>
+                ))}
+              </div>
             )}
+
+            {activeSplit === "eval" &&
+              metrics.mcc == null &&
+              metrics.roc_auc == null && (
+                <p className="mt-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
+                  💡 Metrik MCC, ROC-AUC, dan Mean Std dihitung dari test set.
+                </p>
+              )}
           </div>
-        </TabSection>
-      )}
+
+          {/* Metrik Per Kelas + Rata-rata (footer tabel) */}
+          {metrics.perClass &&
+            Object.keys(metrics.perClass).length > 0 && (
+              <div>
+                <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Metrik Per Kelas
+                </p>
+                <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
+                          {[
+                            "Kelas",
+                            "Precision",
+                            "Recall",
+                            "F1-Score",
+                            "Support",
+                          ].map((h) => (
+                            <th
+                              key={h}
+                              className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
+                            >
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-(--border-subtle) bg-(--bg-surface)">
+                        {(metrics.labels.length > 0
+                          ? metrics.labels
+                          : Object.keys(metrics.perClass)
+                        ).map((cls) => {
+                          const pc = metrics.perClass[cls];
+                          if (!pc) return null;
+                          return (
+                            <tr
+                              key={cls}
+                              className="transition-colors duration-150 hover:bg-(--bg-overlay)"
+                            >
+                              <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                                {cls}
+                              </td>
+                              <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                                {(pc.precision * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                                {(pc.recall * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 font-mono font-medium text-(--text-secondary)">
+                                {(pc.f1 * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 font-mono text-(--text-tertiary)">
+                                {pc.support}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                      {/* Rata-rata sebagai tfoot */}
+                      {(metrics.macroAvg || metrics.weightedAvg) && (
+                        <tfoot className="border-t-2 border-(--border-default) bg-(--bg-elevated)">
+                          {metrics.macroAvg && (
+                            <tr className="border-b border-(--border-subtle)">
+                              <td className="px-4 py-3 text-xs font-bold text-(--text-primary)">
+                                Macro Avg
+                              </td>
+                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                                {(metrics.macroAvg.precision * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                                {(metrics.macroAvg.recall * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 font-mono text-xs font-bold text-(--accent)">
+                                {(metrics.macroAvg.f1 * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 text-(--text-tertiary)">
+                                —
+                              </td>
+                            </tr>
+                          )}
+                          {metrics.weightedAvg && (
+                            <tr>
+                              <td className="px-4 py-3 text-xs font-bold text-(--text-primary)">
+                                Weighted Avg
+                              </td>
+                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                                {(metrics.weightedAvg.precision * 100).toFixed(
+                                  2
+                                )}
+                                %
+                              </td>
+                              <td className="px-4 py-3 font-mono text-xs font-medium text-(--text-secondary)">
+                                {(metrics.weightedAvg.recall * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 font-mono text-xs font-bold text-(--accent)">
+                                {(metrics.weightedAvg.f1 * 100).toFixed(2)}%
+                              </td>
+                              <td className="px-4 py-3 text-(--text-tertiary)">
+                                —
+                              </td>
+                            </tr>
+                          )}
+                        </tfoot>
+                      )}
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          {/* Confusion Matrix */}
+          {metrics.cm && (
+            <div>
+              <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                Confusion Matrix
+              </p>
+              <div className="animate-fade-in">
+                <ConfusionMatrix data={metrics.cm} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* ── Epoch Logs ────────────────────────────────────────── */}
       {job.epoch_logs?.length > 0 && (
-        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
-          <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Epoch Logs
-          </p>
-          <EpochLogsTable logs={job.epoch_logs} />
+        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
+          <div className="rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
+            <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
+              Log Per Epoch
+            </h3>
+          </div>
+          <div className="p-5">
+            <EpochLogsTable logs={job.epoch_logs} />
+          </div>
         </div>
       )}
     </div>
