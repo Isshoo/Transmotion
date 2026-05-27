@@ -17,7 +17,7 @@ export default function HistoryTable() {
   const from = historyTotal === 0 ? 0 : (historyPage - 1) * historyPerPage + 1;
   const to = Math.min(historyPage * historyPerPage, historyTotal);
 
-  if (historyTotal === 0 && !isLoadingHistory) return null;
+  if (historyTotal === 0) return null;
 
   return (
     <div className="animate-slide-up">

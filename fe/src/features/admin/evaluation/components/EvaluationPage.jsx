@@ -18,6 +18,7 @@ export default function EvaluationPage() {
   } = useEvaluationStore();
 
   useEffect(() => {
+    setSelectedDataset("");
     fetchDatasets();
     fetchCompare("");
     return () => {

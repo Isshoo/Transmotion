@@ -13,7 +13,7 @@ export function HistoryTable() {
   } = useTestingStore();
 
   const totalPages = Math.ceil(historyTotal / historyPerPage);
-  if (!isLoadingHistory && historyTotal === 0) return null;
+  if (historyTotal === 0) return null;
 
   return (
     <div className="animate-fade-in mt-8 border-t border-(--border-default) pt-6">

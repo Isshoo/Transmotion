@@ -176,11 +176,17 @@ export default function ModelTable() {
                     className="group transition-colors duration-150 hover:bg-(--bg-overlay)"
                   >
                     <td className="px-4 py-4">
-                      <p className="max-w-[180px] truncate leading-tight font-semibold text-(--text-primary) transition-colors group-hover:text-(--accent)">
+                      <p
+                        title={model.name}
+                        className="max-w-[180px] truncate leading-tight font-medium text-(--text-primary) transition-colors group-hover:text-(--accent)"
+                      >
                         {model.name}
                       </p>
                       {model.description && (
-                        <p className="mt-1 max-w-[180px] truncate font-mono text-[11px] text-(--text-tertiary)">
+                        <p
+                          title={model.description}
+                          className="mt-1 max-w-[180px] truncate font-mono text-[11px] text-(--text-tertiary)"
+                        >
                           {model.description}
                         </p>
                       )}
@@ -196,7 +202,10 @@ export default function ModelTable() {
                         {model.model_type?.toUpperCase()}
                       </span>
                     </td>
-                    <td className="max-w-[120px] truncate px-4 py-4 text-[11px] font-medium tracking-wide text-(--text-secondary) uppercase">
+                    <td
+                      title={model.job?.dataset_name}
+                      className="max-w-[120px] truncate px-4 py-4 text-sm font-medium tracking-wide text-(--text-secondary)"
+                    >
                       {model.job?.dataset_name ?? "—"}
                     </td>
                     <td className="px-4 py-4 text-xs font-semibold text-(--text-secondary)">

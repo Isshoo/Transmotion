@@ -126,44 +126,6 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left Column */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Active Jobs */}
-          {data.active_jobs.length > 0 && (
-            <div className="rounded-xl border border-(--accent)/30 bg-(--accent-muted) p-5 shadow-sm">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="relative flex h-3 w-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--accent) opacity-75"></span>
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-(--accent)"></span>
-                </div>
-                <h2 className="font-semibold text-(--accent)">
-                  Training Sedang Berjalan
-                </h2>
-              </div>
-              <div className="space-y-3">
-                {data.active_jobs.map((job) => (
-                  <div
-                    key={job.id}
-                    className="flex items-center justify-between rounded-lg border border-(--border-default) bg-(--bg-surface) p-3"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-(--text-primary)">
-                        {job.job_name || "Untitled Job"}
-                      </p>
-                      <p className="mt-0.5 text-xs text-(--text-secondary)">
-                        Model: {job.model_type.toUpperCase()}
-                      </p>
-                    </div>
-                    <Link
-                      href="/admin/training"
-                      className="flex items-center gap-1 text-xs font-medium text-(--accent) hover:underline"
-                    >
-                      Lihat Progress <ChevronRight size={14} />
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* mBERT vs XLM-R Comparison */}
           {(mbertCount > 0 || xlmrCount > 0) && (
             <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-sm">
@@ -398,6 +360,43 @@ export default function DashboardPage() {
 
         {/* Right Column (Quick Actions) */}
         <div className="space-y-6">
+          {/* Active Jobs */}
+          {data.active_jobs.length > 0 && (
+            <div className="rounded-xl border border-(--accent)/30 bg-(--accent-muted) p-5 shadow-sm">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--accent) opacity-75"></span>
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-(--accent)"></span>
+                </div>
+                <h2 className="font-semibold text-(--accent)">
+                  Training Sedang Berjalan
+                </h2>
+              </div>
+              <div className="space-y-3">
+                {data.active_jobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className="flex w-full flex-col justify-between rounded-lg border border-(--border-default) bg-(--bg-surface) p-3"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-(--text-primary)">
+                        {job.job_name || "Untitled Job"}
+                      </p>
+                      <p className="mt-0.5 text-xs text-(--text-secondary)">
+                        Model: {job.model_type.toUpperCase()}
+                      </p>
+                    </div>
+                    <Link
+                      href="/admin/training"
+                      className="flex items-center justify-end gap-1 text-xs font-medium text-(--accent) hover:underline"
+                    >
+                      Lihat Progress <ChevronRight size={14} />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
             <h2 className="mb-4 font-medium text-(--text-primary)">
               Aksi Cepat
@@ -418,21 +417,23 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </Link>
-              <Link href="/admin/training">
-                <div className="group flex cursor-pointer items-center gap-3 rounded-lg border border-(--border-default) p-3 transition-all hover:border-(--accent)/50 hover:bg-(--accent-muted)">
-                  <div className="rounded-md bg-(--bg-elevated) p-2 text-(--text-secondary) transition-colors group-hover:bg-(--accent)/10 group-hover:text-(--accent)">
-                    <Play size={18} />
+              {data.active_jobs.length === 0 && (
+                <Link href="/admin/training">
+                  <div className="group flex cursor-pointer items-center gap-3 rounded-lg border border-(--border-default) p-3 transition-all hover:border-(--accent)/50 hover:bg-(--accent-muted)">
+                    <div className="rounded-md bg-(--bg-elevated) p-2 text-(--text-secondary) transition-colors group-hover:bg-(--accent)/10 group-hover:text-(--accent)">
+                      <Play size={18} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-(--text-primary) group-hover:text-(--accent)">
+                        Mulai Training
+                      </p>
+                      <p className="text-xs text-(--text-tertiary)">
+                        Latih model mBERT/XLM-R
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-(--text-primary) group-hover:text-(--accent)">
-                      Mulai Training
-                    </p>
-                    <p className="text-xs text-(--text-tertiary)">
-                      Latih model mBERT/XLM-R
-                    </p>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              )}
               <Link href="/admin/testing">
                 <div className="group flex cursor-pointer items-center gap-3 rounded-lg border border-(--border-default) p-3 transition-all hover:border-(--accent)/50 hover:bg-(--accent-muted)">
                   <div className="rounded-md bg-(--bg-elevated) p-2 text-(--text-secondary) transition-colors group-hover:bg-(--accent)/10 group-hover:text-(--accent)">

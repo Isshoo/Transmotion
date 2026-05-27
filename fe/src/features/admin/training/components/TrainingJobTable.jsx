@@ -188,7 +188,7 @@ export default function TrainingJobTable() {
                     className="group transition-colors duration-150 hover:bg-(--bg-overlay)"
                   >
                     <td className="px-4 py-4">
-                      <p className="max-w-[180px] truncate leading-tight font-medium text-(--text-primary) transition-colors group-hover:text-(--accent)">
+                      <p title={job.display_name} className="max-w-[180px] truncate leading-tight font-medium text-(--text-primary) transition-colors group-hover:text-(--accent)">
                         {job.display_name}
                       </p>
                       <p className="mt-1 font-mono text-[10px] text-(--text-tertiary)">
@@ -206,7 +206,7 @@ export default function TrainingJobTable() {
                         {job.model_type?.toUpperCase()}
                       </span>
                     </td>
-                    <td className="max-w-[140px] truncate px-4 py-4 text-xs font-medium text-(--text-secondary)">
+                    <td title={job.dataset_name} className="max-w-[140px] truncate px-4 py-4 text-xs font-medium text-(--text-secondary)">
                       {job.dataset_name ?? "—"}
                     </td>
                     <td className="px-4 py-4 text-[11px] text-(--text-secondary)">

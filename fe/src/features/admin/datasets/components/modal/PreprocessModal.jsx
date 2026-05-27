@@ -56,7 +56,7 @@ export default function PreprocessModal({ dataset, onClose }) {
             <p className="text-xs font-semibold tracking-wide text-(--accent) uppercase">
               Konfigurasi saat ini:
             </p>
-            <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="mt-5 grid grid-cols-3 gap-3 text-xs">
               <div>
                 <span className="mb-0.5 block text-[10px] tracking-wider text-(--accent) uppercase opacity-80">
                   Kolom Teks
@@ -73,7 +73,7 @@ export default function PreprocessModal({ dataset, onClose }) {
                   {dataset.label_column}
                 </span>
               </div>
-              <div className="col-span-2">
+              <div>
                 <span className="mb-0.5 block text-[10px] tracking-wider text-(--accent) uppercase opacity-80">
                   Total Data Raw
                 </span>

@@ -72,7 +72,7 @@ export default function HomePage() {
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-4">
             <Link
-              href="/dashboard"
+              href="/classifier"
               className="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-(--accent) px-7 py-3.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-accent) transition-all duration-(--transition-base) hover:-translate-y-0.5 hover:bg-(--accent-hover) active:scale-95"
             >
               {/* Button shine effect */}
@@ -113,7 +113,7 @@ export default function HomePage() {
               <div className="flex items-center gap-2">
                 <Activity size={12} className="text-(--success)" />
                 <span className="font-mono text-[10px] tracking-wider text-(--text-secondary) uppercase">
-                  System Online
+                  NLP System
                 </span>
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function HomePage() {
                   Platform Capabilities
                 </h3>
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-(--success-muted) px-2 py-1 text-[10px] font-bold text-(--success)">
-                  Colab Ready
+                  Colab Support
                 </span>
               </div>
 

@@ -9,6 +9,7 @@ import {
   FileText,
   X,
   ChevronDown,
+  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
 import useClassifyStore from "../store";
@@ -19,6 +20,8 @@ export default function ClassifyForm() {
   const {
     activeModels,
     isLoadingModels,
+    modelTypeFilter,
+    setModelTypeFilter,
     selectedModelId,
     inputMode,
     inputText,
@@ -90,10 +93,8 @@ export default function ClassifyForm() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--accent) shadow-[0_0_12px_rgba(99,102,241,0.35)]">
-              <BrainCircuit size={16} className="text-white" />
-            </div>
-            Klasifikasi Teks
+            <BrainCircuit size={20} className="text-(--accent)" />
+            Klasifikasi
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
             Uji model dengan teks tunggal atau batch dari file CSV / Excel
@@ -106,9 +107,29 @@ export default function ClassifyForm() {
         <div className="space-y-5 lg:col-span-3">
           {/* Pilih model */}
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
-            <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Pilih Model Aktif
-            </label>
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-bold text-(--text-secondary) uppercase">
+                Pilih Model
+              </label>
+              {/* Filter arsitektur */}
+              <div className="flex items-center gap-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-1">
+                <Filter size={12} className="ml-1 text-(--text-tertiary)" />
+                {["", "mbert", "xlmr"].map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setModelTypeFilter(v)}
+                    className={`rounded-md px-2 py-1 text-[10px] font-bold tracking-wider uppercase transition-all duration-150 ${
+                      modelTypeFilter === v
+                        ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                        : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
+                    }`}
+                  >
+                    {v === "" ? "Semua" : v}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {isLoadingModels ? (
               <div className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-elevated) px-4 py-3 text-sm font-medium text-(--text-tertiary)">
                 <Loader2 size={16} className="animate-spin text-(--accent)" />{" "}
@@ -181,6 +202,7 @@ export default function ClassifyForm() {
                         >
                           <div className="flex items-center justify-between gap-2">
                             <p
+                              title={model.name}
                               className={`truncate text-sm font-bold ${
                                 selectedModelId === model.id
                                   ? "text-(--accent)"
@@ -248,12 +270,12 @@ export default function ClassifyForm() {
                   onKeyDown={handleKeyDown}
                   rows={6}
                   placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
-                  className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                  className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                   maxLength={5000}
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-[11px] font-medium text-(--text-tertiary)">
-                    {inputText.length}/5000 karakter
+                    {inputText.length}/5000
                   </p>
                   {inputText && (
                     <button
@@ -262,9 +284,9 @@ export default function ClassifyForm() {
                         clearResult();
                         textareaRef.current?.focus();
                       }}
-                      className="text-[11px] font-bold text-(--text-tertiary) transition-colors hover:text-(--error)"
+                      className="text-[11px] font-bold tracking-wide text-(--error) opacity-80 transition-opacity hover:opacity-100"
                     >
-                      Bersihkan Teks
+                      Clear
                     </button>
                   )}
                 </div>
@@ -274,7 +296,7 @@ export default function ClassifyForm() {
                 {!csvFileName ? (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-12 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--bg-overlay)"
+                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-6 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--bg-overlay)"
                   >
                     <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-surface) shadow-(--shadow-sm) transition-colors group-hover:bg-(--accent-muted)/10">
                       <UploadCloud
@@ -387,7 +409,7 @@ export default function ClassifyForm() {
           )}
 
           {!isClassifying && !result && batchResults.length === 0 && (
-            <div className="flex h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-(--border-default) bg-(--bg-surface) px-6 text-center transition-colors hover:border-(--border-strong)">
+            <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-surface) px-6 py-16 text-center transition-colors hover:border-(--border-default)">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
                 <BrainCircuit size={32} className="text-(--text-tertiary)" />
               </div>
@@ -429,7 +451,7 @@ export default function ClassifyForm() {
       </div>
 
       {/* History */}
-      <HistoryTable />
+      {selectedModelId && <HistoryTable />}
     </div>
   );
 }

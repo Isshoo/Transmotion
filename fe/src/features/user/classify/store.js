@@ -7,6 +7,7 @@ const useClassifyStore = create((set, get) => ({
   // ── Models ─────────────────────────────────────────────────────
   activeModels: [],
   isLoadingModels: true,
+  modelTypeFilter: "",
 
   // ── Form state ─────────────────────────────────────────────────
   selectedModelId: "",
@@ -34,16 +35,21 @@ const useClassifyStore = create((set, get) => ({
 
   // ── Fetch models ───────────────────────────────────────────────
   fetchActiveModels: async () => {
+    const { modelTypeFilter } = get();
     set({ isLoadingModels: true });
     try {
-      const { data: res } = await classifyApi.getActiveModels();
+      const params = {};
+      if (modelTypeFilter) params.model_type = modelTypeFilter;
+      const { data: res } = await classifyApi.getActiveModels(params);
       set({ activeModels: res.data ?? [], isLoadingModels: false });
-      if (!get().selectedModelId && res.data?.length > 0) {
-        set({ selectedModelId: res.data[0].id });
-      }
     } catch {
       set({ isLoadingModels: false });
     }
+  },
+
+  setModelTypeFilter: (v) => {
+    set({ modelTypeFilter: v, selectedModelId: "" });
+    get().fetchActiveModels();
   },
 
   setSelectedModelId: (id) => {

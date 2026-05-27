@@ -116,7 +116,7 @@ export function BatchResults({ results, errors, csvTexts }) {
       </div>
 
       {/* Distribusi */}
-      {Object.keys(dist).length > 0 && (
+      {/* {Object.keys(dist).length > 0 && (
         <div className="rounded-xl border border-(--border-default) bg-(--bg-elevated) p-5 shadow-(--shadow-sm)">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Distribusi Prediksi
@@ -148,11 +148,11 @@ export function BatchResults({ results, errors, csvTexts }) {
               })}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Tabel hasil */}
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
-        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) scrollbar-track-transparent max-h-96 overflow-y-auto">
+        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) scrollbar-track-transparent max-h-122 overflow-y-auto">
           <table className="w-full text-xs">
             <thead className="sticky top-0 z-10 border-b border-(--border-default) bg-(--bg-elevated) shadow-sm">
               <tr>

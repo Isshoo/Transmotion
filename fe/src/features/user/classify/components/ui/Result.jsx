@@ -86,15 +86,15 @@ export function BatchResults({ results, errors, csvTexts }) {
     <div className="animate-scale-in space-y-5">
       {/* Summary */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 text-center shadow-(--shadow-sm)">
+        <div className="flex flex-col justify-center rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 text-center shadow-(--shadow-sm)">
           <p className="mb-1 text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-            Total Input
+            Total
           </p>
           <p className="text-2xl font-black text-(--text-primary)">
             {csvTexts.length}
           </p>
         </div>
-        <div className="rounded-xl border border-(--success-muted)/30 bg-(--success-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
+        <div className="flex flex-col justify-center rounded-xl border border-(--success-muted)/30 bg-(--success-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
           <p className="mb-1 text-[10px] font-bold tracking-wider text-(--success)/80 uppercase">
             Berhasil
           </p>
@@ -102,15 +102,15 @@ export function BatchResults({ results, errors, csvTexts }) {
             {results.length}
           </p>
         </div>
-        <div className="rounded-xl border border-(--error-muted)/30 bg-(--error-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
+        <div className="flex flex-col justify-center rounded-xl border border-(--error-muted)/30 bg-(--error-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
           <p className="mb-1 text-[10px] font-bold tracking-wider text-(--error)/80 uppercase">
             Error
           </p>
           <p className="text-2xl font-black text-(--error)">{errors.length}</p>
         </div>
-        <div className="rounded-xl border border-(--info-muted)/30 bg-(--info-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
+        <div className="flex flex-col justify-center rounded-xl border border-(--info-muted)/30 bg-(--info-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
           <p className="mb-1 text-[10px] font-bold tracking-wider text-(--info)/80 uppercase">
-            Kelas Unik
+            Kelas
           </p>
           <p className="text-2xl font-black text-(--info)">
             {Object.keys(dist).length}
@@ -119,7 +119,7 @@ export function BatchResults({ results, errors, csvTexts }) {
       </div>
 
       {/* Distribusi */}
-      {Object.keys(dist).length > 0 && (
+      {/* {Object.keys(dist).length > 0 && (
         <div className="space-y-4 rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
           <p className="border-b border-(--border-subtle) pb-2 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Distribusi Prediksi
@@ -148,11 +148,11 @@ export function BatchResults({ results, errors, csvTexts }) {
               })}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Tabel hasil */}
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
-        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) max-h-96 overflow-x-auto">
+        <div className="scrollbar-thin scrollbar-thumb-(--border-strong) max-h-94 overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="sticky top-0 z-10 border-b border-(--border-default) bg-(--bg-elevated)">
               <tr>

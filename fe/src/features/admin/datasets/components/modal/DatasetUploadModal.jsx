@@ -382,6 +382,7 @@ export default function DatasetUploadModal() {
                             {preview.columns.map((col) => (
                               <td
                                 key={col}
+                                title={row[col]}
                                 className="max-w-[200px] truncate px-4 py-2.5 text-(--text-secondary)"
                               >
                                 {row[col] ?? ""}

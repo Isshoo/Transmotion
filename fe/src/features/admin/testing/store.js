@@ -45,9 +45,9 @@ const useTestingStore = create((set, get) => ({
         isLoadingModels: false,
       });
       // Auto-select pertama
-      if (!get().selectedModelId && res.data?.length > 0) {
-        set({ selectedModelId: res.data[0].id });
-      }
+      // if (!get().selectedModelId && res.data?.length > 0) {
+      //   set({ selectedModelId: res.data[0].id });
+      // }
     } catch {
       set({ isLoadingModels: false });
     }

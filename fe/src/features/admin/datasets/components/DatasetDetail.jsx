@@ -180,7 +180,7 @@ export default function DatasetDetail() {
             <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
               {label}
             </p>
-            <p className="mt-1 truncate text-sm font-medium text-(--text-primary)">
+            <p title={value} className="mt-1 truncate text-sm font-medium text-(--text-primary)">
               {value}
             </p>
           </div>

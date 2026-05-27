@@ -42,8 +42,8 @@ export default function ProgressView() {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold tracking-tight text-(--accent)">
-              {pct !== 100 ? pct + "%" : "Finishing..."}
+            <p className="mb-1 text-xl font-bold tracking-tight text-(--accent)">
+              {pct !== 100 ? pct + "%" : "Evaluating on Test Set..."}
             </p>
             <p className="text-xs font-medium tracking-wider text-(--accent) uppercase opacity-70">
               Epoch {job.current_epoch} / {job.total_epochs}
@@ -60,7 +60,7 @@ export default function ProgressView() {
         </div>
 
         {/* Info dataset & model */}
-        <div className="relative flex flex-wrap gap-4 text-[11px] font-medium tracking-wide text-(--text-secondary) uppercase">
+        <div className="relative flex flex-wrap gap-4 text-[11px] font-medium tracking-wide text-(--text-secondary)">
           <span className="flex items-center gap-1.5">
             <span className="text-(--text-tertiary)">Dataset</span>
             <strong className="text-(--text-primary)">

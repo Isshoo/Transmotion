@@ -209,7 +209,7 @@ export default function ModelDetail({ modelId }) {
                 <p className="text-[9px] font-bold tracking-wider text-(--text-tertiary) uppercase">
                   {label}
                 </p>
-                <p className="mt-1.5 truncate text-sm font-bold text-(--text-primary)">
+                <p title={value} className="mt-1.5 truncate text-sm font-bold text-(--text-primary)">
                   {value}
                 </p>
               </div>
