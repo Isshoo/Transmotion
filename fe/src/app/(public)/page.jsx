@@ -35,7 +35,7 @@ const FEATURES = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function HomePage() {
   return (
-    <div className="relative flex items-center justify-center overflow-hidden bg-(--bg-base) px-6 py-12 text-(--text-primary) selection:bg-(--accent-muted) selection:text-(--text-primary) lg:py-24">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-(--bg-base) px-6 py-34 text-(--text-primary) selection:bg-(--accent-muted) selection:text-(--text-primary) lg:py-12">
       {/* ── Background Ambient Glow ── */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--accent) opacity-[0.08] blur-[120px]" />
 

@@ -9,7 +9,7 @@ export default function Navbar() {
   const { user, logout } = useAuthStore();
 
   return (
-    <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-(--border-subtle) bg-(--bg-surface)/80 px-6 backdrop-blur-md">
+    <header className="fixed w-full top-0 z-40 flex h-14 items-center justify-between border-b border-(--border-subtle) bg-(--bg-surface)/80 px-6 backdrop-blur-md">
       {/* Brand */}
       <Link
         href="/"
