@@ -1,0 +1,122 @@
+"use client";
+
+import { useEffect } from "react";
+import { BrainCircuit } from "lucide-react";
+import { toast } from "sonner";
+import { useSSE } from "@/hooks/useSSE";
+import useTrainingStore from "../store";
+import FormView from "./sub/FormView";
+import ProgressView from "./sub/ProgressView";
+import ResultView from "./sub/ResultView";
+
+export default function TrainingPage() {
+  const { view, activeJob, init, setActiveJob, isCheckingActive } =
+    useTrainingStore();
+
+  useEffect(() => {
+    init();
+    return () => {
+      useTrainingStore.setState({ isCheckingActive: true });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // SSE — follow job aktif
+  const activeJobId = activeJob?.id;
+  const isJobActive =
+    activeJob && ["queued", "running"].includes(activeJob.status);
+
+  useSSE(
+    activeJobId && isJobActive ? `/api/sse/training-jobs/${activeJobId}` : null,
+    {
+      enabled: !!activeJobId && isJobActive,
+      onMessage: (data, eventType) => {
+        if (!data?.id) return;
+        if (eventType === "update" || eventType === "init") {
+          setActiveJob(data);
+        }
+        if (eventType === "complete") {
+          setActiveJob(data);
+          toast.success("Training selesai!");
+        }
+        if (eventType === "error_event") {
+          setActiveJob(data);
+          toast.error("Training gagal: " + (data?.error_message ?? ""));
+        }
+      },
+    }
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+          <BrainCircuit size={20} className="text-(--accent)" />
+          Training Model
+        </h1>
+        <p className="mt-1 text-sm text-(--text-secondary)">
+          {view === "form" &&
+            "Konfigurasi dan mulai pelatihan model mBERT / XLM-R"}
+          {view === "progress" &&
+            "Training sedang berjalan — progress diperbarui otomatis"}
+          {view === "result" &&
+            "Training selesai — lihat hasil evaluasi atau mulai training baru"}
+        </p>
+      </div>
+
+      {/* Step indicator */}
+      <div className="flex items-center gap-2">
+        {[
+          { key: "form", label: "Konfigurasi" },
+          { key: "progress", label: "Training" },
+          { key: "result", label: "Hasil" },
+        ].map(({ key, label }, i) => (
+          <div key={key} className="flex items-center gap-2">
+            {i > 0 && (
+              <div
+                className={`h-px w-8 ${
+                  view === "result" || (view === "progress" && i === 1)
+                    ? "bg-(--accent)"
+                    : "bg-(--border-default)"
+                }`}
+              />
+            )}
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium tracking-wide transition-colors duration-200 ${
+                view === key
+                  ? "bg-(--accent) text-white shadow-(--shadow-accent)"
+                  : (key === "progress" && view === "result") ||
+                      (key === "form" && view !== "form")
+                    ? "bg-(--accent-muted) text-(--accent)"
+                    : "bg-(--bg-elevated) text-(--text-tertiary)"
+              }`}
+            >
+              {label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="animate-fade-in">
+        {isCheckingActive ? (
+          <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
+            <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-(--accent)" />
+              <p className="text-xs font-medium">
+                Memeriksa status training...
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {view === "form" && <FormView />}
+            {view === "progress" && <ProgressView />}
+            {view === "result" && <ResultView />}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

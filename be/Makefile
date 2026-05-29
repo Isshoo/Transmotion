@@ -1,11 +1,3 @@
-# Variabel
-PYTHON = .venv/bin/python
-PIP = .venv/bin/pip
-FLASK = .venv/bin/flask
-RUFF = .venv/bin/ruff
-GUNICORN = .venv/bin/gunicorn
-WAITRESS = .venv/bin/waitress-serve
-
 .PHONY: help venv install dev db-init db-migrate db-upgrade lint format clean seed db-reset create-admin data-prep
 
 help:
@@ -27,50 +19,60 @@ help:
 # Lingkungan
 venv:
 	python3 -m venv .venv
-	$(PIP) install --upgrade pip
+	pip install --upgrade pip
 
 install:
-	$(PIP) install -r requirements.txt
+	pip install -r requirements.txt
 
 # Menjalankan Aplikasi
 dev:
-	$(PYTHON) server.py
+	python server.py
 
 gunicorn:
-	$(GUNICORN) server:app --bind 0.0.0.0:5000
+	gunicorn server:app --bind 0.0.0.0:5000
 
 waitress:
-	$(WAITRESS) --host=0.0.0.0 --port=5000 server:app
+	waitress-serve --host=0.0.0.0 --port=5000 server:app
 
 # Database (Flask-Migrate)
 db-init:
-	$(FLASK) db init
+	flask db init
 
+# make db-migrate msg="Auto migration"
 db-migrate:
-	$(FLASK) db migrate -m "Auto migration"
+	flask db migrate -m "$(or $(msg),Auto migration)"
 
 db-upgrade:
-	$(FLASK) db upgrade
+	flask db upgrade
 
 # Scripts (Menjalankan file di folder scripts/)
 seed:
-	$(PYTHON) scripts/db/seed.py
+	python scripts/db/seed.py
 
 db-reset:
-	$(PYTHON) scripts/db/reset_db.py
+	python scripts/db/reset_db.py
 
 create-admin:
-	$(PYTHON) scripts/db/create_admin.py
+	python scripts/db/create_admin.py
 
 data-prep:
-	$(PYTHON) scripts/dataset/preprocess_dataset.py
+	python scripts/dataset/preprocess_dataset.py
+
+scrape:
+	bash scripts/dataset/harvestscrape.sh
+
+excel2csv:
+	python scripts/dataset/excel_to_csv.py
+
+csv2excel:
+	python scripts/dataset/csv_to_excel.py
 
 # Kualitas Kode
 lint:
-	$(RUFF) check .
+	ruff check .
 
 format:
-	$(RUFF) format .
+	ruff format .
 
 # Pembersihan
 clean:

@@ -39,9 +39,9 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # ── Path ─────────────────────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
-INPUT_DIR = BASE_DIR / "Combined" / "Base"
-OUTPUT_DIR = BASE_DIR / "Combined" / "Base" / "Cleaned"
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+INPUT_DIR = BASE_DIR / "app" / "storage" / "datasets" / "Combined" / "Balanced"
+OUTPUT_DIR = BASE_DIR / "app" / "storage" / "datasets" / "Combined" / "Cleaned"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASETS = ["Kesehatan", "Pendidikan"]

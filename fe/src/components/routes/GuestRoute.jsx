@@ -33,7 +33,7 @@ export default function GuestRoute({ children }) {
   if (!isClient) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" />
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-(--accent)" />
       </div>
     );
   }
@@ -42,7 +42,9 @@ export default function GuestRoute({ children }) {
   if (isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-sm text-gray-400">Mengalihkan ke halaman utama...</p>
+        <p className="text-sm text-(--text-tertiary)">
+          Mengalihkan ke halaman utama...
+        </p>
       </div>
     );
   }

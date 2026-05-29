@@ -1,6 +1,9 @@
+import DashboardPage from "@/features/admin/dashboard/DashboardPage";
+
 export const metadata = {
-  title: "Admin Panel",
+  title: "Admin Dashboard | Transmotion",
 };
+
 export default function AdminDashboardPage() {
-  return <div>Admin Dashboard Page</div>;
+  return <DashboardPage />;
 }

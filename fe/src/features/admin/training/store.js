@@ -1,0 +1,215 @@
+import { create } from "zustand";
+import trainingApi from "./api";
+import datasetsApi from "@/features/admin/datasets/api";
+import { getErrorMessage } from "@/helpers/error";
+
+const useTrainingStore = create((set, get) => ({
+  // ── View state ─────────────────────────────────────────────
+  // "form" | "progress" | "result"
+  view: "form",
+
+  // ── Form ───────────────────────────────────────────────────
+  datasets: [],
+  isLoadingDatasets: false,
+  selectedDatasetId: "",
+  testSize: 0.2,
+  evalSize: 0.1,
+  modelType: "mbert",
+  jobName: "",
+  hyperparams: {
+    learning_rate: 2e-5,
+    epochs: 3,
+    batch_size: 16,
+    max_length: "auto",
+    warmup_steps: 0.1,
+    weight_decay: 0.01,
+    dropout: 0.1,
+    optimizer: "adamw",
+  },
+
+  // ── Split preview ──────────────────────────────────────────
+  splitPreview: null,
+  isLoadingPreview: false,
+
+  // ── Active job (progress / result) ─────────────────────────
+  activeJob: null,
+  isLoadingActive: false,
+
+  // ── UI ─────────────────────────────────────────────────────
+  isSubmitting: false,
+  isCheckingActive: true,
+
+  // ── Init: cek apakah ada job aktif saat masuk halaman ──────
+  init: async () => {
+    set({ isCheckingActive: true });
+
+    // Load datasets
+    get().fetchDatasets();
+
+    // Cek apakah ada job yang sedang berjalan
+    try {
+      const { data: res } = await trainingApi.getActive();
+      const job = res.data;
+      if (job && ["queued", "running"].includes(job.status)) {
+        set({ activeJob: job, view: "progress", isCheckingActive: false });
+      } else if (job && job.status === "completed") {
+        // Ada job selesai — bisa tampilkan result jika mau
+        // set({ activeJob: job, view: "result", isCheckingActive: false });
+        get().resetToForm();
+        set({ isCheckingActive: false });
+      } else {
+        get().resetToForm();
+        set({ isCheckingActive: false });
+      }
+    } catch {
+      // Tidak ada job aktif, reset ke form
+      get().resetToForm();
+      set({ isCheckingActive: false });
+    }
+  },
+
+  resetToForm: () => {
+    set({
+      view: "form",
+      activeJob: null,
+      selectedDatasetId: "",
+      testSize: 0.2,
+      evalSize: 0.1,
+      modelType: "mbert",
+      jobName: "",
+      splitPreview: null,
+      hyperparams: {
+        learning_rate: 2e-5,
+        epochs: 3,
+        batch_size: 16,
+        max_length: "auto",
+        warmup_steps: 0.1,
+        weight_decay: 0.01,
+        dropout: 0.1,
+        optimizer: "adamw",
+      },
+    });
+  },
+
+  // ── Datasets ───────────────────────────────────────────────
+  fetchDatasets: async () => {
+    set({ isLoadingDatasets: true });
+    try {
+      const { data: res } = await datasetsApi.getAll({
+        per_page: 100,
+        sort_by: "created_at",
+        sort_order: "desc",
+      });
+      const ready = (res.data ?? []).filter(
+        (d) =>
+          d.preprocessing_status === "completed" &&
+          (d.num_rows_preprocessed ?? 0) > 0
+      );
+      set({ datasets: ready, isLoadingDatasets: false });
+    } catch {
+      set({ isLoadingDatasets: false });
+    }
+  },
+
+  // ── Form setters ───────────────────────────────────────────
+  setSelectedDatasetId: (id) => {
+    set({ selectedDatasetId: id, splitPreview: null });
+    if (id) get().fetchSplitPreview(id, get().testSize, get().evalSize);
+  },
+
+  setTestSize: (v) => {
+    set({ testSize: v });
+    const { selectedDatasetId, evalSize } = get();
+    if (selectedDatasetId)
+      get().fetchSplitPreview(selectedDatasetId, v, evalSize);
+  },
+
+  setEvalSize: (v) => {
+    set({ evalSize: v });
+    const { selectedDatasetId, testSize } = get();
+    if (selectedDatasetId)
+      get().fetchSplitPreview(selectedDatasetId, testSize, v);
+  },
+
+  setModelType: (v) => set({ modelType: v }),
+  setJobName: (v) => set({ jobName: v }),
+  setHyperparam: (key, value) =>
+    set((state) => ({
+      hyperparams: { ...state.hyperparams, [key]: value },
+    })),
+
+  // ── Split preview ──────────────────────────────────────────
+  fetchSplitPreview: async (datasetId, testSize, evalSize = 0.1) => {
+    set({ isLoadingPreview: true });
+    try {
+      const { data: res } = await trainingApi.splitPreview({
+        dataset_id: datasetId,
+        test_size: testSize,
+        val_size: evalSize,
+      });
+      set({ splitPreview: res.data, isLoadingPreview: false });
+    } catch (err) {
+      set({
+        splitPreview: {
+          is_valid: false,
+          validation_errors: [getErrorMessage(err)],
+        },
+        isLoadingPreview: false,
+      });
+    }
+  },
+
+  // ── Submit ─────────────────────────────────────────────────
+  createJob: async () => {
+    const {
+      selectedDatasetId,
+      testSize,
+      evalSize,
+      modelType,
+      jobName,
+      hyperparams,
+    } = get();
+    set({ isSubmitting: true });
+    try {
+      const { data: res } = await trainingApi.create({
+        dataset_id: selectedDatasetId,
+        model_type: modelType,
+        test_size: testSize,
+        val_size: evalSize,
+        job_name: jobName.trim() || undefined,
+        ...hyperparams,
+      });
+      set({ activeJob: res.data, view: "progress", isSubmitting: false });
+      return { success: true };
+    } catch (err) {
+      set({ isSubmitting: false });
+      return { success: false, message: getErrorMessage(err) };
+    }
+  },
+
+  // ── SSE update ─────────────────────────────────────────────
+  setActiveJob: (job) => {
+    if (!job) return;
+    set({ activeJob: job });
+    if (job.status === "completed" || job.status === "failed") {
+      set({ view: "result" });
+    }
+  },
+
+  // ── Cancel ─────────────────────────────────────────────────
+  cancelJob: async () => {
+    const { activeJob } = get();
+    if (!activeJob) return;
+    set({ isSubmitting: true });
+    try {
+      const { data: res } = await trainingApi.cancel(activeJob.id);
+      set({ activeJob: res.data, view: "result", isSubmitting: false });
+      return { success: true, message: res.message };
+    } catch (err) {
+      set({ isSubmitting: false });
+      return { success: false, message: getErrorMessage(err) };
+    }
+  },
+}));
+
+export default useTrainingStore;

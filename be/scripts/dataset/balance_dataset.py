@@ -34,9 +34,9 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # ── Konfigurasi Path ─────────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
-INPUT_DIR = BASE_DIR / "Combined" / "Base"
-OUTPUT_DIR = BASE_DIR / "Combined" / "Balanced"
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+INPUT_DIR = BASE_DIR / "app" / "storage" / "datasets" / "Combined" / "Base"
+OUTPUT_DIR = BASE_DIR / "app" / "storage" / "datasets" / "Combined" / "Balanced"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASETS = {
@@ -315,8 +315,10 @@ def process_dataset(name: str, filepath: Path):
     )
 
     # ── Simpan output ─────────────────────────────────────────────────────────
-    # Hanya simpan 2 kolom asli
-    output_df = df_balanced[[TEXT_COL, LABEL_COL]]
+    # Tambahkan kolom text_label dari mapping
+    df_balanced["text_label"] = df_balanced[LABEL_COL].map(LABEL_MAP)
+
+    output_df = df_balanced[[TEXT_COL, LABEL_COL, "text_label"]]
     output_path = OUTPUT_DIR / f"{name}.csv"
     output_df.to_csv(output_path, sep=DELIMITER, index=False, encoding="utf-8")
     log.info(f"  ✓ Disimpan ke: {output_path}")

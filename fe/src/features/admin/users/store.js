@@ -21,7 +21,7 @@ const useUsersStore = create((set, get) => ({
   sortOrder: "desc",
 
   // ── UI State ──────────────────────────────────────────────────
-  isLoading: false,
+  isLoading: true,
   isSubmitting: false,
   error: null,
 

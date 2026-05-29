@@ -3,6 +3,9 @@
  */
 export function getErrorMessage(error) {
   return (
-    error?.response?.data?.message || error?.response?.data?.error || error?.message || "Terjadi kesalahan, coba lagi."
+    error?.response?.data?.message ||
+    error?.response?.data?.error ||
+    error?.message ||
+    "Terjadi kesalahan, coba lagi."
   );
 }

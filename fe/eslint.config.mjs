@@ -27,6 +27,12 @@ const eslintConfig = defineConfig([
         },
       ],
 
+      // Hindari penggunaan variabel atau fungsi atau hal yang tidak di defined
+      "no-undef": "error",
+
+      // Hindari penggunaan useEffect tanpa dependency array
+      "react-hooks/exhaustive-deps": "warn",
+
       // Next.js — pakai next/link bukan <a> biasa
       "@next/next/no-html-link-for-pages": "error",
 
@@ -36,8 +42,8 @@ const eslintConfig = defineConfig([
       // React — tidak perlu import React di setiap file (Next.js sudah handle)
       "react/react-in-jsx-scope": "off",
 
-      // Konsistensi — gunakan === bukan ==
-      eqeqeq: ["error", "always"],
+      // Konsistensi — gunakan === bukan == (kecuali untuk cek null/undefined)
+      eqeqeq: ["error", "always", { null: "ignore" }],
 
       // Hindari var, pakai const/let
       "no-var": "error",

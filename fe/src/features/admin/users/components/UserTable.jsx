@@ -11,19 +11,20 @@ import {
   ShieldOff,
   ChevronLeft,
   ChevronRight,
+  Users,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 import useUsersStore from "../store";
 import useAuthStore from "@/features/auth/store";
-import UserFormModal from "./UserFormModal";
 import { formatDate } from "@/helpers/formatter";
-import DeleteUserModal from "./DeleteUserModal";
+import UserFormModal from "./modal/UserFormModal";
+import DeleteUserModal from "./modal/DeleteUserModal";
 import Avatar from "./ui/Avatar";
 import { RoleBadge, StatusBadge, VerifiedBadge } from "./ui/Badge";
 import { ActionButton, PaginationButton } from "./ui/Button";
-import buildPageRange from "../helpers/buildPageRange";
 import UserTableSkeleton from "./UserTableSkeleton";
+import { buildPageRange } from "../helpers";
 
 export default function UserTable() {
   const {
@@ -57,6 +58,9 @@ export default function UserTable() {
 
   useEffect(() => {
     fetchUsers();
+    return () => {
+      useUsersStore.setState({ isLoading: true });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -90,20 +94,21 @@ export default function UserTable() {
   const to = Math.min(page * perPage, total);
 
   return (
-    <div className="space-y-4">
+    <div className="animate-fade-in space-y-4">
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg font-semibold text-gray-800">
+          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+            <Users size={20} className="text-(--accent)" />
             Manajemen Pengguna
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="mt-1 text-sm text-(--text-secondary)">
             Kelola semua akun pengguna di sini
           </p>
         </div>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+          className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Plus size={16} />
           Tambah Pengguna
@@ -115,22 +120,22 @@ export default function UserTable() {
         {/* Search */}
         <div className="relative min-w-0 flex-1 sm:max-w-xs">
           <Search
-            size={15}
-            className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+            size={14}
+            className="absolute top-1/2 left-3.5 -translate-y-1/2 text-(--text-tertiary)"
           />
           <input
             type="text"
             value={localSearch}
             onChange={handleSearchChange}
             placeholder="Cari nama atau email..."
-            className="w-full rounded-lg border border-gray-300 py-2 pr-9 pl-9 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full rounded-lg border border-(--border-default) bg-(--bg-elevated) py-2 pr-9 pl-9 text-sm font-medium text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           {localSearch && (
             <button
               onClick={handleClearSearch}
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-(--text-tertiary) transition-colors hover:text-(--text-primary)"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           )}
         </div>
@@ -139,7 +144,7 @@ export default function UserTable() {
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm font-medium text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
           <option value="">Semua Role</option>
           <option value="user">User</option>
@@ -150,7 +155,7 @@ export default function UserTable() {
         <select
           value={isActive}
           onChange={(e) => setIsActive(e.target.value)}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm font-medium text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
           <option value="">Semua Status</option>
           <option value="true">Aktif</option>
@@ -164,55 +169,49 @@ export default function UserTable() {
               setLocalSearch("");
               resetFilters();
             }}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 transition hover:bg-gray-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm font-bold text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
-            <RotateCcw size={14} />
+            <RotateCcw size={13} />
             Reset
           </button>
         )}
       </div>
 
       {/* ── Table ──────────────────────────────────────────── */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                  Pengguna
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                  Role
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                  Verifikasi
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                  Bergabung
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+              <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
+                {["Pengguna", "Role", "Status", "Verifikasi", "Bergabung"].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
+                    >
+                      {h}
+                    </th>
+                  )
+                )}
+                <th className="px-5 py-3.5 text-right text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-(--border-subtle)">
               {isLoading ? (
-                // Skeleton rows
                 <UserTableSkeleton />
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center">
-                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                      <Search size={22} className="text-gray-400" />
+                  <td colSpan={6} className="px-4 py-16 text-center">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-elevated)">
+                      <Search size={24} className="text-(--text-tertiary)" />
                     </div>
-                    <p className="text-sm font-medium text-gray-500">
+                    <p className="text-sm font-bold text-(--text-primary)">
                       Tidak ada pengguna ditemukan
                     </p>
                     {hasActiveFilters && (
-                      <p className="mt-1 text-xs text-gray-400">
+                      <p className="mt-1 text-xs font-medium text-(--text-tertiary)">
                         Coba ubah filter atau kata kunci pencarian
                       </p>
                     )}
@@ -224,22 +223,22 @@ export default function UserTable() {
                   return (
                     <tr
                       key={user.id}
-                      className="transition-colors hover:bg-gray-50"
+                      className="group transition-colors duration-150 hover:bg-(--bg-overlay)"
                     >
                       {/* Pengguna */}
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <Avatar user={user} />
                           <div>
-                            <p className="leading-tight font-medium text-gray-800">
+                            <p className="leading-tight font-semibold text-(--text-primary) transition-colors group-hover:text-(--accent)">
                               {user.name ?? "—"}
                               {isSelf && (
-                                <span className="ml-1.5 rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-600">
+                                <span className="ml-1.5 rounded-md border border-(--accent-muted)/50 bg-(--accent-muted)/20 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-(--accent) uppercase">
                                   Kamu
                                 </span>
                               )}
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className="mt-0.5 text-[11px] font-medium text-(--text-tertiary)">
                               {user.email}
                             </p>
                           </div>
@@ -247,40 +246,40 @@ export default function UserTable() {
                       </td>
 
                       {/* Role */}
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <RoleBadge role={user.role} />
                       </td>
 
                       {/* Status */}
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <StatusBadge isActive={user.is_active} />
                       </td>
 
                       {/* Verifikasi */}
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <VerifiedBadge isVerified={user.is_verified} />
                       </td>
 
                       {/* Bergabung */}
-                      <td className="px-4 py-3 text-xs text-gray-500">
+                      <td className="px-5 py-3.5 text-[11px] font-medium text-(--text-tertiary)">
                         {user.created_at
                           ? formatDate(user.created_at, "dd MMM yyyy")
                           : "—"}
                       </td>
 
                       {/* Aksi */}
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center justify-end gap-1">
                           {/* Edit */}
                           <ActionButton
                             onClick={() => openEditModal(user)}
                             title="Edit pengguna"
-                            className="text-gray-500 hover:bg-blue-50 hover:text-blue-600"
+                            className="text-(--text-tertiary) hover:bg-(--accent-muted)/30 hover:text-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                           >
                             <Pencil size={14} />
                           </ActionButton>
 
-                          {/* Aktifkan / Nonaktifkan — tidak bisa ke diri sendiri */}
+                          {/* Aktifkan / Nonaktifkan */}
                           {!isSelf && (
                             <ActionButton
                               onClick={() => handleToggleActive(user)}
@@ -292,8 +291,8 @@ export default function UserTable() {
                               }
                               className={
                                 user.is_active
-                                  ? "text-amber-500 hover:bg-amber-50 hover:text-amber-600"
-                                  : "text-green-600 hover:bg-green-50 hover:text-green-700"
+                                  ? "text-(--text-tertiary) hover:bg-(--warning-muted)/30 hover:text-(--warning) focus:ring-2 focus:ring-(--warning-muted)"
+                                  : "text-(--text-tertiary) hover:bg-(--success-muted)/30 hover:text-(--success) focus:ring-2 focus:ring-(--success-muted)"
                               }
                             >
                               {user.is_active ? (
@@ -304,12 +303,12 @@ export default function UserTable() {
                             </ActionButton>
                           )}
 
-                          {/* Hapus — tidak bisa ke diri sendiri */}
+                          {/* Hapus */}
                           {!isSelf && (
                             <ActionButton
                               onClick={() => openDeleteModal(user)}
                               title="Hapus pengguna"
-                              className="text-gray-500 hover:bg-red-50 hover:text-red-600"
+                              className="text-(--text-tertiary) hover:bg-(--error-muted)/30 hover:text-(--error) focus:ring-2 focus:ring-(--error-muted)"
                             >
                               <Trash2 size={14} />
                             </ActionButton>
@@ -326,13 +325,14 @@ export default function UserTable() {
 
         {/* ── Pagination ─────────────────────────────────── */}
         {!isLoading && total > 0 && (
-          <div className="flex items-center justify-between border-t bg-white px-4 py-3">
-            <p className="text-xs text-gray-500">
+          <div className="flex items-center justify-between border-t border-(--border-default) bg-(--bg-elevated) px-5 py-3">
+            <p className="text-[11px] font-medium tracking-wide text-(--text-tertiary)">
               Menampilkan{" "}
-              <span className="font-medium text-gray-700">
+              <span className="font-bold text-(--text-primary)">
                 {from}–{to}
               </span>{" "}
-              dari <span className="font-medium text-gray-700">{total}</span>{" "}
+              dari{" "}
+              <span className="font-bold text-(--text-primary)">{total}</span>{" "}
               pengguna
             </p>
 
@@ -342,15 +342,14 @@ export default function UserTable() {
                 disabled={page <= 1}
                 title="Halaman sebelumnya"
               >
-                <ChevronLeft size={15} />
+                <ChevronLeft size={14} />
               </PaginationButton>
 
-              {/* Page numbers */}
               {buildPageRange(page, totalPages).map((p, i) =>
                 p === "..." ? (
                   <span
                     key={`ellipsis-${i}`}
-                    className="px-1 text-xs text-gray-400"
+                    className="px-1 text-xs text-(--text-disabled)"
                   >
                     …
                   </span>
@@ -370,7 +369,7 @@ export default function UserTable() {
                 disabled={page >= totalPages}
                 title="Halaman berikutnya"
               >
-                <ChevronRight size={15} />
+                <ChevronRight size={14} />
               </PaginationButton>
             </div>
           </div>

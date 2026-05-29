@@ -34,26 +34,28 @@ function VerifyEmailContent() {
 
   if (status === "loading") {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <div className="mb-4 animate-spin text-4xl">⏳</div>
-        <p className="text-sm text-gray-500">Memverifikasi email kamu...</p>
+      <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+        <div className="mb-6 animate-spin text-5xl">⏳</div>
+        <p className="text-sm font-bold text-(--text-secondary)">
+          Memverifikasi email kamu...
+        </p>
       </div>
     );
   }
 
   if (status === "success") {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <div className="mb-4 text-4xl">✅</div>
-        <h2 className="mb-2 text-xl font-semibold text-gray-800">
+      <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--success-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+        <div className="mb-4 text-5xl">✅</div>
+        <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
           Email Terverifikasi!
         </h2>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
           Akun kamu sudah aktif. Silakan login untuk melanjutkan.
         </p>
         <Link
           href="/login"
-          className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+          className="inline-block w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
           Masuk Sekarang
         </Link>
@@ -62,13 +64,18 @@ function VerifyEmailContent() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-      <div className="mb-4 text-4xl">❌</div>
-      <h2 className="mb-2 text-xl font-semibold text-gray-800">
+    <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--error-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+      <div className="mb-4 text-5xl">❌</div>
+      <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
         Verifikasi Gagal
       </h2>
-      <p className="mb-6 text-sm text-gray-500">{message}</p>
-      <Link href="/login" className="text-sm text-blue-600 hover:underline">
+      <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
+        {message}
+      </p>
+      <Link
+        href="/login"
+        className="text-sm font-bold tracking-wide text-(--accent) hover:underline"
+      >
         ← Kembali ke halaman masuk
       </Link>
     </div>
@@ -79,9 +86,9 @@ export default function VerifyEmailForm() {
   return (
     <Suspense
       fallback={
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <div className="mb-4 animate-spin text-4xl">⏳</div>
-          <p className="text-sm text-gray-500">Memuat...</p>
+        <div className="mx-auto mt-10 w-full max-w-md animate-pulse rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+          <div className="mb-6 text-5xl text-(--text-disabled)">⏳</div>
+          <p className="text-sm font-bold text-(--text-tertiary)">Memuat...</p>
         </div>
       }
     >

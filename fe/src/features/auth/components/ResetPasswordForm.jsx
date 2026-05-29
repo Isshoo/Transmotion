@@ -53,18 +53,18 @@ function ResetPasswordContent() {
   // Kalau tidak ada token di URL, tampilkan pesan error
   if (!token) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <div className="mb-4 text-4xl">❌</div>
-        <h2 className="mb-2 text-xl font-semibold text-gray-800">
+      <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--error-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+        <div className="mb-4 text-5xl">❌</div>
+        <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
           Link Tidak Valid
         </h2>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
           Link reset password tidak valid atau sudah kadaluarsa. Silakan minta
           link baru.
         </p>
         <Link
           href="/forgot-password"
-          className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+          className="inline-block rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
           Minta Link Baru
         </Link>
@@ -75,18 +75,18 @@ function ResetPasswordContent() {
   // Tampilan sukses
   if (success) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <div className="mb-4 text-4xl">✅</div>
-        <h2 className="mb-2 text-xl font-semibold text-gray-800">
+      <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--success-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+        <div className="mb-4 text-5xl">✅</div>
+        <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
           Password Berhasil Direset!
         </h2>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
           Password kamu sudah berhasil diubah. Silakan login dengan password
           baru kamu.
         </p>
         <button
           onClick={() => router.push("/login")}
-          className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+          className="w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
           Masuk Sekarang
         </button>
@@ -95,23 +95,23 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-      <h1 className="mb-1 text-2xl font-semibold text-gray-800">
+    <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
+      <h1 className="mb-2 text-3xl font-black tracking-tight text-(--text-primary)">
         Reset Password
       </h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <p className="mb-6 text-sm font-medium text-(--text-secondary)">
         Masukkan password baru kamu di bawah ini.
       </p>
 
       {error && (
-        <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+        <div className="mb-5 rounded-xl border border-(--error-muted)/50 bg-(--error-muted)/10 p-3.5 text-xs font-bold text-(--error) shadow-(--shadow-sm)">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Password Baru
           </label>
           <input
@@ -122,13 +122,15 @@ function ResetPasswordContent() {
             required
             minLength={8}
             placeholder="••••••••"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
-          <p className="mt-1 text-xs text-gray-400">Minimal 8 karakter</p>
+          <p className="mt-2 text-[10px] font-bold tracking-wide text-(--text-tertiary)">
+            Minimal 8 karakter
+          </p>
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
             Konfirmasi Password Baru
           </label>
           <input
@@ -138,7 +140,7 @@ function ResetPasswordContent() {
             onChange={handleChange}
             required
             placeholder="••••••••"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
         </div>
 
@@ -148,14 +150,17 @@ function ResetPasswordContent() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-lg bg-blue-600 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? "Menyimpan..." : "Reset Password"}
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm">
-        <Link href="/login" className="text-blue-600 hover:underline">
+      <p className="mt-6 text-center">
+        <Link
+          href="/login"
+          className="text-sm font-bold tracking-wide text-(--text-secondary) transition-colors hover:text-(--accent) hover:underline"
+        >
           ← Kembali ke halaman masuk
         </Link>
       </p>
@@ -180,36 +185,36 @@ function PasswordStrength({ password }) {
   const strengthLabel = ["", "Lemah", "Cukup", "Baik", "Kuat"][passed];
   const strengthColor = [
     "",
-    "bg-red-500",
-    "bg-yellow-500",
-    "bg-blue-500",
-    "bg-green-500",
+    "bg-(--error) shadow-(--shadow-sm)",
+    "bg-(--warning) shadow-(--shadow-sm)",
+    "bg-(--data-1) shadow-(--shadow-sm)",
+    "bg-(--success) shadow-(--shadow-sm)",
   ][passed];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3 rounded-xl border border-(--border-subtle) bg-(--bg-surface) p-4 shadow-inner">
       {/* Bar */}
-      <div className="flex gap-1">
+      <div className="flex gap-1.5">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full transition-all ${i <= passed ? strengthColor : "bg-gray-200"}`}
+            className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i <= passed ? strengthColor : "bg-(--border-strong)"}`}
           />
         ))}
       </div>
 
       {/* Label */}
-      <p className="text-xs text-gray-500">
+      <p className="text-[11px] font-bold tracking-wide text-(--text-tertiary) uppercase">
         Kekuatan password:{" "}
         <span
-          className={`font-medium ${
+          className={`ml-1 font-black ${
             passed <= 1
-              ? "text-red-500"
+              ? "text-(--error)"
               : passed === 2
-                ? "text-yellow-500"
+                ? "text-(--warning)"
                 : passed === 3
-                  ? "text-blue-500"
-                  : "text-green-500"
+                  ? "text-(--data-1)"
+                  : "text-(--success)"
           }`}
         >
           {strengthLabel}
@@ -217,13 +222,17 @@ function PasswordStrength({ password }) {
       </p>
 
       {/* Checklist */}
-      <ul className="space-y-1">
+      <ul className="space-y-1.5 border-t border-(--border-subtle) pt-1">
         {checks.map((check) => (
           <li
             key={check.label}
-            className={`flex items-center gap-1.5 text-xs ${check.pass ? "text-green-600" : "text-gray-400"}`}
+            className={`flex items-center gap-2 text-[11px] font-bold ${check.pass ? "text-(--success)" : "text-(--text-tertiary)"}`}
           >
-            <span>{check.pass ? "✓" : "○"}</span>
+            <span
+              className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] ${check.pass ? "bg-(--success-muted)/20 text-(--success)" : "bg-(--bg-overlay) text-(--text-disabled)"}`}
+            >
+              {check.pass ? "✓" : ""}
+            </span>
             {check.label}
           </li>
         ))}
@@ -236,8 +245,8 @@ export default function ResetPasswordForm() {
   return (
     <Suspense
       fallback={
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-sm text-gray-500">Memuat...</p>
+        <div className="mx-auto mt-10 w-full max-w-md animate-pulse rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+          <p className="text-sm font-bold text-(--text-tertiary)">Memuat...</p>
         </div>
       }
     >
