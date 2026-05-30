@@ -55,7 +55,7 @@ function VerifyEmailContent() {
         </p>
         <Link
           href="/login"
-          className="inline-block w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+          className="inline-block w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
           Masuk Sekarang
         </Link>

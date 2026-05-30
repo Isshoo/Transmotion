@@ -24,7 +24,7 @@ export function CancelConfirm2Modal({ onConfirm, onCancel, isLoading }) {
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
+            className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
           >
             {isLoading ? "Membatalkan..." : "Ya, Batalkan"}
           </button>

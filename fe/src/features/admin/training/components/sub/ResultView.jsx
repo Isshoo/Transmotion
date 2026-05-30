@@ -116,7 +116,7 @@ export default function ResultView() {
           {/* Tombol train baru */}
           <button
             onClick={resetToForm}
-            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-semibold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
             <RotateCcw size={16} />
             Training Baru

@@ -265,7 +265,7 @@ export default function ProgressView() {
             <button
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="rounded-lg bg-(--error) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
+              className="rounded-lg bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
             >
               {isSubmitting ? "Membatalkan..." : "Ya, Batalkan"}
             </button>

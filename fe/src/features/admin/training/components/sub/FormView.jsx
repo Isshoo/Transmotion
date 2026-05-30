@@ -259,7 +259,7 @@ export default function FormView() {
                   ].map(([pct, color, label]) => (
                     <div
                       key={label}
-                      className={`${color} flex items-center justify-center text-[9px] font-bold text-white transition-all duration-300`}
+                      className={`${color} flex items-center justify-center text-[9px] font-bold text-(--bg-base) transition-all duration-300`}
                       style={{ width: `${pct}%` }}
                     >
                       {pct >= 5 && `${label} ${pct}%`}
@@ -536,7 +536,7 @@ export default function FormView() {
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-4 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-4 text-sm font-semibold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none"
       >
         {isSubmitting ? (
           <>

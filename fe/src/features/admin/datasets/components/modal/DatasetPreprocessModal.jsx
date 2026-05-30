@@ -258,19 +258,19 @@ export default function DatasetPreprocessModal() {
             {/* Visual bar */}
             <div className="mt-4 flex h-3.5 overflow-hidden rounded-full bg-(--bg-elevated)">
               <div
-                className="flex items-center justify-center bg-(--accent) text-[9px] font-bold text-white transition-all duration-300"
+                className="flex items-center justify-center bg-(--accent) text-[9px] font-bold text-(--bg-base) transition-all duration-300"
                 style={{ width: `${trainPct}%` }}
               >
                 {trainPct >= 15 && `Train ${trainPct}%`}
               </div>
               <div
-                className="flex items-center justify-center bg-(--data-2) text-[9px] font-bold text-white transition-all duration-300"
+                className="flex items-center justify-center bg-(--data-2) text-[9px] font-bold text-(--bg-base) transition-all duration-300"
                 style={{ width: `${valPct}%` }}
               >
                 {valPct >= 10 && `${valPct}%`}
               </div>
               <div
-                className="flex items-center justify-center bg-(--warning) text-[9px] font-bold text-white transition-all duration-300"
+                className="flex items-center justify-center bg-(--warning) text-[9px] font-bold text-(--bg-base) transition-all duration-300"
                 style={{ width: `${testPct}%` }}
               >
                 {testPct >= 10 && `${testPct}%`}
@@ -311,7 +311,7 @@ export default function DatasetPreprocessModal() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? "Memproses..." : "Jalankan Preprocessing"}
             </button>

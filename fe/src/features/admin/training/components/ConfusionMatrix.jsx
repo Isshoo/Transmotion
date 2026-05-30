@@ -13,14 +13,14 @@ export default function ConfusionMatrix({ data }) {
     if (isCorrect) {
       // Diagonal — biru/accent
       if (intensity > 0.7)
-        return "bg-(--accent) text-white font-bold ring-1 ring-inset ring-(--accent-hover)";
-      if (intensity > 0.4) return "bg-(--accent)/70 text-white font-bold";
+        return "bg-(--accent) text-(--bg-base) font-bold ring-1 ring-inset ring-(--accent-hover)";
+      if (intensity > 0.4) return "bg-(--accent)/70 text-(--bg-base) font-bold";
       return "bg-(--accent-muted) text-(--accent)";
     } else {
       // Off-diagonal — merah/error
       if (intensity > 0.3)
-        return "bg-(--error) text-white font-bold ring-1 ring-inset ring-(--error-hover)";
-      if (intensity > 0.1) return "bg-(--error)/70 text-white font-bold";
+        return "bg-(--error) text-(--bg-base) font-bold ring-1 ring-inset ring-(--error-hover)";
+      if (intensity > 0.1) return "bg-(--error)/70 text-(--bg-base) font-bold";
       return "bg-(--error-muted) text-(--error)";
     }
   };

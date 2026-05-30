@@ -85,7 +85,7 @@ export default function TrainingPage() {
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium tracking-wide transition-colors duration-200 ${
                 view === key
-                  ? "bg-(--accent) text-white shadow-(--shadow-accent)"
+                  ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-accent)"
                   : (key === "progress" && view === "result") ||
                       (key === "form" && view !== "form")
                     ? "bg-(--accent-muted) text-(--accent)"

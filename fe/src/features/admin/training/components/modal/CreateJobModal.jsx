@@ -184,9 +184,9 @@ export default function CreateJobModal() {
               <span
                 className={`mr-2.5 inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
                   step === n
-                    ? "bg-(--accent) text-white shadow-(--shadow-accent)"
+                    ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-accent)"
                     : n < step
-                      ? "bg-(--success) text-white"
+                      ? "bg-(--success) text-(--bg-base)"
                       : "bg-(--bg-overlay) text-(--text-tertiary)"
                 }`}
               >
@@ -594,7 +594,7 @@ export default function CreateJobModal() {
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={!canProceedStep1}
-                className="rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+                className="rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               >
                 Lanjutkan →
               </button>
@@ -603,7 +603,7 @@ export default function CreateJobModal() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !canSubmit}
-                className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+                className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               >
                 {isSubmitting ? "Membuat Job..." : "Mulai Training"}
               </button>

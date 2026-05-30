@@ -52,7 +52,7 @@ export default function DeleteConfirmModal() {
           <button
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="rounded-lg bg-(--error) px-4 py-2 text-sm font-bold tracking-wide text-white shadow-(--shadow-sm) transition-all hover:bg-(--error-hover) hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-(--error) px-4 py-2 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-sm) transition-all hover:bg-(--error-hover) hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Menghapus..." : "Ya, Hapus"}
           </button>

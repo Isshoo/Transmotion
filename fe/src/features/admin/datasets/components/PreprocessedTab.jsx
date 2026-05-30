@@ -108,7 +108,7 @@ export default function PreprocessedTab({ dataset }) {
         <button
           onClick={() => setShowPreprocessModal(true)}
           disabled={isNotConfigured}
-          className="mt-5 inline-flex items-center gap-2 rounded-md bg-(--accent) px-5 py-2.5 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-5 inline-flex items-center gap-2 rounded-md bg-(--accent) px-5 py-2.5 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Cpu size={15} /> Mulai Preprocessing
         </button>
@@ -197,7 +197,7 @@ export default function PreprocessedTab({ dataset }) {
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-(--accent) px-3 py-1.5 text-xs font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+            className="inline-flex items-center gap-1.5 rounded-md bg-(--accent) px-3 py-1.5 text-xs font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
             <Plus size={12} />{" "}
             <span className="max-md:hidden">Tambah Data</span>
@@ -403,7 +403,7 @@ export default function PreprocessedTab({ dataset }) {
               <button
                 onClick={() => handleDelete(deleteTarget)}
                 disabled={isSubmitting}
-                className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
+                className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
               >
                 {isSubmitting ? "Menghapus..." : "Ya, Hapus"}
               </button>

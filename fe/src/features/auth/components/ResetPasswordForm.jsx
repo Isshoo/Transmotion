@@ -64,7 +64,7 @@ function ResetPasswordContent() {
         </p>
         <Link
           href="/forgot-password"
-          className="inline-block rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+          className="inline-block rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
           Minta Link Baru
         </Link>
@@ -86,7 +86,7 @@ function ResetPasswordContent() {
         </p>
         <button
           onClick={() => router.push("/login")}
-          className="w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+          className="w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
           Masuk Sekarang
         </button>
@@ -150,7 +150,7 @@ function ResetPasswordContent() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? "Menyimpan..." : "Reset Password"}
         </button>

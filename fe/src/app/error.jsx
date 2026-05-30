@@ -25,7 +25,7 @@ export default function GlobalError({ error, reset }) {
         <div className="flex justify-center gap-3">
           <button
             onClick={reset}
-            className="rounded-xl bg-(--accent) px-6 py-2.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+            className="rounded-xl bg-(--accent) px-6 py-2.5 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
             Coba Lagi
           </button>

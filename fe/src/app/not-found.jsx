@@ -27,7 +27,7 @@ export default function NotFound() {
 
         <Link
           href={user?.role === "admin" ? "/admin" : "/"}
-          className="inline-flex items-center gap-2 rounded-xl bg-(--accent) px-6 py-2.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-xl bg-(--accent) px-6 py-2.5 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
           Kembali ke Beranda
         </Link>

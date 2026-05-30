@@ -19,7 +19,7 @@ export function SingleResult({ result }) {
           <p className="text-[11px] font-bold tracking-wide text-(--text-tertiary) uppercase">
             Confidence:
           </p>
-          <span className="inline-flex items-center rounded-md bg-(--accent) px-2 py-0.5 text-[11px] font-bold text-white shadow-(--shadow-sm)">
+          <span className="inline-flex items-center rounded-md bg-(--accent) px-2 py-0.5 text-[11px] font-bold text-(--bg-base) shadow-(--shadow-sm)">
             {result.confidence !== null
               ? `${(result.confidence * 100).toFixed(1)}%`
               : "—"}

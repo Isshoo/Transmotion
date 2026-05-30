@@ -10,6 +10,7 @@ import {
   X,
   ChevronDown,
   Filter,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
 import useClassifyStore from "../store";
@@ -46,6 +47,7 @@ export default function ClassifyForm() {
   } = useClassifyStore();
 
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const selectedModel = activeModels.find((m) => m.id === selectedModelId);
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
@@ -88,9 +90,9 @@ export default function ClassifyForm() {
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="animate-fade-in w-full">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <BrainCircuit size={20} className="text-(--accent)" />
@@ -100,6 +102,13 @@ export default function ClassifyForm() {
             Uji model dengan teks tunggal atau batch dari file CSV / Excel
           </p>
         </div>
+        <button
+          onClick={() => setIsHistoryModalOpen(true)}
+          className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-surface) px-4 py-2 text-sm font-bold text-(--text-primary) shadow-(--shadow-sm) transition hover:border-(--border-strong) hover:bg-(--bg-elevated) active:scale-[0.98]"
+        >
+          <History size={16} className="text-(--text-secondary)" />
+          Riwayat
+        </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -120,7 +129,7 @@ export default function ClassifyForm() {
                     onClick={() => setModelTypeFilter(v)}
                     className={`rounded-md px-2 py-1 text-[10px] font-bold tracking-wider uppercase transition-all duration-150 ${
                       modelTypeFilter === v
-                        ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                        ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                         : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                     }`}
                   >
@@ -251,7 +260,7 @@ export default function ClassifyForm() {
                   }}
                   className={`flex-1 rounded-md py-1.5 text-xs font-bold transition-all duration-200 ${
                     inputMode === key
-                      ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                      ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                       : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                   }`}
                 >
@@ -270,12 +279,12 @@ export default function ClassifyForm() {
                   onKeyDown={handleKeyDown}
                   rows={6}
                   placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
-                  className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
-                  maxLength={5000}
+                  className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-4 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                  maxLength={1000}
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-[11px] font-medium text-(--text-tertiary)">
-                    {inputText.length}/5000
+                    {inputText.length}/1000
                   </p>
                   {inputText && (
                     <button
@@ -296,7 +305,7 @@ export default function ClassifyForm() {
                 {!csvFileName ? (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-6 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--bg-overlay)"
+                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-7 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--bg-overlay)"
                   >
                     <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-surface) shadow-(--shadow-sm) transition-colors group-hover:bg-(--accent-muted)/10">
                       <UploadCloud
@@ -317,7 +326,7 @@ export default function ClassifyForm() {
                     <div className="flex items-center justify-between rounded-xl border border-(--success-muted)/50 bg-(--success-muted)/10 px-4 py-3 shadow-(--shadow-sm)">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--success) shadow-(--shadow-sm)">
-                          <FileText size={16} className="text-white" />
+                          <FileText size={16} className="text-(--bg-base)" />
                         </div>
                         <div>
                           <p className="text-sm font-bold text-(--success)">
@@ -354,7 +363,7 @@ export default function ClassifyForm() {
                               onClick={() => setSelectedTextColumn(idx)}
                               className={`rounded-lg border px-3 py-1.5 text-[11px] font-bold transition-all duration-150 ${
                                 selectedTextColumn === idx
-                                  ? "border-(--accent) bg-(--accent) text-white shadow-(--shadow-sm)"
+                                  ? "border-(--accent) bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                                   : "border-(--border-strong) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                               }`}
                             >
@@ -385,7 +394,7 @@ export default function ClassifyForm() {
                   onClick={() => {
                     clearResult();
                   }}
-                  className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-white focus:outline-none"
+                  className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-(--bg-base) focus:outline-none"
                 >
                   <X size={16} />
                 </button>
@@ -397,7 +406,7 @@ export default function ClassifyForm() {
           <button
             onClick={classify}
             disabled={!canClassify}
-            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isClassifying ? (
               <>
@@ -463,8 +472,34 @@ export default function ClassifyForm() {
         </div>
       </div>
 
-      {/* History */}
-      {selectedModelId && <HistoryTable />}
+      {/* History Modal */}
+      {isHistoryModalOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 h-screen bg-black/50 backdrop-blur-sm"
+            onClick={() => setIsHistoryModalOpen(false)}
+          />
+          <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            <div className="animate-scale-in pointer-events-auto w-full max-w-4xl overflow-hidden rounded-2xl border border-(--border-default) bg-(--bg-surface) shadow-2xl">
+              <div className="flex items-center justify-between border-b border-(--border-default) bg-(--bg-elevated) p-5">
+                <h2 className="flex items-center gap-2 text-lg font-bold text-(--text-primary)">
+                  <History size={20} className="text-(--accent)" />
+                  Riwayat Klasifikasi
+                </h2>
+                <button
+                  onClick={() => setIsHistoryModalOpen(false)}
+                  className="rounded-lg p-2 text-(--text-tertiary) transition hover:bg-(--bg-overlay) hover:text-(--text-primary) focus:ring-2 focus:ring-(--accent-muted) focus:outline-none"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="scrollbar-thin scrollbar-thumb-(--border-strong) max-h-[70vh] overflow-y-auto p-5">
+                <HistoryTable />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // ── History table ──────────────────────────────────────────────
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, History } from "lucide-react";
 import useClassifyStore from "../store";
 
 export default function HistoryTable() {
@@ -17,13 +17,24 @@ export default function HistoryTable() {
   const from = historyTotal === 0 ? 0 : (historyPage - 1) * historyPerPage + 1;
   const to = Math.min(historyPage * historyPerPage, historyTotal);
 
-  if (historyTotal === 0) return null;
+  if (!isLoadingHistory && historyTotal === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
+          <History size={32} className="text-(--text-tertiary)" />
+        </div>
+        <p className="text-base font-bold text-(--text-secondary)">
+          Belum ada riwayat
+        </p>
+        <p className="mt-1.5 text-sm text-(--text-tertiary)">
+          Riwayat klasifikasi model Anda akan muncul di sini.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-slide-up">
-      <h3 className="mb-4 text-sm font-bold tracking-tight text-(--text-primary)">
-        Riwayat Klasifikasi
-      </h3>
+    <div className="animate-fade-in">
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -60,7 +71,10 @@ export default function HistoryTable() {
                           {(historyPage - 1) * historyPerPage + index + 1}
                         </span>
                       </td>
-                      <td className="max-w-[280px] px-5 py-3.5">
+                      <td
+                        className="max-w-[280px] px-5 py-3.5"
+                        title={item.input_text}
+                      >
                         <span className="line-clamp-2 text-[13px] leading-relaxed font-medium text-(--text-primary)">
                           {item.input_text}
                         </span>

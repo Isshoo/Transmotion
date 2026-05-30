@@ -47,7 +47,7 @@ export default function CancelConfirmModal() {
           <button
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
+            className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
           >
             {isSubmitting ? "Membatalkan..." : "Ya, Batalkan"}
           </button>

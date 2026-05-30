@@ -35,7 +35,7 @@ const FEATURES = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function HomePage() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-(--bg-base) px-6 py-34 text-(--text-primary) selection:bg-(--accent-muted) selection:text-(--text-primary) lg:py-12">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-(--bg-base) px-4 py-34 text-(--text-primary) selection:bg-(--accent-muted) selection:text-(--text-primary) lg:py-12">
       {/* ── Background Ambient Glow ── */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--accent) opacity-[0.08] blur-[120px]" />
 
@@ -56,8 +56,8 @@ export default function HomePage() {
           {/* Version chip */}
           <div className="mb-8 inline-flex items-center gap-3 rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 font-mono text-xs font-medium text-(--text-secondary) shadow-(--shadow-sm)">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--success) opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-(--success) shadow-[0_0_8px_var(--success)]"></span>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--text-primary) opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-(--text-primary) shadow-[0_0_8px_var(--text-primary)]"></span>
             </span>
             Built with mBERT &amp; XLM-R
           </div>
@@ -73,7 +73,7 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/classifier"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-(--accent) px-7 py-3.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-accent) transition-all duration-(--transition-base) hover:-translate-y-0.5 hover:bg-(--accent-hover) active:scale-95"
+              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-(--accent) px-7 py-3.5 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-accent) transition-all duration-(--transition-base) hover:-translate-y-0.5 hover:bg-(--accent-hover) active:scale-95"
             >
               {/* Button shine effect */}
               <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />

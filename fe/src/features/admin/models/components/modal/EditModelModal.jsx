@@ -126,7 +126,7 @@ export default function EditModelModal() {
                   />
                   <div className="h-5 w-5 rounded border-2 border-(--border-strong) bg-(--bg-surface) transition-colors peer-checked:border-(--accent) peer-checked:bg-(--accent) peer-focus-visible:ring-2 peer-focus-visible:ring-(--accent-muted)" />
                   <svg
-                    className="pointer-events-none absolute top-[55%] left-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100"
+                    className="pointer-events-none absolute top-[55%] left-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 text-(--bg-base) opacity-0 transition-opacity peer-checked:opacity-100"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -163,7 +163,7 @@ export default function EditModelModal() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-(--accent) px-4 py-2.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-sm) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:opacity-50"
+              className="rounded-xl bg-(--accent) px-4 py-2.5 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-sm) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:opacity-50"
             >
               {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
             </button>

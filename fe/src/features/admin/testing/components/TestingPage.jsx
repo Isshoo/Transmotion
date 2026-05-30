@@ -113,7 +113,7 @@ export default function TestingPage() {
                     onClick={() => setModelTypeFilter(v)}
                     className={`rounded-md px-2 py-1 text-[10px] font-bold tracking-wider uppercase transition-all duration-150 ${
                       modelTypeFilter === v
-                        ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                        ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                         : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                     }`}
                   >
@@ -248,7 +248,7 @@ export default function TestingPage() {
                 }}
                 className={`flex-1 rounded-md py-1.5 text-xs font-bold transition-all duration-200 ${
                   inputMode === key
-                    ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                    ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                     : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                 }`}
               >
@@ -267,7 +267,7 @@ export default function TestingPage() {
                   rows={6}
                   placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
                   className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-3 text-sm leading-relaxed text-(--text-primary) transition-all duration-200 outline-none placeholder:font-sans placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
-                  maxLength={5000}
+                  maxLength={1000}
                   onKeyDown={(e) => {
                     if (
                       e.key === "Enter" &&
@@ -280,7 +280,7 @@ export default function TestingPage() {
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary)">
-                    {inputText.length}/5000
+                    {inputText.length}/1000
                   </p>
                   {inputText && (
                     <button
@@ -300,7 +300,7 @@ export default function TestingPage() {
                 {!csvFileName ? (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-10 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--accent-muted)/5"
+                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-9.5 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--accent-muted)/5"
                   >
                     <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-overlay) transition-colors group-hover:bg-(--accent-muted)/20">
                       <UploadCloud
@@ -363,7 +363,7 @@ export default function TestingPage() {
                               onClick={() => setSelectedTextColumn(idx)}
                               className={`rounded-lg border px-3.5 py-2 text-xs font-bold tracking-wide transition-all duration-150 ${
                                 selectedTextColumn === idx
-                                  ? "border-(--accent) bg-(--accent) text-white shadow-(--shadow-sm)"
+                                  ? "border-(--accent) bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                                   : "border-(--border-strong) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                               }`}
                             >
@@ -396,7 +396,7 @@ export default function TestingPage() {
                       onClick={() => {
                         clearResults();
                       }}
-                      className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-white focus:outline-none"
+                      className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-(--bg-base) focus:outline-none"
                     >
                       <X size={16} />
                     </button>
@@ -406,7 +406,7 @@ export default function TestingPage() {
               <button
                 onClick={classify}
                 disabled={!canClassify}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none disabled:active:scale-100"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none disabled:active:scale-100"
               >
                 {isClassifying ? (
                   <>

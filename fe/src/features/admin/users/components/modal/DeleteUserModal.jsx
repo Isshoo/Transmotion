@@ -52,7 +52,7 @@ export default function DeleteUserModal() {
           <button
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="rounded-xl bg-(--error) px-5 py-2.5 text-sm font-bold text-white shadow-(--shadow-md) transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-(--error) px-5 py-2.5 text-sm font-bold text-(--bg-base) shadow-(--shadow-md) transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Menghapus..." : "Ya, Hapus"}
           </button>

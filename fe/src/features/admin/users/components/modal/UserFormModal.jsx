@@ -254,7 +254,7 @@ export default function UserFormModal() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-bold text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-bold text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting
                 ? "Menyimpan..."
