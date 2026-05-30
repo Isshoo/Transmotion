@@ -9,6 +9,8 @@ const useModelStore = create((set, get) => ({
   totalPages: 0,
   page: 1,
   perPage: 15,
+  search: "",
+  datasetFilter: "",
   modelTypeFilter: "",
   isActiveFilter: "",
   sortBy: "created_at",
@@ -35,6 +37,8 @@ const useModelStore = create((set, get) => ({
     const {
       page,
       perPage,
+      search,
+      datasetFilter,
       modelTypeFilter,
       isActiveFilter,
       sortBy,
@@ -48,6 +52,8 @@ const useModelStore = create((set, get) => ({
         sort_by: sortBy,
         sort_order: sortOrder,
       };
+      if (search) params.search = search;
+      if (datasetFilter) params.dataset_id = datasetFilter;
       if (modelTypeFilter) params.model_type = modelTypeFilter;
       if (isActiveFilter !== "") params.is_active = isActiveFilter;
       const { data: res } = await modelsApi.getAll(params);
@@ -64,6 +70,14 @@ const useModelStore = create((set, get) => ({
 
   setPage: (page) => {
     set({ page });
+    get().fetchModels();
+  },
+  setSearch: (v) => {
+    set({ search: v, page: 1 });
+    get().fetchModels();
+  },
+  setDatasetFilter: (v) => {
+    set({ datasetFilter: v, page: 1 });
     get().fetchModels();
   },
   setModelTypeFilter: (v) => {

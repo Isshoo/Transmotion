@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BrainCircuit,
   Pencil,
@@ -10,10 +10,13 @@ import {
   CheckCircle,
   XCircle,
   Cpu,
+  Search,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/helpers/formatter";
 import useModelStore from "../store";
+import modelsApi from "../api";
 import ModelDetailModal from "./modal/ModelDetailModal";
 import EditModelModal from "./modal/EditModelModal";
 import DeleteConfirmModal from "./modal/EditConfirmModal";
@@ -31,9 +34,13 @@ export default function ModelTable() {
     modelTypeFilter,
     isActiveFilter,
     sortBy,
+    search,
+    datasetFilter,
     isLoading,
     fetchModels,
     setPage,
+    setSearch,
+    setDatasetFilter,
     setModelTypeFilter,
     setIsActiveFilter,
     setSortBy,
@@ -43,14 +50,35 @@ export default function ModelTable() {
   } = useModelStore();
 
   const [pendingToggleId, setPendingToggleId] = useState(null);
+  const [localSearch, setLocalSearch] = useState(search);
+  const [datasetOptions, setDatasetOptions] = useState([]);
+  const searchTimeout = useRef(null);
 
   useEffect(() => {
     fetchModels();
+    const loadDatasets = async () => {
+      try {
+        const { data } = await modelsApi.getEvaluationDatasets();
+        if (data.success) {
+          setDatasetOptions(data.data);
+        }
+      } catch (err) {
+        console.error("Gagal memuat dataset:", err);
+      }
+    };
+    loadDatasets();
     return () => {
       useModelStore.setState({ isLoading: true });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleSearchChange = (e) => {
+    const v = e.target.value;
+    setLocalSearch(v);
+    clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => setSearch(v), 400);
+  };
 
   const from = total === 0 ? 0 : (page - 1) * perPage + 1;
   const to = Math.min(page * perPage, total);
@@ -86,6 +114,44 @@ export default function ModelTable() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
+        <div className="relative min-w-[240px] flex-1 sm:max-w-xs">
+          <Search
+            size={14}
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-(--text-tertiary)"
+          />
+          <input
+            type="text"
+            value={localSearch}
+            onChange={handleSearchChange}
+            placeholder="Cari model..."
+            className="w-full rounded-lg border border-(--border-default) bg-(--bg-elevated) py-2 pr-8 pl-9 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+          />
+          {localSearch && (
+            <button
+              onClick={() => {
+                setLocalSearch("");
+                setSearch("");
+              }}
+              className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 text-(--text-tertiary) transition-colors hover:text-(--text-primary)"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
+        
+        <select
+          value={datasetFilter}
+          onChange={(e) => setDatasetFilter(e.target.value)}
+          className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+        >
+          <option value="">Semua Dataset</option>
+          {datasetOptions.map((ds) => (
+            <option key={ds.id} value={ds.id}>
+              {ds.name}
+            </option>
+          ))}
+        </select>
+
         <select
           value={modelTypeFilter}
           onChange={(e) => setModelTypeFilter(e.target.value)}

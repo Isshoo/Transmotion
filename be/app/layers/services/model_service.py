@@ -3,7 +3,7 @@
 import os
 import threading
 
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, or_
 
 from app.config.extensions import db
 from app.layers.models.prediction import Prediction
@@ -95,6 +95,8 @@ def get_model_by_id(model_id: str) -> TrainedModel:
 def get_all_models(
     page=1,
     per_page=20,
+    search=None,
+    dataset_id=None,
     model_type=None,
     is_active=None,
     is_public=None,
@@ -103,6 +105,17 @@ def get_all_models(
 ):
     query = db.session.query(TrainedModel)
 
+    if search:
+        term = f"%{search}%"
+        query = query.filter(
+            or_(TrainedModel.name.ilike(term), TrainedModel.description.ilike(term))
+        )
+    if dataset_id:
+        from app.layers.models.training_job import TrainingJob
+
+        query = query.join(TrainingJob, TrainedModel.job_id == TrainingJob.id).filter(
+            TrainingJob.dataset_id == dataset_id
+        )
     if model_type:
         query = query.filter(TrainedModel.model_type == model_type)
     if is_active is not None:
@@ -287,9 +300,9 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
     except http_requests.exceptions.Timeout:
         raise BadRequestError(
             "Inference timeout. Coba lagi — model mungkin sedang dimuat pertama kali."
-        )
+        ) from None
     except http_requests.exceptions.RequestException as e:
-        raise BadRequestError(f"Gagal menghubungi Colab: {e}")
+        raise BadRequestError(f"Gagal menghubungi Colab: {e}") from None
 
 
 def _classify_local(model_record, text: str) -> dict:

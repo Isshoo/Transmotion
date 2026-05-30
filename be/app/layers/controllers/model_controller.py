@@ -33,6 +33,8 @@ def list_models():
     models, total = model_service.get_all_models(
         page=params["page"],
         per_page=params["per_page"],
+        search=params.get("search"),
+        dataset_id=params.get("dataset_id"),
         model_type=params.get("model_type"),
         is_active=params.get("is_active"),
         is_public=params.get("is_public"),

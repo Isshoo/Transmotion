@@ -15,6 +15,8 @@ class ModelListQuerySchema(Schema):
     error_messages = {"unknown": "Kolom tidak dikenal"}
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+    search = fields.String(load_default=None, validate=validate.Length(max=100))
+    dataset_id = fields.String(load_default=None)
     model_type = fields.String(validate=validate.OneOf(["mbert", "xlmr"]))
     is_active = fields.Boolean()
     is_public = fields.Boolean()

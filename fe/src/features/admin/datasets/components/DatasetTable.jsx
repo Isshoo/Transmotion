@@ -117,159 +117,172 @@ export default function DatasetTable() {
         </select>
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-surface)">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-(--border-default)">
-                {[
-                  "Nama Dataset",
-                  "Baris (Raw)",
-                  "Baris (Preprocessed)",
-                  "Ukuran",
-                  "Status",
-                  "Diupload",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="bg-(--bg-elevated) px-4 py-3 text-left text-xs font-semibold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase"
-                  >
-                    {h}
-                  </th>
-                ))}
-                <th className="bg-(--bg-elevated) px-4 py-3 text-right text-xs font-semibold tracking-wider text-(--text-tertiary) uppercase">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-(--border-subtle)">
-              {isLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i}>
-                    <td className="px-4 py-3.5">
-                      <div className="h-3 w-40 animate-pulse rounded bg-(--bg-elevated)" />
-                    </td>
-                    {[...Array(5)].map((_, j) => (
-                      <td key={j} className="px-4 py-3.5">
-                        <div className="h-3 w-16 animate-pulse rounded bg-(--bg-elevated)" />
-                      </td>
-                    ))}
-                    <td className="px-4 py-3.5">
-                      <div className="ml-auto h-7 w-8 animate-pulse rounded bg-(--bg-elevated)" />
-                    </td>
-                  </tr>
-                ))
-              ) : datasets.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-16 text-center">
-                    <Database
-                      size={36}
-                      className="mx-auto mb-3 text-(--text-disabled)"
-                    />
-                    <p className="text-sm font-medium text-(--text-secondary)">
-                      Belum ada dataset
+      {/* Cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex h-[200px] flex-col justify-between rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)"
+            >
+              <div className="space-y-3">
+                <div className="h-5 w-2/3 animate-pulse rounded bg-(--bg-elevated)" />
+                <div className="h-3 w-1/2 animate-pulse rounded bg-(--bg-elevated)" />
+                <div className="h-3 w-1/3 animate-pulse rounded bg-(--bg-elevated)" />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="h-6 w-20 animate-pulse rounded-full bg-(--bg-elevated)" />
+                <div className="h-8 w-8 animate-pulse rounded-md bg-(--bg-elevated)" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : datasets.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface) px-4 py-20 text-center">
+          <Database size={40} className="mb-4 text-(--text-disabled)" />
+          <p className="text-base font-medium text-(--text-primary)">
+            Belum ada dataset
+          </p>
+          <p className="mt-1.5 text-sm text-(--text-tertiary)">
+            Klik &quot;Upload Dataset&quot; untuk mulai menambahkan dataset
+            baru.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {datasets.map((ds) => (
+            <div
+              key={ds.id}
+              onClick={() => router.push(`/admin/datasets/${ds.id}`)}
+              className="group relative flex cursor-pointer flex-col justify-between rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm) transition-all duration-200 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:shadow-(--shadow-md)"
+            >
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3
+                      title={ds.name}
+                      className="truncate text-base font-semibold tracking-tight text-(--text-primary) transition-colors group-hover:text-(--accent)"
+                    >
+                      {ds.name}
+                    </h3>
+                    <p
+                      title={ds.file_name}
+                      className="mt-1 truncate font-mono text-[11px] text-(--text-tertiary)"
+                    >
+                      {ds.file_name}
                     </p>
-                    <p className="mt-1 text-xs text-(--text-tertiary)">
-                      Klik &quot;Upload Dataset&quot; untuk mulai
-                    </p>
-                  </td>
-                </tr>
-              ) : (
-                datasets.map((ds) => (
-                  <tr
-                    key={ds.id}
-                    className="cursor-pointer transition-colors duration-100 hover:bg-(--bg-overlay)"
-                    onClick={() => router.push(`/admin/datasets/${ds.id}`)}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDeleteModal(ds);
+                    }}
+                    title="Hapus"
+                    className="shrink-0 rounded-md p-1.5 text-(--text-tertiary) opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-(--error-muted)/30 hover:text-(--error) focus:opacity-100"
                   >
-                    <td className="px-4 py-3.5">
-                      <p className="leading-tight font-medium text-(--text-primary)">
-                        {ds.name}
-                      </p>
-                      <p className="mt-0.5 font-mono text-xs text-(--text-tertiary)">
-                        {ds.file_name}
-                      </p>
-                      {ds.columns_configured && (
-                        <p className="mt-0.5 text-xs text-(--accent)">
-                          Teks: {ds.text_column} · Label: {ds.label_column}
-                        </p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3.5 text-(--text-secondary) tabular-nums">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+
+                {ds.columns_configured ? (
+                  <div className="inline-flex flex-wrap items-center gap-1.5 rounded-md border border-(--accent-muted) bg-(--accent-muted)/10 px-2 py-1 text-[11px]">
+                    <span className="font-medium text-(--text-secondary)">
+                      Teks:
+                    </span>
+                    <span className="font-semibold text-(--accent)">
+                      {ds.text_column}
+                    </span>
+                    <span className="mx-0.5 text-(--text-tertiary)">·</span>
+                    <span className="font-medium text-(--text-secondary)">
+                      Label:
+                    </span>
+                    <span className="font-semibold text-(--accent)">
+                      {ds.label_column}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="inline-flex rounded-md border border-(--warning-muted) bg-(--warning-muted)/10 px-2 py-1 text-[11px] font-medium text-(--warning)">
+                    Kolom belum diatur
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3">
+                  <div>
+                    <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+                      Row (Raw)
+                    </p>
+                    <p className="mt-0.5 text-sm font-medium text-(--text-primary)">
                       {ds.num_rows_raw !== null
                         ? ds.num_rows_raw.toLocaleString("id")
                         : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 text-(--text-secondary) tabular-nums">
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
+                      Row (Prep)
+                    </p>
+                    <p className="mt-0.5 text-sm font-medium text-(--text-primary)">
                       {ds.num_rows_preprocessed !== null
                         ? ds.num_rows_preprocessed.toLocaleString("id")
                         : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 text-xs text-(--text-secondary)">
-                      <SizeLabel bytes={ds.file_size} />
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <PreprocessBadge status={ds.preprocessing_status} />
-                    </td>
-                    <td className="px-4 py-3.5 text-xs text-(--text-tertiary)">
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 flex items-center justify-between border-t border-(--border-subtle) pt-4">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <PreprocessBadge status={ds.preprocessing_status} />
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] text-(--text-tertiary)">
+                    <SizeLabel bytes={ds.file_size} />
+                    <span>•</span>
+                    <span>
                       {ds.created_at
                         ? formatDate(ds.created_at, "dd MMM yyyy")
                         : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openDeleteModal(ds);
-                        }}
-                        title="Hapus"
-                        className="rounded-md p-1.5 text-(--text-tertiary) transition-all duration-150 hover:bg-(--error-muted) hover:text-(--error)"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {!isLoading && total > 0 && (
-          <div className="flex items-center justify-between border-t border-(--border-subtle) bg-(--bg-surface) px-4 py-3">
-            <p className="text-xs text-(--text-tertiary)">
-              Menampilkan{" "}
-              <span className="font-medium text-(--text-secondary)">
-                {from}–{to}
-              </span>{" "}
-              dari{" "}
-              <span className="font-medium text-(--text-secondary)">
-                {total}
-              </span>{" "}
-              dataset
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setPage(page - 1)}
-                disabled={page <= 1}
-                className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                <ChevronLeft size={13} />
-              </button>
-              <span className="min-w-12 text-center text-xs text-(--text-tertiary)">
-                {page} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage(page + 1)}
-                disabled={page >= totalPages}
-                className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                <ChevronRight size={13} />
-              </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && total > 0 && (
+        <div className="flex items-center justify-between rounded-lg border border-(--border-default) bg-(--bg-surface) px-4 py-3">
+          <p className="text-xs text-(--text-tertiary)">
+            Menampilkan{" "}
+            <span className="font-medium text-(--text-secondary)">
+              {from}–{to}
+            </span>{" "}
+            dari{" "}
+            <span className="font-medium text-(--text-secondary)">{total}</span>{" "}
+            dataset
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page <= 1}
+              className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <ChevronLeft size={13} />
+            </button>
+            <span className="min-w-12 text-center text-xs text-(--text-tertiary)">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={page >= totalPages}
+              className="flex h-7 w-7 items-center justify-center rounded-md border border-(--border-default) text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <ChevronRight size={13} />
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <DatasetUploadModal />
       <DeleteConfirmModal />

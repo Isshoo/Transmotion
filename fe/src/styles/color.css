@@ -57,8 +57,8 @@
   --bg-elevated: #f5f5f5;
   --bg-overlay: #e5e5e5;
 
-  --border-subtle: rgba(0, 0, 0, 0.03);
-  --border-default: rgba(0, 0, 0, 0.06);
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.09);
   --border-strong: rgba(0, 0, 0, 0.12);
 
   /* Text */
