@@ -17,6 +17,7 @@ import {
   Star,
   BarChart3,
   LayoutDashboard,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import dashboardApi from "./api";
@@ -52,7 +53,44 @@ export default function DashboardPage() {
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="animate-fade-in space-y-6 pb-5">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+              <LayoutDashboard size={20} className="text-(--accent)" />
+              Overview
+            </h1>
+            <p className="mt-1 text-sm text-(--text-secondary)">
+              Ringkasan aktivitas dan metrik sistem Transmotion.
+            </p>
+          </div>
+          <div className="flex w-48 items-center gap-3">
+            <ColabStatusBadge />
+          </div>
+        </div>
+
+        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-red-500/20 bg-red-500/5 p-8 text-center">
+          <div className="mb-4 rounded-full bg-red-500/10 p-4 text-red-500">
+            <AlertCircle size={40} />
+          </div>
+          <h3 className="mb-2 text-xl font-semibold text-(--text-primary)">
+            Gagal Memuat Dashboard
+          </h3>
+          <p className="max-w-md text-sm text-(--text-secondary)">
+            Tidak dapat memuat data statistik. Hal ini mungkin terjadi karena backend tidak merespons atau adanya kendala jaringan.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-6 flex items-center gap-2 rounded-lg bg-(--accent) px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-opacity-90 active:scale-95"
+          >
+            Coba Muat Ulang
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const {
     model_comparison,
