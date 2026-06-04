@@ -26,7 +26,7 @@ class CreateTrainingJobSchema(Schema):
     )
     val_size = fields.Float(
         load_default=0.1,
-        validate=validate.Range(min=0.05, max=0.3),
+        validate=validate.Range(min=0.05, max=0.1),
     )
 
     # Hyperparameters
@@ -71,7 +71,7 @@ class SplitPreviewSchema(Schema):
     )
     val_size = fields.Float(
         load_default=0.1,
-        validate=validate.Range(min=0.05, max=0.3),
+        validate=validate.Range(min=0.05, max=0.1),
     )
 
 

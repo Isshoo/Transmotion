@@ -60,6 +60,7 @@ export default function CreateJobModal() {
   // Form
   const [datasetId, setDatasetId] = useState("");
   const [testSize, setTestSize] = useState(0.2);
+  const [valSize, setValSize] = useState(0.1);
   const [modelType, setModelType] = useState("mbert");
   const [jobName, setJobName] = useState("");
   const [hp, setHp] = useState(DEFAULT_HYPERPARAMS);
@@ -81,10 +82,10 @@ export default function CreateJobModal() {
       return;
     }
     previewTimeout.current = setTimeout(() => {
-      fetchSplitPreview(datasetId, testSize);
+      fetchSplitPreview(datasetId, testSize, valSize);
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [datasetId, testSize]);
+  }, [datasetId, testSize, valSize]);
 
   const fetchReadyDatasets = async () => {
     setIsLoadingDatasets(true);
@@ -111,6 +112,7 @@ export default function CreateJobModal() {
     setStep(1);
     setDatasetId("");
     setTestSize(0.2);
+    setValSize(0.1);
     setModelType("mbert");
     setJobName("");
     setHp(DEFAULT_HYPERPARAMS);
@@ -123,6 +125,7 @@ export default function CreateJobModal() {
       dataset_id: datasetId,
       model_type: modelType,
       test_size: testSize,
+      val_size: valSize,
       job_name: jobName.trim() || undefined,
       ...hp,
     };
@@ -306,6 +309,36 @@ export default function CreateJobModal() {
                   <div className="mt-1.5 flex justify-between text-[10px] font-medium text-(--text-tertiary)">
                     <span>5%</span>
                     <span>40%</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Val size slider */}
+              {datasetId && (
+                <div className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-xs font-medium text-(--text-secondary)">
+                      Ukuran Validation Set
+                    </label>
+                    <span className="text-[11px] font-semibold tracking-wide text-(--accent) uppercase">
+                      <span className="text-(--warning)">
+                        {Math.round(valSize * 100)}%
+                      </span>{" "}
+                      val
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="5"
+                    max="10"
+                    step="1"
+                    value={Math.round(valSize * 100)}
+                    onChange={(e) => setValSize(e.target.value / 100)}
+                    className="mt-1 w-full cursor-pointer accent-(--accent)"
+                  />
+                  <div className="mt-1.5 flex justify-between text-[10px] font-medium text-(--text-tertiary)">
+                    <span>5%</span>
+                    <span>10%</span>
                   </div>
                 </div>
               )}
