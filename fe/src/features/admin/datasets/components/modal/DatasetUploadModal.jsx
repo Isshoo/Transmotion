@@ -50,9 +50,9 @@ export default function DatasetUploadModal() {
         setPreviewError(
           `Dataset harus memiliki minimal 2 kolom (ditemukan ${result.columnCount} kolom)`
         );
-      } else if (result.rowCount < 1400) {
+      } else if (result.rowCount < 1500) {
         setPreviewError(
-          `Dataset harus memiliki minimal 1400 baris (ditemukan ${result.rowCount} baris). Catatan: file besar mungkin dibaca sebagian untuk preview.`
+          `Dataset harus memiliki minimal 1500 baris (ditemukan ${result.rowCount} baris). Catatan: file besar mungkin dibaca sebagian untuk preview.`
         );
       }
     } catch {
@@ -228,7 +228,7 @@ export default function DatasetUploadModal() {
                   </span>
                 </p>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
-                  CSV, XLS, atau XLSX — minimal 1400 baris, 2 kolom. Nama
+                  CSV, XLS, atau XLSX — minimal 1500 baris, 2 kolom. Nama
                   dataset harus unik.
                 </p>
               </div>

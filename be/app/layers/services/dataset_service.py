@@ -20,7 +20,7 @@ from app.utils.logger import logger
 DATASET_DIR = os.path.join(
     os.path.dirname(__file__), "..", "..", "storage", "uploads", "datasets"
 )
-MIN_ROWS = 1400
+MIN_ROWS = 1500
 MIN_COLS = 2
 
 

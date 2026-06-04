@@ -13,8 +13,8 @@ from app.layers.services.sse_service import sse_manager
 from app.utils.exceptions import BadRequestError, NotFoundError
 from app.utils.logger import logger
 
-MIN_SAMPLES_PER_CLASS = 200
-MIN_TOTAL_TRAIN = 1400
+MIN_SAMPLES_PER_CLASS = 100
+MIN_TOTAL_TRAIN = 700
 
 
 def get_by_id(job_id: str) -> TrainingJob:
