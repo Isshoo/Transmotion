@@ -50,9 +50,9 @@ export default function DatasetUploadModal() {
         setPreviewError(
           `Dataset harus memiliki minimal 2 kolom (ditemukan ${result.columnCount} kolom)`
         );
-      } else if (result.rowCount < 100) {
+      } else if (result.rowCount < 1400) {
         setPreviewError(
-          `Dataset harus memiliki minimal 100 baris (ditemukan ${result.rowCount} baris). Catatan: file besar mungkin dibaca sebagian untuk preview.`
+          `Dataset harus memiliki minimal 1400 baris (ditemukan ${result.rowCount} baris). Catatan: file besar mungkin dibaca sebagian untuk preview.`
         );
       }
     } catch {
