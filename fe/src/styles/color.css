@@ -1,23 +1,23 @@
 /* ── Color Palette & Variables — Dark Mode (Monochrome + Muted Data) ─── */
 :root {
-  /* Background hierarchy — Tetap Pure Pitch Black & Ink Dark */
+  /* Background hierarchy */
   --bg-base: #000000;
   --bg-surface: #0a0a0a;
   --bg-elevated: #171717;
   --bg-overlay: #262626;
 
-  /* Border — Garis tipis khas monokrom */
+  /* Border */
   --border-subtle: rgba(255, 255, 255, 0.04);
   --border-default: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.16);
 
-  /* Text — Kontras tinggi untuk pembacaan teks */
+  /* Text */
   --text-primary: #ffffff;
   --text-secondary: #a3a3a3;
   --text-tertiary: #737373;
   --text-disabled: #404040;
 
-  /* Shadow — Clean & Deep */
+  /* Shadow */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.8);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.9);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 1);
@@ -29,27 +29,27 @@
   --accent-muted: rgba(255, 255, 255, 0.1);
   --accent-border: rgba(255, 255, 255, 0.3);
 
-  /* Semantic — Menggunakan rona matte/redup agar matching dengan base hitam */
-  --success: #4cc38a; /* Sage / Emerald redup */
+  /* Semantic */
+  --success: #4cc38a;
   --success-muted: rgba(76, 195, 138, 0.1);
-  --warning: #e0a95c; /* Ochre / Amber hangat redup */
+  --warning: #e0a95c;
   --warning-muted: rgba(224, 169, 92, 0.1);
-  --error: #e05c5c; /* Muted Crimson / Coral */
+  --error: #e05c5c;
   --error-muted: rgba(224, 92, 92, 0.1);
-  --info: #5ca3e0; /* Slate Blue profesional */
+  --info: #5ca3e0;
   --info-muted: rgba(92, 163, 224, 0.1);
 
-  /* Data colors — Dipetakan untuk Sentimen/Emosi dengan warna *desaturated* */
-  --data-1: #4cc38a; /* Positif / Joy (Sage) */
-  --data-2: #5cbdae; /* Subtle Positif / Trust (Muted Teal) */
-  --data-3: #5ca3e0; /* Netral / Sadness (Slate Blue) */
-  --data-4: #8b80df; /* Surprise / Fear (Muted Lavender) */
-  --data-5: #e05c5c; /* Negatif / Anger (Muted Crimson) */
-  --data-6: #e0a95c; /* Disgust / Warning (Muted Amber) */
-  --data-7: #737373; /* Undefined Token Base (Grayscale) */
+  /* Data colors */
+  --data-1: #4cc38a;
+  --data-2: #5cbdae;
+  --data-3: #5ca3e0;
+  --data-4: #8b80df;
+  --data-5: #e05c5c;
+  --data-6: #e0a95c;
+  --data-7: #737373;
 }
 
-/* ── Light Mode ─────────────────────────────────────────────── */
+/* ── Light Mode ─────────────────── */
 :root[data-theme="light"] {
   /* Background hierarchy — Pure Paper White */
   --bg-base: #ffffff;
@@ -57,9 +57,10 @@
   --bg-elevated: #f5f5f5;
   --bg-overlay: #e5e5e5;
 
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-default: rgba(0, 0, 0, 0.09);
-  --border-strong: rgba(0, 0, 0, 0.12);
+  /* Border */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-default: rgba(0, 0, 0, 0.16);
+  --border-strong: rgba(0, 0, 0, 0.28);
 
   /* Text */
   --text-primary: #000000;
@@ -68,10 +69,10 @@
   --text-disabled: #a3a3a3;
 
   /* Shadow */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --shadow-accent: 0 0 20px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.16);
+  --shadow-accent: 0 0 20px rgba(0, 0, 0, 0.06);
 
   /* Accent — Pure High-Contrast Black */
   --accent: #000000;
@@ -79,7 +80,7 @@
   --accent-muted: rgba(0, 0, 0, 0.05);
   --accent-border: rgba(0, 0, 0, 0.3);
 
-  /* Semantic — Versi sedikit lebih solid untuk background putih */
+  /* Semantic */
   --success: #1e7e48;
   --success-muted: rgba(30, 126, 72, 0.08);
   --warning: #b47b18;
@@ -89,7 +90,7 @@
   --info: #2261b3;
   --info-muted: rgba(34, 97, 179, 0.08);
 
-  /* Data colors — Disesuaikan kontrasnya untuk Light Mode agar tidak pudar */
+  /* Data colors */
   --data-1: #1e7e48;
   --data-2: #218274;
   --data-3: #2261b3;
