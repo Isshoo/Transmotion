@@ -228,7 +228,8 @@ export default function DatasetUploadModal() {
                   </span>
                 </p>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
-                  CSV, XLS, atau XLSX — minimal 100 baris, 2 kolom
+                  CSV, XLS, atau XLSX — minimal 1400 baris, 2 kolom. Nama
+                  dataset harus unik.
                 </p>
               </div>
             ) : (

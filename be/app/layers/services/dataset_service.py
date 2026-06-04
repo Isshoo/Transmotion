@@ -20,7 +20,7 @@ from app.utils.logger import logger
 DATASET_DIR = os.path.join(
     os.path.dirname(__file__), "..", "..", "storage", "uploads", "datasets"
 )
-MIN_ROWS = 100
+MIN_ROWS = 1400
 MIN_COLS = 2
 
 
@@ -140,6 +140,13 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
     ext = os.path.splitext(filename)[1].lower()
     if ext not in (".csv", ".tsv", ".txt", ".xls", ".xlsx"):
         raise BadRequestError("Format file harus CSV, TSV, TXT, XLS, atau XLSX")
+
+    # Validasi nama dataset unik
+    existing = db.session.query(Dataset).filter(Dataset.name == name).first()
+    if existing:
+        raise BadRequestError(
+            f"Dataset dengan nama '{name}' sudah ada. Gunakan nama yang berbeda."
+        )
 
     unique_name = f"{_uuid.uuid4().hex}{ext}"
     file_path = os.path.join(DATASET_DIR, unique_name)
@@ -455,6 +462,22 @@ def get_preprocessed_data(
     return rows, total
 
 
+def _validate_preprocessed_text(text: str) -> list[str]:
+    """Validasi teks preprocessed tidak mengandung elemen noise."""
+    violations = []
+    if re.search(r"https?://\S+|www\.\S+", text):
+        violations.append("URL")
+    if re.search(r"\S+@\S+\.\S+", text):
+        violations.append("email")
+    if re.search(r"@[\w_]+", text):
+        violations.append("mention (@)")
+    if re.search(r"#[\w]+", text):
+        violations.append("hashtag (#)")
+    if re.search(r"<[^>]+>", text):
+        violations.append("tag HTML")
+    return violations
+
+
 def add_preprocessed_row(
     dataset_id: str, raw_text: str, preprocessed_text: str, label: str
 ) -> PreprocessedRow:
@@ -483,6 +506,13 @@ def add_preprocessed_row(
     cleaned = preprocessed_text.strip()
     if not cleaned:
         raise BadRequestError("Teks terpreproses tidak boleh kosong")
+
+    # Validasi noise
+    violations = _validate_preprocessed_text(cleaned)
+    if violations:
+        raise BadRequestError(
+            f"Teks terpreproses mengandung elemen yang tidak valid: {', '.join(violations)}"
+        )
 
     row = PreprocessedRow(
         dataset_id=dataset_id,
@@ -520,6 +550,14 @@ def update_preprocessed_row(
         cleaned = preprocessed_text.strip()
         if not cleaned:
             raise BadRequestError("Teks terpreproses tidak boleh kosong")
+
+        # Validasi noise
+        violations = _validate_preprocessed_text(cleaned)
+        if violations:
+            raise BadRequestError(
+                f"Teks terpreproses mengandung elemen yang tidak valid: {', '.join(violations)}"
+            )
+
         effective_label = label if (label is not None) else old_label
         dup = (
             db.session.query(PreprocessedRow)
