@@ -2,9 +2,9 @@ import { bestModel } from "../ui/Helpers";
 import InfoPopup from "@/components/ui/InfoPopup";
 import { PER_CLASS_COMPARISON_INFO } from "@/components/ui/InfoContents";
 
-export default function PerClassComparison({ mbert, xlmr }) {
-  const bMbert = bestModel(mbert);
-  const bXlmr = bestModel(xlmr);
+export default function PerClassComparison({ mbert, xlmr, metric }) {
+  const bMbert = bestModel(mbert, metric);
+  const bXlmr = bestModel(xlmr, metric);
 
   const mbertPc = bMbert?.per_class_metrics;
   const xlmrPc = bXlmr?.per_class_metrics;

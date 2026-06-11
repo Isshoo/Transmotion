@@ -1,5 +1,5 @@
 import { MetricCell } from "../ui/Cell";
-import { findModelsBySplit, fmtPct } from "../ui/Helpers";
+import { findModelsBySplit, fmt } from "../ui/Helpers";
 import { useRouter } from "next/navigation";
 
 const SPLITS = [
@@ -9,7 +9,12 @@ const SPLITS = [
   { label: "90:10", testSize: 0.1 },
 ];
 
-export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
+export default function IterationTable({
+  mbert,
+  xlmr,
+  metric = "accuracy",
+  raw = false,
+}) {
   const router = useRouter();
   const maxIter = SPLITS.reduce((acc, s) => {
     const xlmrCount = findModelsBySplit(xlmr, s.testSize).length;
@@ -101,6 +106,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                       }
                       onClick={handleClick}
                       cursor={m ? "pointer" : "default"}
+                      raw={raw}
                     />
                   );
                 })}
@@ -120,6 +126,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                       }
                       onClick={handleClick}
                       cursor={m ? "pointer" : "default"}
+                      raw={raw}
                     />
                   );
                 })}
@@ -138,7 +145,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                     key={`xlmr-avg-${s.label}`}
                     className="border-r border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[11px] font-bold text-(--accent)"
                   >
-                    {fmtPct(avg)}
+                    {fmt(avg, raw)}
                   </td>
                 );
               })}
@@ -149,7 +156,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                     key={`mbert-avg-${s.label}`}
                     className={`${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[11px] font-bold text-(--accent)`}
                   >
-                    {fmtPct(avg)}
+                    {fmt(avg, raw)}
                   </td>
                 );
               })}

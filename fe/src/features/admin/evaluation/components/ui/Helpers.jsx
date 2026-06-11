@@ -18,10 +18,10 @@ export function fmt(val, raw) {
   return raw ? val.toFixed(4) : `${(val * 100).toFixed(2)}%`;
 }
 
-export function bestModel(models) {
+export function bestModel(models, metric = "accuracy") {
   if (!models || models.length === 0) return null;
   return models.reduce(
-    (best, m) => (!best || (m.accuracy ?? 0) > (best.accuracy ?? 0) ? m : best),
+    (best, m) => (!best || (m[metric] ?? 0) > (best[metric] ?? 0) ? m : best),
     null
   );
 }

@@ -125,9 +125,9 @@ export default function EvaluationPage() {
             {/* Header dataset */}
             <div className="flex items-center gap-4">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-(--border-strong) to-(--border-strong)" />
-              <h2 className="rounded-full border border-(--border-default) bg-(--bg-surface) px-5 py-2 text-xs font-black tracking-widest text-(--text-primary) uppercase shadow-(--shadow-sm)">
+              {/* <h2 className="rounded-full border border-(--border-default) bg-(--bg-surface) px-5 py-2 text-xs font-black tracking-widest text-(--text-primary) uppercase shadow-(--shadow-sm)">
                 {group.dataset_name}
-              </h2>
+              </h2> */}
               <div className="h-px flex-1 bg-linear-to-l from-transparent via-(--border-strong) to-(--border-strong)" />
             </div>
 

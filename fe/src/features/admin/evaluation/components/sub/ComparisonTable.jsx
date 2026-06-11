@@ -1,8 +1,8 @@
 import { bestModel, fmt } from "../ui/Helpers";
 
-export default function ComparisonTable({ mbert, xlmr }) {
-  const bMbert = bestModel(mbert);
-  const bXlmr = bestModel(xlmr);
+export default function ComparisonTable({ mbert, xlmr, metric, metricLabel }) {
+  const bMbert = bestModel(mbert, metric);
+  const bXlmr = bestModel(xlmr, metric);
 
   const rows = [
     { label: "Accuracy", xlmrVal: bXlmr?.accuracy, mbertVal: bMbert?.accuracy },
@@ -127,7 +127,7 @@ export default function ComparisonTable({ mbert, xlmr }) {
         <p className="text-[11px] leading-relaxed text-(--text-tertiary)">
           <strong className="text-(--success)">▲ / ✓</strong> indicates a better
           value. The best model is selected based on the highest{" "}
-          <strong className="text-(--text-secondary)">Accuracy</strong>.
+          <strong className="text-(--text-secondary)">{metricLabel}</strong>.
           <br />
           <strong className="text-(--text-secondary)">Mean Std:</strong> average
           standard deviation of confidence scores (lower = more confident).

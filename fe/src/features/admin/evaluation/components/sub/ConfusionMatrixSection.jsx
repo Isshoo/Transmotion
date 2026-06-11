@@ -1,10 +1,17 @@
+import { bestModel } from "../ui/Helpers";
 import ConfusionMatrix from "@/features/admin/training/components/ConfusionMatrix";
 import InfoPopup from "@/components/ui/InfoPopup";
 import { CONFUSION_MATRIX_COMPARISON_INFO } from "@/components/ui/InfoContents";
 
-export default function ConfusionMatrixSection({ mbert, xlmr }) {
-  const bMbert = mbert.find((m) => m.confusion_matrix);
-  const bXlmr = xlmr.find((m) => m.confusion_matrix);
+export default function ConfusionMatrixSection({ mbert, xlmr, metric }) {
+  const bMbert = bestModel(
+    mbert.filter((m) => m.confusion_matrix),
+    metric
+  );
+  const bXlmr = bestModel(
+    xlmr.filter((m) => m.confusion_matrix),
+    metric
+  );
 
   if (!bMbert && !bXlmr) return null;
 
