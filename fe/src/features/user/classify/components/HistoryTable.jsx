@@ -11,13 +11,31 @@ export default function HistoryTable() {
     historyPerPage,
     isLoadingHistory,
     setHistoryPage,
+    selectedModelId,
   } = useClassifyStore();
 
   const totalPages = Math.ceil(historyTotal / historyPerPage);
   const from = historyTotal === 0 ? 0 : (historyPage - 1) * historyPerPage + 1;
   const to = Math.min(historyPage * historyPerPage, historyTotal);
 
-  if (!isLoadingHistory && historyTotal === 0) {
+  // If no model is selected, show empty state
+  if (selectedModelId === "") {
+    return (
+      <div className="animate-fade-in flex flex-col items-center justify-center py-12 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
+          <History size={32} className="text-(--text-tertiary)" />
+        </div>
+        <p className="text-base font-bold text-(--text-secondary)">
+          No model selected
+        </p>
+        <p className="mt-1.5 text-sm text-(--text-tertiary)">
+          Please select a model to view classification history
+        </p>
+      </div>
+    );
+  }
+
+  if (!isLoadingHistory && historyTotal === 0 && selectedModelId) {
     return (
       <div className="animate-fade-in flex flex-col items-center justify-center py-12 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
