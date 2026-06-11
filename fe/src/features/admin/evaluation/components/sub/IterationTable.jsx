@@ -41,7 +41,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                 rowSpan={2}
                 className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
               >
-                ITERASI
+                ITERATION
               </th>
               <th
                 colSpan={4}

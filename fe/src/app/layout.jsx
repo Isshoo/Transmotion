@@ -14,12 +14,12 @@ export const metadata = {
     default: "Transmotion",
   },
   description:
-    "Transmotion App - Website deteksi emosi berbasis teks menggunakan model transformer",
+    "Transmotion - Multilingual text classification platform using transformer models",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${oxygen.className}`}>
         <Providers>{children}</Providers>
       </body>

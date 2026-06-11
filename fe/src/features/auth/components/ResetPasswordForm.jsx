@@ -28,12 +28,12 @@ function ResetPasswordContent() {
     setError(null);
 
     if (form.password !== form.confirmPassword) {
-      setError("Password baru dan konfirmasi tidak cocok.");
+      setError("New password and confirmation do not match.");
       return;
     }
 
     if (form.password.length < 8) {
-      setError("Password minimal 8 karakter.");
+      setError("Password must be at least 8 characters.");
       return;
     }
 
@@ -50,45 +50,43 @@ function ResetPasswordContent() {
     }
   };
 
-  // Kalau tidak ada token di URL, tampilkan pesan error
+  // If there is no token in the URL, show an error message
   if (!token) {
     return (
       <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--error-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
         <div className="mb-4 text-5xl">❌</div>
         <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
-          Link Tidak Valid
+          Invalid Link
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
-          Link reset password tidak valid atau sudah kadaluarsa. Silakan minta
-          link baru.
+          The password reset link is invalid or has expired. Please request a new link.
         </p>
         <Link
           href="/forgot-password"
           className="inline-block rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
-          Minta Link Baru
+          Request New Link
         </Link>
       </div>
     );
   }
 
-  // Tampilan sukses
+  // Success view
   if (success) {
     return (
       <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--success-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
         <div className="mb-4 text-5xl">✅</div>
         <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
-          Password Berhasil Direset!
+          Password Successfully Reset!
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
-          Password kamu sudah berhasil diubah. Silakan login dengan password
-          baru kamu.
+          Your password has been successfully changed. Please login with your new password.
         </p>
         <button
           onClick={() => router.push("/login")}
           className="w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
-          Masuk Sekarang
+          Login Now
         </button>
       </div>
     );
@@ -100,7 +98,7 @@ function ResetPasswordContent() {
         Reset Password
       </h1>
       <p className="mb-6 text-sm font-medium text-(--text-secondary)">
-        Masukkan password baru kamu di bawah ini.
+        Enter your new password below.
       </p>
 
       {error && (
@@ -112,7 +110,7 @@ function ResetPasswordContent() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Password Baru
+            New Password
           </label>
           <input
             type="password"
@@ -125,13 +123,13 @@ function ResetPasswordContent() {
             className="w-full rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           <p className="mt-2 text-[10px] font-bold tracking-wide text-(--text-tertiary)">
-            Minimal 8 karakter
+            Minimum 8 characters
           </p>
         </div>
 
         <div>
           <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Konfirmasi Password Baru
+            Confirm New Password
           </label>
           <input
             type="password"
@@ -152,7 +150,7 @@ function ResetPasswordContent() {
           disabled={isLoading}
           className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isLoading ? "Menyimpan..." : "Reset Password"}
+          {isLoading ? "Saving..." : "Reset Password"}
         </button>
       </form>
 
@@ -161,28 +159,28 @@ function ResetPasswordContent() {
           href="/login"
           className="text-sm font-bold tracking-wide text-(--text-secondary) transition-colors hover:text-(--accent) hover:underline"
         >
-          ← Kembali ke halaman masuk
+          ← Back to login
         </Link>
       </p>
     </div>
   );
 }
 
-// Komponen indikator kekuatan password
+// Password strength indicator component
 function PasswordStrength({ password }) {
   const checks = [
-    { label: "Minimal 8 karakter", pass: password.length >= 8 },
-    { label: "Mengandung huruf besar", pass: /[A-Z]/.test(password) },
-    { label: "Mengandung angka", pass: /[0-9]/.test(password) },
+    { label: "Minimum 8 characters", pass: password.length >= 8 },
+    { label: "Contains uppercase letter", pass: /[A-Z]/.test(password) },
+    { label: "Contains number", pass: /[0-9]/.test(password) },
     {
-      label: "Mengandung karakter khusus",
+      label: "Contains special character",
       pass: /[^A-Za-z0-9]/.test(password),
     },
   ];
 
   const passed = checks.filter((c) => c.pass).length;
 
-  const strengthLabel = ["", "Lemah", "Cukup", "Baik", "Kuat"][passed];
+  const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"][passed];
   const strengthColor = [
     "",
     "bg-(--error) shadow-(--shadow-sm)",
@@ -205,7 +203,7 @@ function PasswordStrength({ password }) {
 
       {/* Label */}
       <p className="text-[11px] font-bold tracking-wide text-(--text-tertiary) uppercase">
-        Kekuatan password:{" "}
+        Password strength:{" "}
         <span
           className={`ml-1 font-black ${
             passed <= 1
@@ -246,7 +244,7 @@ export default function ResetPasswordForm() {
     <Suspense
       fallback={
         <div className="mx-auto mt-10 w-full max-w-md animate-pulse rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
-          <p className="text-sm font-bold text-(--text-tertiary)">Memuat...</p>
+          <p className="text-sm font-bold text-(--text-tertiary)">Loading...</p>
         </div>
       }
     >

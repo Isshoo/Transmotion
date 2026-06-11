@@ -58,11 +58,11 @@ export default function DatasetSection({ group }) {
       <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
         <div className="mb-5">
           <p className="text-sm font-bold tracking-tight text-(--text-primary)">
-            Tabel Iterasi — Accuracy
+            Iteration Table — Accuracy
           </p>
           <p className="mt-1 text-xs font-medium text-(--text-secondary)">
-            Setiap baris = iterasi training ke-N dengan split yang sama.
-            Rata-rata dihitung dari semua iterasi per kolom.
+            Each row = training iteration N with the same split.
+            The average is calculated from all iterations per column.
           </p>
         </div>
         <IterationTable mbert={mbert} xlmr={xlmr} metric="accuracy" />
@@ -72,11 +72,10 @@ export default function DatasetSection({ group }) {
       <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
         <div className="mb-5">
           <p className="text-sm font-bold tracking-tight text-(--text-primary)">
-            Perbandingan Metrik — Model Terbaik
+            Metric Comparison — Best Model
           </p>
           <p className="mt-1 text-xs font-medium text-(--text-secondary)">
-            Dibandingkan dari model dengan Accuracy tertinggi masing-masing
-            tipe.
+            Compared from the model with the highest Accuracy of each type.
           </p>
         </div>
         <ComparisonTable mbert={mbert} xlmr={xlmr} />

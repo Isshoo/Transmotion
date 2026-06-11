@@ -5,22 +5,22 @@ import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
 export function PreprocessStatusBadge({ status }) {
   const map = {
     idle: {
-      label: "Belum diproses",
+      label: "Unprocessed",
       cls: "bg-(--bg-elevated) text-(--text-tertiary)",
       icon: Clock,
     },
     running: {
-      label: "Sedang memproses",
+      label: "Processing",
       cls: "bg-(--warning-muted) text-(--warning)",
       icon: Loader2,
     },
     completed: {
-      label: "Selesai",
+      label: "Completed",
       cls: "bg-(--success-muted) text-(--success)",
       icon: CheckCircle,
     },
     error: {
-      label: "Gagal",
+      label: "Failed",
       cls: "bg-(--error-muted) text-(--error)",
       icon: AlertCircle,
     },
@@ -44,9 +44,9 @@ export function PreprocessBadge({ status }) {
     error: "bg-(--error-muted) text-(--error)",
   };
   const PREPROCESS_LABEL = {
-    idle: "Belum diproses",
-    running: "Memproses...",
-    completed: "Siap training",
+    idle: "Unprocessed",
+    running: "Processing...",
+    completed: "Ready for training",
     error: "Error",
   };
   return (

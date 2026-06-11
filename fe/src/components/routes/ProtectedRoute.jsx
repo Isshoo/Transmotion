@@ -33,7 +33,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
       <div className="flex min-h-screen items-center justify-center bg-(--bg-base)">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={24} className="animate-spin text-(--accent)" />
-          <p className="text-xs text-(--text-disabled)">Memuat...</p>
+          <p className="text-xs text-(--text-disabled)">Loading...</p>
         </div>
       </div>
     );
@@ -46,7 +46,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
         <div className="flex flex-col items-center gap-2">
           <Loader2 size={20} className="animate-spin text-(--text-tertiary)" />
           <p className="animate-pulse text-xs text-(--text-tertiary)">
-            Mengalihkan ke halaman login...
+            Redirecting to login page...
           </p>
         </div>
       </div>
@@ -63,17 +63,17 @@ export default function ProtectedRoute({ children, requiredRole }) {
           </div>
           <div>
             <p className="text-sm font-medium text-(--text-primary)">
-              Akses Ditolak
+              Access Denied
             </p>
             <p className="mt-1 text-xs text-(--text-tertiary)">
-              Anda tidak memiliki akses ke halaman ini.
+              You do not have permission to access this page.
             </p>
           </div>
           <Link
             href={user?.role === "admin" ? "/admin" : "/"}
             className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) px-4 py-2 text-xs font-medium text-(--text-secondary) transition-all hover:border-(--accent) hover:bg-(--accent-muted) hover:text-(--accent)"
           >
-            Kembali ke halaman utama
+            Back to home
           </Link>
         </div>
       </div>

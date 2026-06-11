@@ -69,11 +69,11 @@ export default function ClassifyForm() {
     if (!file) return;
     const ext = file.name.split(".").pop().toLowerCase();
     if (!["csv", "tsv", "txt", "xlsx", "xls"].includes(ext)) {
-      toast.error("Format harus CSV, TSV, TXT, XLSX, atau XLS");
+      toast.error("Format must be CSV, TSV, TXT, XLSX, or XLS");
       return;
     }
     await setCsvFile(file);
-    toast.success(`${file.name} dimuat`);
+    toast.success(`${file.name} loaded`);
   };
 
   const canClassify =
@@ -96,10 +96,10 @@ export default function ClassifyForm() {
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <BrainCircuit size={20} className="text-(--accent)" />
-            Klasifikasi
+            Classification
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Uji model dengan teks tunggal atau batch dari file CSV / Excel
+            Test models with a single text or a batch from a CSV / Excel file
           </p>
         </div>
         <button
@@ -107,18 +107,18 @@ export default function ClassifyForm() {
           className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-surface) px-4 py-2 text-sm font-bold text-(--text-primary) shadow-(--shadow-sm) transition hover:border-(--border-strong) hover:bg-(--bg-elevated) active:scale-[0.98]"
         >
           <History size={16} className="text-(--text-secondary)" />
-          Riwayat
+          History
         </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* Input panel (3/5) */}
         <div className="space-y-5 lg:col-span-3">
-          {/* Pilih model */}
+          {/* Select model */}
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
             <div className="mb-3 flex items-center justify-between">
               <label className="text-sm font-bold text-(--text-secondary) uppercase">
-                Pilih Model
+                Select Model
               </label>
               {/* Filter arsitektur */}
               <div className="flex items-center gap-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-1">
@@ -133,7 +133,7 @@ export default function ClassifyForm() {
                         : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                     }`}
                   >
-                    {v === "" ? "Semua" : v}
+                    {v === "" ? "All" : v}
                   </button>
                 ))}
               </div>
@@ -142,11 +142,11 @@ export default function ClassifyForm() {
             {isLoadingModels ? (
               <div className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-elevated) px-4 py-3 text-sm font-medium text-(--text-tertiary)">
                 <Loader2 size={16} className="animate-spin text-(--accent)" />{" "}
-                Memuat model...
+                Loading models...
               </div>
             ) : activeModels.length === 0 ? (
               <div className="rounded-xl border border-(--warning-muted)/50 bg-(--warning-muted)/10 px-4 py-3 text-sm font-bold text-(--warning)">
-                Tidak ada model yang aktif saat ini.
+                No active models currently.
               </div>
             ) : (
               <div className="relative">
@@ -176,7 +176,7 @@ export default function ClassifyForm() {
                     </div>
                   ) : (
                     <span className="text-sm font-medium text-(--text-tertiary)">
-                      Pilih model...
+                      Select a model...
                     </span>
                   )}
                   <ChevronDown
@@ -233,7 +233,7 @@ export default function ClassifyForm() {
                           <p className="mt-1 text-[11px] font-medium text-(--text-tertiary)">
                             {model.accuracy !== null &&
                               `Acc: ${(model.accuracy * 100).toFixed(1)}% · `}
-                            {model.num_labels} kelas
+                            {model.num_labels} classes
                           </p>
                         </button>
                       ))}
@@ -249,7 +249,7 @@ export default function ClassifyForm() {
             {/* Mode toggle */}
             <div className="mb-4 flex overflow-hidden rounded-lg border border-(--border-strong) bg-(--bg-elevated) p-1">
               {[
-                { key: "single", label: "Teks Tunggal" },
+                { key: "single", label: "Single Text" },
                 { key: "csv", label: "Upload File" },
               ].map(({ key, label }) => (
                 <button
@@ -278,7 +278,7 @@ export default function ClassifyForm() {
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyDown={handleKeyDown}
                   rows={6}
-                  placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
+                  placeholder="Enter text here... (Ctrl+Enter to classify)"
                   className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-4 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                   maxLength={1000}
                 />
@@ -314,11 +314,11 @@ export default function ClassifyForm() {
                       />
                     </div>
                     <p className="text-sm font-bold text-(--text-secondary)">
-                      Klik untuk upload{" "}
+                      Click to upload{" "}
                       <span className="text-(--accent)">CSV / Excel</span>
                     </p>
                     <p className="mt-1 text-xs font-medium text-(--text-tertiary)">
-                      Maks 500 baris · .csv .xlsx .xls
+                      Max 500 rows · .csv .xlsx .xls
                     </p>
                   </div>
                 ) : (
@@ -333,7 +333,7 @@ export default function ClassifyForm() {
                             {csvFileName}
                           </p>
                           <p className="text-[11px] font-bold tracking-wide text-(--success)/70 uppercase">
-                            {csvTexts.length} teks ditemukan
+                            {csvTexts.length} texts found
                           </p>
                         </div>
                       </div>
@@ -354,7 +354,7 @@ export default function ClassifyForm() {
                     {csvHeaders.length > 0 && (
                       <div className="rounded-xl border border-(--border-subtle) bg-(--bg-elevated) p-4 shadow-inner">
                         <label className="mb-2.5 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                          Pilih Kolom Teks Utama
+                          Select Main Text Column
                         </label>
                         <div className="flex flex-wrap gap-2">
                           {csvHeaders.map((header, idx) => (
@@ -367,7 +367,7 @@ export default function ClassifyForm() {
                                   : "border-(--border-strong) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                               }`}
                             >
-                              {header || `Kolom ${idx + 1}`}
+                              {header || `Column ${idx + 1}`}
                             </button>
                           ))}
                         </div>
@@ -411,7 +411,7 @@ export default function ClassifyForm() {
             {isClassifying ? (
               <>
                 <Loader2 size={18} className="animate-spin" />{" "}
-                Mengklasifikasikan...
+                Classifying...
               </>
             ) : (
               <>
@@ -419,7 +419,7 @@ export default function ClassifyForm() {
                   size={18}
                   className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
                 />{" "}
-                Klasifikasikan Sekarang
+                Classify Now
               </>
             )}
           </button>
@@ -433,10 +433,10 @@ export default function ClassifyForm() {
                 <BrainCircuit size={32} className="text-(--text-tertiary)" />
               </div>
               <p className="text-sm font-bold text-(--text-secondary)">
-                Belum ada hasil
+                No results yet
               </p>
               <p className="mx-auto mt-1.5 max-w-[200px] text-xs font-medium text-(--text-tertiary)">
-                Hasil klasifikasi teks Anda akan muncul di sini
+                Your text classification results will appear here
               </p>
             </div>
           )}
@@ -448,8 +448,8 @@ export default function ClassifyForm() {
               </div>
               <p className="text-sm font-bold tracking-wide text-(--accent)">
                 {inputMode === "csv"
-                  ? `Memproses ${csvTexts.length} data...`
-                  : "Menganalisis teks..."}
+                  ? `Processing ${csvTexts.length} data...`
+                  : "Analyzing text..."}
               </p>
             </div>
           )}
@@ -484,7 +484,7 @@ export default function ClassifyForm() {
               <div className="flex items-center justify-between border-b border-(--border-default) bg-(--bg-elevated) p-5">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-(--text-primary)">
                   <History size={20} className="text-(--accent)" />
-                  Riwayat Klasifikasi
+                  Classification History
                 </h2>
                 <button
                   onClick={() => setIsHistoryModalOpen(false)}

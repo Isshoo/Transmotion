@@ -39,7 +39,7 @@ const useTrainingStore = create((set, get) => ({
   isSubmitting: false,
   isCheckingActive: true,
 
-  // ── Init: cek apakah ada job aktif saat masuk halaman ──────
+  // ── Init: check if there is an active job when entering the page ──────
   init: async () => {
     set({ isCheckingActive: true });
 
@@ -53,7 +53,7 @@ const useTrainingStore = create((set, get) => ({
       if (job && ["queued", "running"].includes(job.status)) {
         set({ activeJob: job, view: "progress", isCheckingActive: false });
       } else if (job && job.status === "completed") {
-        // Ada job selesai — bisa tampilkan result jika mau
+        // If a job is completed — show result if desired
         // set({ activeJob: job, view: "result", isCheckingActive: false });
         get().resetToForm();
         set({ isCheckingActive: false });
@@ -62,7 +62,7 @@ const useTrainingStore = create((set, get) => ({
         set({ isCheckingActive: false });
       }
     } catch {
-      // Tidak ada job aktif, reset ke form
+      // No active job, reset to form
       get().resetToForm();
       set({ isCheckingActive: false });
     }

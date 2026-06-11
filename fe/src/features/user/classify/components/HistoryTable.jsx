@@ -24,10 +24,10 @@ export default function HistoryTable() {
           <History size={32} className="text-(--text-tertiary)" />
         </div>
         <p className="text-base font-bold text-(--text-secondary)">
-          Belum ada riwayat
+          No history yet
         </p>
         <p className="mt-1.5 text-sm text-(--text-tertiary)">
-          Riwayat klasifikasi model Anda akan muncul di sini.
+          Your model classification history will appear here.
         </p>
       </div>
     );
@@ -40,7 +40,7 @@ export default function HistoryTable() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["No", "Teks", "Prediksi", "Confidence", "Waktu"].map((h) => (
+                {["No", "Text", "Prediction", "Confidence", "Time"].map((h) => (
                   <th
                     key={h}
                     className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
@@ -119,7 +119,7 @@ export default function HistoryTable() {
         {historyTotal > historyPerPage && (
           <div className="flex items-center justify-between border-t border-(--border-default) bg-(--bg-elevated) px-5 py-3">
             <p className="text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-              {from}–{to} dari {historyTotal}
+              {from}–{to} of {historyTotal}
             </p>
             <div className="flex items-center gap-1.5">
               <button

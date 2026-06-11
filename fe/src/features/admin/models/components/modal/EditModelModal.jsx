@@ -38,7 +38,7 @@ export default function EditModelModal() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) {
-      toast.error("Nama model harus diisi");
+      toast.error("Model name is required");
       return;
     }
     const result = await updateModel(currentModel.id, form);
@@ -69,22 +69,22 @@ export default function EditModelModal() {
         <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
           <div>
             <label className="mb-1.5 block text-xs font-bold tracking-wide text-(--text-secondary) uppercase">
-              Nama Model
+              Model Name
             </label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
               className="w-full rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
-              placeholder="Masukkan nama model"
+              placeholder="Enter model name"
             />
           </div>
 
           <div>
             <label className="mb-1.5 flex items-center gap-2 text-xs font-bold tracking-wide text-(--text-secondary) uppercase">
-              Deskripsi
+              Description
               <span className="rounded bg-(--bg-overlay) px-1.5 py-0.5 text-[10px] font-normal text-(--text-tertiary) normal-case">
-                opsional
+                optional
               </span>
             </label>
             <textarea
@@ -93,7 +93,7 @@ export default function EditModelModal() {
                 setForm((p) => ({ ...p, description: e.target.value }))
               }
               rows={3}
-              placeholder="Masukkan deskripsi model..."
+              placeholder="Enter model description..."
               className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             />
           </div>
@@ -102,13 +102,13 @@ export default function EditModelModal() {
             {[
               {
                 key: "is_active",
-                label: "Model Aktif",
-                desc: "Model dapat diakses di sistem",
+                label: "Active Model",
+                desc: "Model can be accessed in the system",
               },
               {
                 key: "is_public",
-                label: "Publik",
-                desc: "Model dapat digunakan oleh user lain",
+                label: "Public",
+                desc: "Model can be used by other users",
               },
             ].map(({ key, label, desc }) => (
               <label
@@ -158,14 +158,14 @@ export default function EditModelModal() {
               disabled={isSubmitting}
               className="rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-2.5 text-sm font-bold tracking-wide text-(--text-secondary) transition-all hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
-              Batal
+              Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className="rounded-xl bg-(--accent) px-4 py-2.5 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-sm) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:opacity-50"
             >
-              {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

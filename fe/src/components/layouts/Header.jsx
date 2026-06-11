@@ -72,7 +72,7 @@ export default function Navbar() {
               <button
                 onClick={() => logout()}
                 className="group flex h-9 w-9 items-center justify-center rounded-md border border-(--border-default) bg-(--bg-surface) text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--error) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--accent-muted)"
-                title={`Keluar`}
+                title={`Logout`}
               >
                 <LogOut
                   size={16}
@@ -167,7 +167,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-(--error) transition-all hover:bg-red-500/10"
               >
                 <LogOut size={16} />
-                Keluar
+                Logout
               </button>
             </>
           ) : (

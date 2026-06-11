@@ -50,7 +50,7 @@ export default function ColabStatusBadge() {
     return (
       <span
         className="inline-flex w-full items-center gap-1.5 rounded-md bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-tertiary)"
-        title="Menyambungkan ulang koneksi status..."
+        title="Reconnecting status connection..."
       >
         <Loader2 size={11} className="animate-spin" />
         {status?.status === "online" ? "Colab Online" : "Colab..."}
@@ -65,7 +65,7 @@ export default function ColabStatusBadge() {
     return (
       <span
         className="inline-flex w-full cursor-default items-center gap-1.5 rounded-md bg-(--success-muted) px-2.5 py-1.5 text-xs font-medium text-(--success)"
-        title={`Colab Online — ping ${secondsAgo}s lalu`}
+        title={`Colab Online — ping ${secondsAgo}s ago`}
       >
         <Wifi size={11} />
         Colab Online
@@ -77,10 +77,10 @@ export default function ColabStatusBadge() {
     return (
       <span
         className="inline-flex w-full cursor-default items-center gap-1.5 rounded-md bg-(--warning-muted) px-2.5 py-1.5 text-xs font-medium text-(--warning)"
-        title={`Koneksi tidak stabil — ping terakhir ${secondsAgo}s lalu`}
+        title={`Unstable connection — last ping ${secondsAgo}s ago`}
       >
         <AlertTriangle size={11} />
-        Colab Lambat
+        Colab Slow
       </span>
     );
   }
@@ -90,7 +90,7 @@ export default function ColabStatusBadge() {
       className="inline-flex w-full cursor-default items-center gap-1.5 rounded-md bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
       title={
         secondsAgo
-          ? `Colab Offline — ping terakhir ${secondsAgo}s lalu`
+          ? `Colab Offline — last ping ${secondsAgo}s ago`
           : "Colab Offline"
       }
     >

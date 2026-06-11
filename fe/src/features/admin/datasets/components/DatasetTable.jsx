@@ -65,10 +65,10 @@ export default function DatasetTable() {
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <Database size={20} className="text-(--accent)" />
-            Manajemen Dataset
+            Dataset Management
           </h1>
           <p className="mt-0.5 text-sm text-(--text-secondary)">
-            Upload dan kelola dataset untuk training model
+            Upload and manage datasets for model training
           </p>
         </div>
         <button
@@ -90,7 +90,7 @@ export default function DatasetTable() {
             type="text"
             value={localSearch}
             onChange={handleSearchChange}
-            placeholder="Cari dataset..."
+            placeholder="Search dataset..."
             className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) py-2 pr-8 pl-9 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           {localSearch && (
@@ -110,9 +110,9 @@ export default function DatasetTable() {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="">Semua Status</option>
+          <option value="">All Statuses</option>
           <option value="uploaded">Uploaded</option>
-          <option value="ready">Siap</option>
+          <option value="ready">Ready</option>
           <option value="error">Error</option>
         </select>
       </div>
@@ -141,11 +141,10 @@ export default function DatasetTable() {
         <div className="flex flex-col items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface) px-4 py-20 text-center">
           <Database size={40} className="mb-4 text-(--text-disabled)" />
           <p className="text-base font-medium text-(--text-primary)">
-            Belum ada dataset
+            No datasets yet
           </p>
           <p className="mt-1.5 text-sm text-(--text-tertiary)">
-            Klik &quot;Upload Dataset&quot; untuk mulai menambahkan dataset
-            baru.
+            Click &quot;Upload Dataset&quot; to start adding a new dataset.
           </p>
         </div>
       ) : (
@@ -177,7 +176,7 @@ export default function DatasetTable() {
                       e.stopPropagation();
                       openDeleteModal(ds);
                     }}
-                    title="Hapus"
+                    title="Delete"
                     className="shrink-0 rounded-md p-1.5 text-(--text-tertiary) opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-(--error-muted)/30 hover:text-(--error) focus:opacity-100"
                   >
                     <Trash2 size={16} />
@@ -187,7 +186,7 @@ export default function DatasetTable() {
                 {ds.columns_configured ? (
                   <div className="inline-flex flex-wrap items-center gap-1.5 rounded-md border border-(--accent-muted) bg-(--accent-muted)/10 px-2 py-1 text-[11px]">
                     <span className="font-medium text-(--text-secondary)">
-                      Teks:
+                      Text:
                     </span>
                     <span className="font-semibold text-(--accent)">
                       {ds.text_column}
@@ -202,7 +201,7 @@ export default function DatasetTable() {
                   </div>
                 ) : (
                   <div className="inline-flex rounded-md border border-(--warning-muted) bg-(--warning-muted)/10 px-2 py-1 text-[11px] font-medium text-(--warning)">
-                    Kolom belum diatur
+                    Columns not configured
                   </div>
                 )}
 
@@ -255,13 +254,13 @@ export default function DatasetTable() {
       {!isLoading && total > 0 && (
         <div className="flex items-center justify-between rounded-lg border border-(--border-default) bg-(--bg-surface) px-4 py-3">
           <p className="text-xs text-(--text-tertiary)">
-            Menampilkan{" "}
+            Showing{" "}
             <span className="font-medium text-(--text-secondary)">
               {from}–{to}
             </span>{" "}
-            dari{" "}
+            of{" "}
             <span className="font-medium text-(--text-secondary)">{total}</span>{" "}
-            dataset
+            datasets
           </p>
           <div className="flex items-center gap-1">
             <button

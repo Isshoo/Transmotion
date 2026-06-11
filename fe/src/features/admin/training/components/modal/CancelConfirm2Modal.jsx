@@ -8,10 +8,10 @@ export function CancelConfirm2Modal({ onConfirm, onCancel, isLoading }) {
           <Ban size={20} className="text-(--error)" />
         </div>
         <h2 className="mb-1.5 text-base font-semibold tracking-tight text-(--text-primary)">
-          Batalkan Training?
+          Cancel Training?
         </h2>
         <p className="mb-6 text-sm leading-relaxed text-(--text-secondary)">
-          Proses training yang sedang berjalan akan dihentikan.
+          The ongoing training process will be stopped.
         </p>
         <div className="flex justify-end gap-2.5">
           <button
@@ -19,14 +19,14 @@ export function CancelConfirm2Modal({ onConfirm, onCancel, isLoading }) {
             disabled={isLoading}
             className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
           >
-            Tidak
+            No
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
             className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
           >
-            {isLoading ? "Membatalkan..." : "Ya, Batalkan"}
+            {isLoading ? "Cancelling..." : "Yes, Cancel"}
           </button>
         </div>
       </div>

@@ -19,13 +19,13 @@ const MODEL_OPTIONS = [
     value: "mbert",
     label: "mBERT",
     badge: "bg-(--data-1)/20 text-(--data-1) border border-(--data-1)/30",
-    desc: "bert-base-multilingual-cased — cocok untuk dataset multibahasa & Bahasa Indonesia",
+    desc: "bert-base-multilingual-cased — suitable for multilingual & Indonesian datasets",
   },
   {
     value: "xlmr",
     label: "XLM-R",
     badge: "bg-(--data-4)/20 text-(--data-4) border border-(--data-4)/30",
-    desc: "xlm-roberta-base — performa lebih baik untuk teks Bahasa Indonesia & rendah sumber daya",
+    desc: "xlm-roberta-base — better performance for Indonesian text & low resource",
   },
 ];
 
@@ -74,7 +74,7 @@ export default function CreateJobModal() {
     }
   }, [isCreateModalOpen]);
 
-  // Auto-fetch preview saat dataset atau testSize berubah
+  // Auto-fetch preview when dataset or testSize changes
   useEffect(() => {
     clearTimeout(previewTimeout.current);
     if (!datasetId) {
@@ -95,7 +95,7 @@ export default function CreateJobModal() {
         sort_by: "created_at",
         sort_order: "desc",
       });
-      // Hanya dataset yang sudah preprocessing selesai
+      // Only datasets with completed preprocessing
       const ready = (res.data ?? []).filter(
         (d) =>
           d.preprocessing_status === "completed" && d.num_rows_preprocessed > 0
@@ -154,7 +154,7 @@ export default function CreateJobModal() {
           <div className="flex items-center gap-2">
             <BrainCircuit size={18} className="text-(--accent)" />
             <h2 className="text-base font-semibold tracking-tight text-(--text-primary)">
-              Buat Training Job Baru
+              Create New Training Job
             </h2>
           </div>
           <button
@@ -205,13 +205,13 @@ export default function CreateJobModal() {
           {/* ── STEP 1 ─────────────────────────────────────── */}
           {step === 1 && (
             <div className="animate-fade-in space-y-6">
-              {/* Pilih dataset */}
+              {/* Select dataset */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
                   Dataset
                 </label>
                 <p className="mb-3 text-xs text-(--text-tertiary)">
-                  Hanya menampilkan dataset yang sudah melewati preprocessing.
+                  Only shows datasets that have been preprocessed.
                 </p>
                 {isLoadingDatasets ? (
                   <div className="flex items-center gap-2 rounded-md border border-(--border-default) bg-(--bg-elevated) px-4 py-3 text-sm text-(--text-tertiary)">
@@ -219,12 +219,11 @@ export default function CreateJobModal() {
                       size={16}
                       className="animate-spin text-(--accent)"
                     />{" "}
-                    Memuat daftar dataset...
+                    Loading dataset list...
                   </div>
                 ) : datasets.length === 0 ? (
                   <div className="rounded-md border border-(--warning-muted) bg-(--warning-muted) px-4 py-3 text-sm text-(--warning) opacity-90">
-                    Belum ada dataset yang siap. Lakukan preprocessing dataset
-                    terlebih dahulu.
+                    No datasets are ready yet. Please preprocess a dataset first.
                   </div>
                 ) : (
                   <div className="space-y-2.5">
@@ -249,7 +248,7 @@ export default function CreateJobModal() {
                             <strong className="text-(--text-secondary)">
                               {ds.num_rows_preprocessed?.toLocaleString("id")}
                             </strong>{" "}
-                            baris preprocessed
+                            preprocessed rows
                           </span>
                           <span>|</span>
                           <span>
@@ -259,11 +258,11 @@ export default function CreateJobModal() {
                                   ds.class_distribution_preprocessed ?? {}
                                 ).length}
                             </strong>{" "}
-                            kelas
+                            classes
                           </span>
                           <span>|</span>
                           <span>
-                            Teks:{" "}
+                            Text:{" "}
                             <strong className="text-(--text-secondary)">
                               {ds.text_column}
                             </strong>{" "}
@@ -284,7 +283,7 @@ export default function CreateJobModal() {
                 <div className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <label className="text-xs font-medium text-(--text-secondary)">
-                      Ukuran Test Set
+                      Test Size
                     </label>
                     <span className="text-[11px] font-semibold tracking-wide text-(--accent) uppercase">
                       <span className="text-(--warning)">
@@ -318,7 +317,7 @@ export default function CreateJobModal() {
                 <div className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <label className="text-xs font-medium text-(--text-secondary)">
-                      Ukuran Validation Set
+                      Validation Size
                     </label>
                     <span className="text-[11px] font-semibold tracking-wide text-(--accent) uppercase">
                       <span className="text-(--warning)">
@@ -361,7 +360,7 @@ export default function CreateJobModal() {
                 <div className="flex flex-col gap-3 rounded-xl border border-(--border-default) bg-(--bg-elevated) px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="mb-1 text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-                      Dataset Terpilih
+                      Selected Dataset
                     </p>
                     <p className="text-sm font-semibold tracking-tight text-(--text-primary)">
                       {selectedDataset.name}
@@ -381,7 +380,7 @@ export default function CreateJobModal() {
                       </strong>
                     </span>
                     <span>
-                      Kelas:{" "}
+                      Classes:{" "}
                       <strong className="text-(--text-primary)">
                         {splitPreview.num_labels}
                       </strong>
@@ -393,24 +392,24 @@ export default function CreateJobModal() {
               {/* Nama job */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-                  Nama Job{" "}
+                  Job Name{" "}
                   <span className="font-normal text-(--text-tertiary)">
-                    (opsional)
+                    (optional)
                   </span>
                 </label>
                 <input
                   type="text"
                   value={jobName}
                   onChange={(e) => setJobName(e.target.value)}
-                  placeholder={`cth. mBERT Sentiment v1`}
+                  placeholder={`e.g. mBERT Sentiment v1`}
                   className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                 />
               </div>
 
-              {/* Pilih model */}
+              {/* Select model */}
               <div>
                 <label className="mb-2.5 block text-sm font-medium text-(--text-secondary)">
-                  Arsitektur Model
+                  Model Architecture
                 </label>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {MODEL_OPTIONS.map((opt) => (
@@ -448,7 +447,7 @@ export default function CreateJobModal() {
               {/* Hyperparameter dasar */}
               <div>
                 <p className="mb-2.5 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Konfigurasi Dasar
+                  Basic Configuration
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -550,8 +549,7 @@ export default function CreateJobModal() {
                   ) : (
                     <ChevronDown size={13} />
                   )}
-                  {showAdvanced ? "Sembunyikan" : "Tampilkan"} parameter
-                  lanjutan
+                  {showAdvanced ? "Hide" : "Show"} advanced parameters
                 </button>
 
                 {showAdvanced && (
@@ -609,7 +607,7 @@ export default function CreateJobModal() {
             disabled={isSubmitting}
             className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
           >
-            Batal
+            Cancel
           </button>
 
           <div className="flex gap-2">
@@ -619,7 +617,7 @@ export default function CreateJobModal() {
                 onClick={() => setStep(1)}
                 className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
               >
-                ← Kembali
+                ← Back
               </button>
             )}
             {step === 1 ? (
@@ -629,7 +627,7 @@ export default function CreateJobModal() {
                 disabled={!canProceedStep1}
                 className="rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               >
-                Lanjutkan →
+                Continue →
               </button>
             ) : (
               <button
@@ -638,7 +636,7 @@ export default function CreateJobModal() {
                 disabled={isSubmitting || !canSubmit}
                 className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-5 py-2 text-sm font-medium tracking-wide text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
               >
-                {isSubmitting ? "Membuat Job..." : "Mulai Training"}
+                {isSubmitting ? "Creating Job..." : "Start Training"}
               </button>
             )}
           </div>

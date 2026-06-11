@@ -54,7 +54,7 @@ export default function RawDataTab({ dataset }) {
             type="text"
             value={localSearch}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Cari teks..."
+            placeholder="Search text..."
             className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) py-1.5 pr-8 pl-8 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           {localSearch && (
@@ -75,7 +75,7 @@ export default function RawDataTab({ dataset }) {
             onChange={(e) => setRawFilterLabel(datasetId, e.target.value)}
             className="w-full max-w-[160px] rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           >
-            <option value="">Semua Label</option>
+            <option value="">All Labels</option>
             {labels.map((l) => (
               <option key={l} value={l}>
                 {l}
@@ -84,7 +84,7 @@ export default function RawDataTab({ dataset }) {
           </select>
         )}
         <span className="ml-auto text-xs text-(--text-tertiary)">
-          {rawTotal.toLocaleString("id")} baris
+          {rawTotal.toLocaleString("id")} rows
         </span>
       </div>
 
@@ -104,7 +104,7 @@ export default function RawDataTab({ dataset }) {
                   >
                     {col}
                     {col === dataset.text_column && (
-                      <span className="ml-1 text-(--accent)">(teks)</span>
+                      <span className="ml-1 text-(--accent)">(text)</span>
                     )}
                     {col === dataset.label_column && (
                       <span className="ml-1 text-(--success)">(label)</span>
@@ -133,7 +133,7 @@ export default function RawDataTab({ dataset }) {
                     colSpan={columns.length + 1}
                     className="px-4 py-12 text-center text-sm text-(--text-disabled)"
                   >
-                    Tidak ada data ditemukan
+                    No data found
                   </td>
                 </tr>
               ) : (
@@ -171,7 +171,7 @@ export default function RawDataTab({ dataset }) {
             <span className="font-medium text-(--text-secondary)">
               {from}–{to}
             </span>{" "}
-            dari{" "}
+            of{" "}
             <span className="font-medium text-(--text-secondary)">
               {rawTotal.toLocaleString("id")}
             </span>

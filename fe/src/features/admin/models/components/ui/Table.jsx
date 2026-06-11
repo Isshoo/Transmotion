@@ -5,7 +5,7 @@ export function PerClassTable({ perClass }) {
       <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-            {["Kelas", "Precision", "Recall", "F1-Score", "Support"].map(
+            {["Class", "Precision", "Recall", "F1-Score", "Support"].map(
               (h) => (
                 <th
                   key={h}

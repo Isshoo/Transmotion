@@ -82,7 +82,7 @@ export default function EvaluationResults({ job }) {
           {/* Metrik KPI Cards */}
           <div>
             <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Metrik Evaluasi
+              Evaluation Metrics
             </p>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <MetricsCard
@@ -140,7 +140,7 @@ export default function EvaluationResults({ job }) {
               metrics.mcc == null &&
               metrics.roc_auc == null && (
                 <p className="mt-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-                  💡 Metrik MCC, ROC-AUC, dan Mean Std dihitung dari test set.
+                  💡 MCC, ROC-AUC, and Mean Std metrics are calculated from the test set.
                 </p>
               )}
           </div>
@@ -149,7 +149,7 @@ export default function EvaluationResults({ job }) {
           {metrics.perClass && Object.keys(metrics.perClass).length > 0 && (
             <div>
               <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                Metrik Per Kelas
+                Per-Class Metrics
               </p>
               <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
                 <div className="overflow-x-auto">
@@ -157,7 +157,7 @@ export default function EvaluationResults({ job }) {
                     <thead>
                       <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
                         {[
-                          "Kelas",
+                          "Class",
                           "Precision",
                           "Recall",
                           "F1-Score",
@@ -272,7 +272,7 @@ export default function EvaluationResults({ job }) {
         <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
           <div className="rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
             <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Log Per Epoch
+              Per-Epoch Logs
             </h3>
           </div>
           <div className="p-5">

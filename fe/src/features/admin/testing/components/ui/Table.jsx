@@ -18,14 +18,14 @@ export function HistoryTable() {
   return (
     <div className="animate-fade-in mt-8 border-t border-(--border-default) pt-6">
       <h3 className="mb-4 text-sm font-bold tracking-tight text-(--text-primary)">
-        Riwayat Klasifikasi
+        Classification History
       </h3>
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["No", "Teks", "Prediksi", "Confidence", "Model", "Waktu"].map(
+                {["No", "Text", "Prediction", "Confidence", "Model", "Time"].map(
                   (h) => (
                     <th
                       key={h}

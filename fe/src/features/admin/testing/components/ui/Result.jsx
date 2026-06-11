@@ -10,7 +10,7 @@ export function SingleResult({ result }) {
       {/* Header */}
       <div className="border-b border-(--border-subtle) bg-(--accent-muted)/10 px-6 py-5">
         <p className="mb-2 text-[10px] font-bold tracking-wider text-(--accent) uppercase">
-          Hasil Klasifikasi
+          Classification Result
         </p>
         <p className="text-3xl font-black tracking-tight text-(--text-primary)">
           {result.predicted_label}
@@ -27,11 +27,11 @@ export function SingleResult({ result }) {
         </div>
       </div>
 
-      {/* Skor semua kelas */}
+      {/* Probability score distribution */}
       {entries.length > 1 && (
         <div className="m-2 space-y-3 rounded-2xl bg-(--bg-elevated) px-6 py-5">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Distribusi Skor Probabilitas
+            Probability Score Distribution
           </p>
           <div className="space-y-3">
             {entries.map(([label, score]) => (
@@ -89,7 +89,7 @@ export function BatchResults({ results, errors, csvTexts }) {
         </div>
         <div className="rounded-xl border border-(--success-muted)/50 bg-(--success-muted)/10 px-4 py-4 text-center shadow-(--shadow-sm)">
           <p className="text-[10px] font-bold tracking-wider text-(--success) uppercase">
-            Berhasil
+            Successful
           </p>
           <p className="mt-1.5 text-2xl font-black text-(--success)">
             {results.length}
@@ -105,7 +105,7 @@ export function BatchResults({ results, errors, csvTexts }) {
         </div>
         <div className="rounded-xl border border-(--accent-muted)/50 bg-(--accent-muted)/10 px-4 py-4 text-center shadow-(--shadow-sm)">
           <p className="text-[10px] font-bold tracking-wider text-(--accent) uppercase">
-            Kelas
+            Classes
           </p>
           <p className="mt-1.5 text-2xl font-black text-(--accent)">
             {Object.keys(dist).length}
@@ -117,7 +117,7 @@ export function BatchResults({ results, errors, csvTexts }) {
       {/* {Object.keys(dist).length > 0 && (
         <div className="rounded-xl border border-(--border-default) bg-(--bg-elevated) p-5 shadow-(--shadow-sm)">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Distribusi Prediksi
+            Prediction Distribution
           </p>
           <div className="space-y-3.5">
             {Object.entries(dist)
@@ -154,7 +154,7 @@ export function BatchResults({ results, errors, csvTexts }) {
           <table className="w-full text-xs">
             <thead className="sticky top-0 z-10 border-b border-(--border-default) bg-(--bg-elevated) shadow-sm">
               <tr>
-                {["#", "Teks", "Prediksi", "Confidence"].map((h) => (
+                {["#", "Text", "Prediction", "Confidence"].map((h) => (
                   <th
                     key={h}
                     className="px-4 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"

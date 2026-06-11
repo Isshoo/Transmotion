@@ -9,7 +9,7 @@ export default function ConfusionMatrixSection({ mbert, xlmr }) {
   return (
     <div>
       <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-        Confusion Matrix (Model Terbaik)
+        Confusion Matrix (Best Model)
       </p>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {bXlmr?.confusion_matrix && (

@@ -42,20 +42,20 @@ export default function ForgotPasswordForm() {
       <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
         <div className="mb-4 text-5xl">📧</div>
         <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
-          Cek email kamu!
+          Check your email!
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
           {activeTab === "forgot"
-            ? "Link reset password sudah dikirim ke "
-            : "Link verifikasi sudah dikirim ulang ke "}
-          <strong className="text-(--text-primary)">{email}</strong>. Cek inbox
-          atau folder spam kamu.
+            ? "Password reset link has been sent to "
+            : "Verification link has been resent to "}
+          <strong className="text-(--text-primary)">{email}</strong>. Check your inbox
+          or spam folder.
         </p>
         <Link
           href="/login"
           className="text-sm font-bold tracking-wide text-(--accent) hover:underline"
         >
-          ← Kembali ke halaman masuk
+          ← Back to login page
         </Link>
       </div>
     );
@@ -64,10 +64,10 @@ export default function ForgotPasswordForm() {
   return (
     <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
       <h1 className="mb-2 text-3xl font-black tracking-tight text-(--text-primary)">
-        Bantuan Akun
+        Account Support
       </h1>
       <p className="mb-6 text-sm font-medium text-(--text-secondary)">
-        Pilih jenis bantuan yang kamu butuhkan.
+        Select the type of help you need.
       </p>
 
       {/* Tabs */}
@@ -83,7 +83,7 @@ export default function ForgotPasswordForm() {
               : "text-(--text-tertiary) hover:text-(--text-secondary)"
           }`}
         >
-          Lupa Password
+          Forgot Password
         </button>
         <button
           onClick={() => {
@@ -96,15 +96,15 @@ export default function ForgotPasswordForm() {
               : "text-(--text-tertiary) hover:text-(--text-secondary)"
           }`}
         >
-          Kirim Ulang Verifikasi
+          Resend Verification
         </button>
       </div>
 
       {/* Deskripsi tab */}
       <p className="mb-6 rounded-xl border border-(--border-subtle) bg-(--bg-surface) p-4 text-[13px] leading-relaxed font-medium text-(--text-secondary)">
         {activeTab === "forgot"
-          ? "Masukkan email kamu dan kami akan kirimkan link untuk membuat password baru."
-          : "Belum menerima email verifikasi? Masukkan email kamu untuk mengirim ulang."}
+          ? "Enter your email and we will send a link to create a new password."
+          : "Haven't received the verification email? Enter your email to resend it."}
       </p>
 
       {error && (
@@ -134,10 +134,10 @@ export default function ForgotPasswordForm() {
           className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading
-            ? "Mengirim..."
+            ? "Sending..."
             : activeTab === "forgot"
-              ? "Kirim Link Reset"
-              : "Kirim Ulang Verifikasi"}
+              ? "Send Reset Link"
+              : "Resend Verification"}
         </button>
       </form>
 
@@ -146,7 +146,7 @@ export default function ForgotPasswordForm() {
           href="/login"
           className="text-sm font-bold tracking-wide text-(--text-secondary) transition-colors hover:text-(--accent) hover:underline"
         >
-          ← Kembali ke halaman masuk
+          ← Back to login page
         </Link>
       </p>
     </div>

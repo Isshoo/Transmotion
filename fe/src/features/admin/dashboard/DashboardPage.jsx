@@ -33,7 +33,7 @@ export default function DashboardPage() {
         const res = await dashboardApi.getStats();
         setData(res.data.data);
       } catch (error) {
-        toast.error("Gagal memuat statistik dashboard");
+        toast.error("Failed to load dashboard statistics");
         console.error(error);
       } finally {
         setLoading(false);
@@ -47,7 +47,7 @@ export default function DashboardPage() {
       <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
         <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
           <Loader2 className="h-8 w-8 animate-spin text-(--accent)" />
-          <p className="text-sm font-medium">Memuat Dashboard...</p>
+          <p className="text-sm font-medium">Loading Dashboard...</p>
         </div>
       </div>
     );
@@ -63,7 +63,7 @@ export default function DashboardPage() {
               Overview
             </h1>
             <p className="mt-1 text-sm text-(--text-secondary)">
-              Ringkasan aktivitas dan metrik sistem Transmotion.
+              Summary of Transmotion system activities and metrics.
             </p>
           </div>
           <div className="flex w-48 items-center gap-3">
@@ -76,16 +76,16 @@ export default function DashboardPage() {
             <AlertCircle size={40} />
           </div>
           <h3 className="mb-2 text-xl font-semibold text-(--text-primary)">
-            Gagal Memuat Dashboard
+            Failed to Load Dashboard
           </h3>
           <p className="max-w-md text-sm text-(--text-secondary)">
-            Tidak dapat memuat data statistik. Hal ini mungkin terjadi karena backend tidak merespons atau adanya kendala jaringan.
+            Unable to load statistical data. This might happen because the backend is not responding or there is a network issue.
           </p>
           <button
             onClick={() => window.location.reload()}
             className="mt-6 flex items-center gap-2 rounded-lg bg-(--accent) px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-opacity-90 active:scale-95"
           >
-            Coba Muat Ulang
+            Try Reloading
           </button>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default function DashboardPage() {
             Overview
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Ringkasan aktivitas dan metrik sistem Transmotion.
+            Summary of Transmotion system activities and metrics.
           </p>
         </div>
         <div className="flex w-48 items-center gap-3">
@@ -124,28 +124,28 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         <StatCard
-          title="Total Pengguna"
+          title="Total Users"
           value={data.totals.users}
           icon={Users}
           color="text-(--data-2)"
           bg="bg-(--data-2)/10"
         />
         <StatCard
-          title="Total Dataset"
+          title="Total Datasets"
           value={data.totals.datasets}
           icon={Database}
           color="text-(--data-1)"
           bg="bg-(--data-1)/10"
         />
         <StatCard
-          title="Model Dilatih"
+          title="Trained Models"
           value={data.totals.models}
           icon={BrainCircuit}
           color="text-(--data-7)"
           bg="bg-(--data-7)/10"
         />
         <StatCard
-          title="Total Prediksi"
+          title="Total Predictions"
           value={data.totals.predictions}
           icon={MessageSquareText}
           color="text-(--data-5)"
@@ -173,7 +173,7 @@ export default function DashboardPage() {
                     size={16}
                     className="mr-2 inline text-(--accent)"
                   />
-                  Perbandingan mBERT vs XLM-R
+                  mBERT vs XLM-R Comparison
                 </h2>
               </div>
               <div className="grid grid-cols-2 divide-x divide-(--border-default)">
@@ -204,7 +204,7 @@ export default function DashboardPage() {
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
                   <Trophy size={16} className="text-(--warning)" />
                   <p className="text-xs font-semibold tracking-wider uppercase">
-                    Model Terbaik (F1)
+                    Best Model (F1)
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-(--text-primary)">
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
-                  {best_model.model_type.toUpperCase()} · Akurasi{" "}
+                  {best_model.model_type.toUpperCase()} · Accuracy{" "}
                   {(best_model.accuracy * 100).toFixed(1)}%
                 </p>
               </div>
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
                   <Star size={16} className="text-(--data-5)" />
                   <p className="text-xs font-semibold tracking-wider uppercase">
-                    Paling Banyak Digunakan
+                    Most Used
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-(--text-primary)">
@@ -240,7 +240,7 @@ export default function DashboardPage() {
                     {most_used_model.prediction_count.toLocaleString("id-ID")}
                   </span>
                   <span className="text-xs text-(--text-tertiary)">
-                    prediksi
+                    predictions
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
@@ -307,7 +307,7 @@ export default function DashboardPage() {
             <div className="p-0">
               {data.recent_models.length === 0 ? (
                 <div className="p-8 text-center text-sm text-(--text-tertiary)">
-                  Belum ada model yang dilatih.
+                  No models trained yet.
                 </div>
               ) : (
                 <div className="divide-y divide-(--border-default)">
@@ -363,7 +363,7 @@ export default function DashboardPage() {
             <div className="p-0">
               {data.recent_datasets.length === 0 ? (
                 <div className="p-8 text-center text-sm text-(--text-tertiary)">
-                  Belum ada dataset.
+                  No datasets yet.
                 </div>
               ) : (
                 <div className="divide-y divide-(--border-default)">
@@ -407,7 +407,7 @@ export default function DashboardPage() {
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-(--accent)"></span>
                 </div>
                 <h2 className="font-semibold text-(--accent)">
-                  Training Sedang Berjalan
+                  Training in Progress
                 </h2>
               </div>
               <div className="space-y-3">
@@ -428,7 +428,7 @@ export default function DashboardPage() {
                       href="/admin/training"
                       className="flex items-center justify-end gap-1 text-xs font-medium text-(--accent) hover:underline"
                     >
-                      Lihat Progress <ChevronRight size={14} />
+                      View Progress <ChevronRight size={14} />
                     </Link>
                   </div>
                 ))}
@@ -437,7 +437,7 @@ export default function DashboardPage() {
           )}
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
             <h2 className="mb-4 font-medium text-(--text-primary)">
-              Aksi Cepat
+              Quick Actions
             </h2>
             <div className="space-y-3">
               <Link href="/admin/datasets">
@@ -450,7 +450,7 @@ export default function DashboardPage() {
                       Upload Dataset
                     </p>
                     <p className="text-xs text-(--text-tertiary)">
-                      Tambahkan data baru
+                      Add new data
                     </p>
                   </div>
                 </div>
@@ -463,10 +463,10 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-(--text-primary) group-hover:text-(--accent)">
-                        Mulai Training
+                        Start Training
                       </p>
                       <p className="text-xs text-(--text-tertiary)">
-                        Latih model mBERT/XLM-R
+                        Train mBERT/XLM-R model
                       </p>
                     </div>
                   </div>
@@ -479,10 +479,10 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-(--text-primary) group-hover:text-(--accent)">
-                      Uji Model
+                      Test Model
                     </p>
                     <p className="text-xs text-(--text-tertiary)">
-                      Testing & Evaluasi
+                      Testing & Evaluation
                     </p>
                   </div>
                 </div>
@@ -531,7 +531,7 @@ function ModelTypeColumn({ label, count, avgF1, color, bgBar, total }) {
       </p>
       {avgF1 != null && (
         <p className="mt-1 text-xs text-(--text-secondary)">
-          Rata-rata F1: {(avgF1 * 100).toFixed(1)}%
+          Average F1: {(avgF1 * 100).toFixed(1)}%
         </p>
       )}
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-(--bg-elevated)">

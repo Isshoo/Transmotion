@@ -165,7 +165,7 @@ const useClassifyStore = create((set, get) => ({
       });
       get().updateCsvTexts(0);
     } catch (err) {
-      set({ error: "Gagal membaca file: " + err.message });
+      set({ error: "Failed to read file: " + err.message });
     }
   },
 
@@ -199,7 +199,7 @@ const useClassifyStore = create((set, get) => ({
     try {
       if (inputMode === "single") {
         if (!inputText.trim()) {
-          set({ error: "Masukkan teks terlebih dahulu", isClassifying: false });
+          set({ error: "Please enter text first", isClassifying: false });
           return;
         }
         const { data: res } = await classifyApi.classify({
@@ -210,7 +210,7 @@ const useClassifyStore = create((set, get) => ({
       } else {
         if (csvTexts.length === 0) {
           set({
-            error: "Pilih file dan kolom teks terlebih dahulu",
+            error: "Please select a file and text column first",
             isClassifying: false,
           });
           return;

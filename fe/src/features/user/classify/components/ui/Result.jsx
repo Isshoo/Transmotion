@@ -10,7 +10,7 @@ export function SingleResult({ result }) {
       {/* Header */}
       <div className="border-b border-(--border-subtle) bg-linear-to-br from-(--accent-muted)/10 to-(--bg-surface) px-5 py-5">
         <p className="mb-2 text-[10px] font-bold tracking-wider text-(--accent) uppercase">
-          Hasil Klasifikasi
+          Classification Result
         </p>
         <p className="text-3xl font-black tracking-tight text-(--text-primary)">
           {result.predicted_label}
@@ -31,7 +31,7 @@ export function SingleResult({ result }) {
       {entries.length > 1 && (
         <div className="m-2 space-y-3 rounded-2xl bg-(--bg-elevated) px-5 py-5">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Distribusi Skor Probabilitas
+            Probability Score Distribution
           </p>
           {entries.map(([label, score]) => (
             <div
@@ -58,7 +58,7 @@ export function SingleResult({ result }) {
       {/* Teks input */}
       {/* <div className="border-t border-(--border-subtle) bg-(--bg-surface) px-5 py-4">
         <p className="mb-1.5 text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-          Teks Input
+          Input Text
         </p>
         <p className="line-clamp-4 text-sm leading-relaxed font-medium text-(--text-secondary)">
           {result.input_text}
@@ -91,7 +91,7 @@ export function BatchResults({ results, errors, csvTexts }) {
         </div>
         <div className="flex flex-col justify-center rounded-xl border border-(--success-muted)/30 bg-(--success-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
           <p className="mb-1 text-[10px] font-bold tracking-wider text-(--success)/80 uppercase">
-            Berhasil
+            Success
           </p>
           <p className="text-2xl font-black text-(--success)">
             {results.length}
@@ -105,7 +105,7 @@ export function BatchResults({ results, errors, csvTexts }) {
         </div>
         <div className="flex flex-col justify-center rounded-xl border border-(--info-muted)/30 bg-(--info-muted)/10 px-5 py-4 text-center shadow-(--shadow-sm)">
           <p className="mb-1 text-[10px] font-bold tracking-wider text-(--info)/80 uppercase">
-            Kelas
+            Classes
           </p>
           <p className="text-2xl font-black text-(--info)">
             {Object.keys(dist).length}
@@ -151,7 +151,7 @@ export function BatchResults({ results, errors, csvTexts }) {
           <table className="w-full text-xs">
             <thead className="sticky top-0 z-10 border-b border-(--border-default) bg-(--bg-elevated)">
               <tr>
-                {["#", "Teks", "Prediksi", "Confidence"].map((h) => (
+                {["#", "Text", "Prediction", "Confidence"].map((h) => (
                   <th
                     key={h}
                     className="px-4 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"

@@ -40,7 +40,7 @@ export default function OfflineBanner() {
             d="M18.364 5.636a9 9 0 11-12.728 0M12 9v4m0 4h.01"
           />
         </svg>
-        Kamu sedang offline. Beberapa fitur mungkin tidak tersedia.
+        You are offline. Some features may not be available.
       </span>
     </div>
   );

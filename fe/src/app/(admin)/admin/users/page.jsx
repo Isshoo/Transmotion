@@ -1,7 +1,7 @@
 import UserTable from "@/features/admin/users/components/UserTable";
 
 export const metadata = {
-  title: "Manajemen User",
+  title: "Users Management",
 };
 
 export default function UsersPage() {

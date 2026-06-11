@@ -78,11 +78,11 @@ export default function DatasetDetail({ datasetId }) {
           useDatasetStore.setState({ currentDataset: data });
         }
         if (eventType === "complete") {
-          toast.success("Preprocessing selesai!");
+          toast.success("Preprocessing completed!");
         }
         if (eventType === "error_event") {
           toast.error(
-            "Preprocessing gagal: " + (data?.preprocessing_error ?? "")
+            "Preprocessing failed: " + (data?.preprocessing_error ?? "")
           );
         }
       },
@@ -92,11 +92,11 @@ export default function DatasetDetail({ datasetId }) {
 
   const handleSaveColumns = async () => {
     if (!textCol || !labelCol) {
-      toast.error("Pilih kolom teks dan kolom label terlebih dahulu");
+      toast.error("Please select text and label columns first");
       return;
     }
     if (textCol === labelCol) {
-      toast.error("Kolom teks dan label harus berbeda");
+      toast.error("Text and label columns must be different");
       return;
     }
     const result = await setColumns(datasetId, textCol, labelCol);
@@ -113,7 +113,7 @@ export default function DatasetDetail({ datasetId }) {
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={24} className="animate-spin text-(--accent)" />
-          <p className="text-xs text-(--text-tertiary)">Memuat dataset...</p>
+          <p className="text-xs text-(--text-tertiary)">Loading dataset...</p>
         </div>
       </div>
     );
@@ -124,13 +124,13 @@ export default function DatasetDetail({ datasetId }) {
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <Database size={36} className="mb-3 text-(--text-disabled)" />
         <p className="text-sm font-medium text-(--text-secondary)">
-          Dataset tidak ditemukan.
+          Dataset not found.
         </p>
         <button
           onClick={() => router.back()}
           className="mt-4 inline-flex items-center gap-1.5 text-xs text-(--text-tertiary) transition-colors hover:text-(--accent)"
         >
-          <ArrowLeft size={13} /> Kembali
+          <ArrowLeft size={13} /> Back
         </button>
       </div>
     );
@@ -149,7 +149,7 @@ export default function DatasetDetail({ datasetId }) {
           onClick={() => router.push("/admin/datasets")}
           className="mb-4 inline-flex items-center gap-1.5 text-xs font-medium text-(--text-tertiary) transition-all duration-150 hover:text-(--text-primary)"
         >
-          <ArrowLeft size={13} /> Kembali ke daftar dataset
+          <ArrowLeft size={13} /> Back to dataset list
         </button>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -160,24 +160,24 @@ export default function DatasetDetail({ datasetId }) {
             <div className="mt-3 flex flex-wrap items-center gap-2.5">
               <span
                 className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
-                title="Nama File"
+                title="File Name"
               >
                 <FileText size={13} className="text-(--text-tertiary)" />
                 {ds.file_name}
               </span>
               <span
                 className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
-                title="Diupload Oleh"
+                title="Uploaded By"
               >
                 <User size={13} className="text-(--text-tertiary)" />
                 {ds.uploader_name || "admin"}
               </span>
               <span
                 className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
-                title="Kolom"
+                title="Columns"
               >
                 <Columns size={13} className="text-(--text-tertiary)" />
-                {availableColumns.length} Kolom
+                {availableColumns.length} Columns
                 {/* {hasColumnConfig && (
                   <span className="ml-0.5 opacity-70">
                     (Teks: {ds.text_column}, Label: {ds.label_column})
@@ -201,7 +201,7 @@ export default function DatasetDetail({ datasetId }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
           <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
-            Baris Raw
+            Raw Rows
           </p>
           <p className="mt-1 text-2xl font-bold tracking-tight text-(--text-primary)">
             {ds.num_rows_raw?.toLocaleString("id") ?? "—"}
@@ -209,7 +209,7 @@ export default function DatasetDetail({ datasetId }) {
         </div>
         <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
           <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
-            Baris Preprocessed
+            Preprocessed Rows
           </p>
           <p className="mt-1 text-2xl font-bold tracking-tight text-(--text-primary)">
             {ds.num_rows_preprocessed?.toLocaleString("id") ?? "—"}
@@ -217,7 +217,7 @@ export default function DatasetDetail({ datasetId }) {
         </div>
         <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
           <p className="text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
-            Ukuran File
+            File Size
           </p>
           <p className="mt-1 text-2xl font-bold tracking-tight text-(--text-primary)">
             {ds.file_size
@@ -229,27 +229,26 @@ export default function DatasetDetail({ datasetId }) {
         </div>
       </div>
 
-      {/* 2-Column Grid: Pengaturan Kolom & Distribusi Kelas */}
+      {/* 2-Column Grid: Column Settings & Class Distribution */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch">
-        {/* Kolom Kiri: Pengaturan Kolom */}
+        {/* Left Column: Column Settings */}
         <div className="flex flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
           <h2 className="mb-1 text-sm font-semibold text-(--text-primary)">
-            Pengaturan Kolom
+            Column Settings
           </h2>
           <p className="mb-4 text-xs text-(--text-secondary)">
-            Tentukan kolom mana yang berisi teks dan kolom mana yang berisi
-            label kelas.
+            Determine which column contains text and which contains class labels.
           </p>
 
           {availableColumns.length === 0 ? (
             <div className="flex flex-1 items-center justify-center text-sm text-(--text-tertiary)">
-              Tidak ada informasi kolom.
+              No column information.
             </div>
           ) : (
             <div className="flex flex-1 flex-col space-y-4">
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
-                  Kolom Teks
+                  Text Column
                 </label>
                 <select
                   value={textCol}
@@ -259,7 +258,7 @@ export default function DatasetDetail({ datasetId }) {
                   }}
                   className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                 >
-                  <option value="">-- Pilih kolom --</option>
+                  <option value="">-- Select column --</option>
                   {availableColumns.map((c) => (
                     <option key={c} value={c}>
                       {c}
@@ -269,7 +268,7 @@ export default function DatasetDetail({ datasetId }) {
               </div>
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
-                  Kolom Label
+                  Label Column
                 </label>
                 <select
                   value={labelCol}
@@ -279,7 +278,7 @@ export default function DatasetDetail({ datasetId }) {
                   }}
                   className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                 >
-                  <option value="">-- Pilih kolom --</option>
+                  <option value="">-- Select column --</option>
                   {availableColumns
                     .filter((c) => c !== textCol)
                     .map((c) => (
@@ -298,17 +297,17 @@ export default function DatasetDetail({ datasetId }) {
                   }
                   className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
                 >
-                  {isSubmitting ? "Menyimpan..." : "Simpan Pengaturan"}
+                  {isSubmitting ? "Saving..." : "Save Settings"}
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Kolom Kanan: Distribusi Kelas */}
+        {/* Right Column: Class Distribution */}
         <div className="flex flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
           <h2 className="mb-4 text-sm font-semibold text-(--text-primary)">
-            Distribusi Kelas (Raw vs Preprocessed)
+            Class Distribution (Raw vs Preprocessed)
           </h2>
           <div className="flex flex-1 flex-col justify-center">
             {showDistribution ? (
@@ -320,9 +319,9 @@ export default function DatasetDetail({ datasetId }) {
             ) : (
               <div className="flex h-full min-h-[200px] flex-col items-center justify-center text-center text-(--text-tertiary)">
                 <Database size={32} className="mb-3 text-(--border-strong)" />
-                <p className="text-sm">Belum ada distribusi data.</p>
+                <p className="text-sm">No data distribution yet.</p>
                 <p className="mt-1 text-xs">
-                  Silakan simpan Pengaturan Kolom terlebih dahulu.
+                  Please save Column Settings first.
                 </p>
               </div>
             )}
@@ -335,8 +334,8 @@ export default function DatasetDetail({ datasetId }) {
         {/* Tab headers */}
         <div className="flex border-b border-(--border-default)">
           {[
-            { key: "raw", label: "Data Asli (Raw)" },
-            { key: "preprocessed", label: "Data Preprocessed" },
+            { key: "raw", label: "Raw Data" },
+            { key: "preprocessed", label: "Preprocessed Data" },
           ].map(({ key, label }) => (
             <button
               key={key}

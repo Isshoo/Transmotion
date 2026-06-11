@@ -1,6 +1,6 @@
 import ModelTable from "@/features/admin/models/components/ModelTable";
 
-export const metadata = { title: "Model Terlatih" };
+export const metadata = { title: "Trained Models" };
 
 export default function ModelsPage() {
   return (

@@ -24,7 +24,7 @@ export default function ModelDetailModal() {
     if (!secs) return "—";
     const h = Math.floor(secs / 3600);
     const m2 = Math.floor((secs % 3600) / 60);
-    return h > 0 ? `${h}j ${m2}m` : `${m2}m`;
+    return h > 0 ? `${h}h ${m2}m` : `${m2}m`;
   };
 
   return (
@@ -51,11 +51,11 @@ export default function ModelDetailModal() {
           <div className="flex items-center gap-3">
             {m.is_active ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-(--success-muted)/50 bg-(--success-muted)/20 px-3 py-1 text-[10px] font-bold tracking-wider text-(--success) uppercase shadow-(--shadow-sm)">
-                <CheckCircle size={12} /> Aktif
+                <CheckCircle size={12} /> Active
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-(--border-strong) bg-(--bg-elevated) px-3 py-1 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase shadow-(--shadow-sm)">
-                <XCircle size={12} /> Nonaktif
+                <XCircle size={12} /> Inactive
               </span>
             )}
             <button
@@ -70,24 +70,24 @@ export default function ModelDetailModal() {
         {/* Body */}
         <div className="scrollbar-thin scrollbar-thumb-(--border-strong) scrollbar-track-transparent flex-1 space-y-6 overflow-y-auto p-6">
           {/* Info umum */}
-          <Section title="Informasi Model">
+          <Section title="Model Information">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
-                ["Arsitektur", m.model_type?.toUpperCase()],
+                ["Architecture", m.model_type?.toUpperCase()],
                 ["Base Model", m.base_model_name ?? "—"],
-                ["Jumlah Kelas", m.num_labels ?? "—"],
-                ["Ukuran File", formatSize(m.file_size)],
+                ["Number of Classes", m.num_labels ?? "—"],
+                ["File Size", formatSize(m.file_size)],
                 [
-                  "Total Prediksi",
+                  "Total Predictions",
                   (m.total_predictions || 0).toLocaleString("id"),
                 ],
-                ["Durasi Training", formatDur(m.job?.duration_seconds)],
+                ["Training Duration", formatDur(m.job?.duration_seconds)],
                 ["Dataset", m.job?.dataset_name ?? "—"],
                 [
-                  "Lokasi File",
+                  "File Location",
                   m.file_path?.startsWith("/content/drive")
                     ? "Google Drive"
-                    : "Lokal",
+                    : "Local",
                 ],
               ].map(([label, value]) => (
                 <div
@@ -110,7 +110,7 @@ export default function ModelDetailModal() {
 
           {/* Deskripsi */}
           {m.description && (
-            <Section title="Deskripsi">
+            <Section title="Description">
               <p className="font-mono text-sm leading-relaxed text-(--text-secondary)">
                 {m.description}
               </p>
@@ -119,7 +119,7 @@ export default function ModelDetailModal() {
 
           {/* Label mapping */}
           {m.label_map && Object.keys(m.label_map).length > 0 && (
-            <Section title="Label Kelas">
+            <Section title="Class Labels">
               <div className="flex flex-wrap gap-2.5">
                 {Object.entries(m.label_map).map(([idx, label]) => (
                   <span
@@ -137,7 +137,7 @@ export default function ModelDetailModal() {
           )}
 
           {/* Metrik utama */}
-          <Section title="Metrik Evaluasi (Test Set)">
+          <Section title="Evaluation Metrics (Test Set)">
             <div className="space-y-4">
               <MetricBar
                 label="Accuracy"
@@ -164,14 +164,14 @@ export default function ModelDetailModal() {
 
           {/* Per-class */}
           {m.per_class_metrics && (
-            <Section title="Metrik Per Kelas">
+            <Section title="Per-Class Metrics">
               <PerClassTable perClass={m.per_class_metrics} />
             </Section>
           )}
 
           {/* Rata-rata */}
           {(m.macro_avg || m.weighted_avg) && (
-            <Section title="Rata-rata">
+            <Section title="Averages">
               <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
                 <table className="w-full text-xs">
                   <thead>
@@ -234,7 +234,7 @@ export default function ModelDetailModal() {
 
           {/* Hyperparameter */}
           {m.training_config && (
-            <Section title="Hyperparameter Training">
+            <Section title="Training Hyperparameters">
               <div className="flex flex-wrap gap-2.5">
                 {[
                   ["Learning Rate", m.training_config.learning_rate],
@@ -260,7 +260,7 @@ export default function ModelDetailModal() {
 
           {/* Distribusi prediksi */}
           {m.total_predictions > 0 && m.per_label && (
-            <Section title="Distribusi Prediksi">
+            <Section title="Prediction Distribution">
               <div className="space-y-3.5">
                 {Object.entries(m.per_label)
                   .sort((a, b) => b[1] - a[1])
@@ -301,7 +301,7 @@ export default function ModelDetailModal() {
             onClick={closeDetailModal}
             className="rounded-xl border border-(--border-strong) bg-(--bg-surface) px-5 py-2.5 text-sm font-bold tracking-wide text-(--text-secondary) shadow-(--shadow-sm) transition-all hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
-            Tutup
+            Close
           </button>
         </div>
       </div>

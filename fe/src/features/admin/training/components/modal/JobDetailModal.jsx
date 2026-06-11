@@ -31,14 +31,14 @@ export default function JobDetailModal() {
         useTrainingStore.setState((state) => ({
           jobs: state.jobs.map((j) => (j.id === data.id ? data : j)),
         }));
-        toast.success("Training selesai!");
+        toast.success("Training complete!");
       }
       if (eventType === "error_event") {
         useTrainingStore.setState((state) => ({
           currentJob: data,
           jobs: state.jobs.map((j) => (j.id === data.id ? data : j)),
         }));
-        toast.error("Training gagal: " + (data?.error_message ?? ""));
+        toast.error("Training failed: " + (data?.error_message ?? ""));
       }
     },
   });
@@ -110,7 +110,7 @@ export default function JobDetailModal() {
               />
               <div>
                 <p className="text-sm font-semibold text-(--error)">
-                  Training gagal
+                  Training failed
                 </p>
                 <p className="mt-1 font-mono text-xs leading-relaxed text-(--error) opacity-80">
                   {job.error_message}
@@ -164,10 +164,10 @@ export default function JobDetailModal() {
             {[
               ["Dataset", job.dataset_name ?? "—"],
               ["Model", job.model_type?.toUpperCase()],
-              ["Durasi", formatDuration(job.duration_seconds)],
+              ["Duration", formatDuration(job.duration_seconds)],
               ["Train", split.train_total?.toLocaleString("id") ?? "—"],
               ["Test", split.test_total?.toLocaleString("id") ?? "—"],
-              ["Jumlah Kelas", split.num_labels ?? "—"],
+              ["Num Classes", split.num_labels ?? "—"],
             ].map(([label, value]) => (
               <div
                 key={label}
@@ -216,7 +216,7 @@ export default function JobDetailModal() {
           {job.epoch_logs?.length > 0 && (
             <div>
               <p className="mb-2.5 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                Log Per Epoch
+                Per-Epoch Logs
               </p>
               <div className="overflow-hidden rounded-lg border border-(--border-default)">
                 <div className="overflow-x-auto">
@@ -277,7 +277,7 @@ export default function JobDetailModal() {
         {/* Footer */}
         <div className="flex shrink-0 items-center justify-between rounded-b-xl border-t border-(--border-default) bg-(--bg-elevated) px-6 py-4">
           <div className="text-[10px] font-medium tracking-wide text-(--text-tertiary) uppercase">
-            Dibuat:{" "}
+            Created:{" "}
             {job.created_at
               ? new Date(job.created_at).toLocaleString("id-ID")
               : "—"}
@@ -291,14 +291,14 @@ export default function JobDetailModal() {
                 }}
                 className="rounded-md border border-(--error)/30 px-4 py-2 text-sm font-medium text-(--error) transition-all duration-150 hover:bg-(--error-muted)"
               >
-                Batalkan Job
+                Cancel Job
               </button>
             )}
             <button
               onClick={closeDetailModal}
               className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             >
-              Tutup
+              Close
             </button>
           </div>
         </div>

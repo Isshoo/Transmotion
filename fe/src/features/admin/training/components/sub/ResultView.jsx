@@ -17,7 +17,7 @@ export default function ResultView() {
     const h = Math.floor(secs / 3600);
     const m = Math.floor((secs % 3600) / 60);
     const s = secs % 60;
-    return h > 0 ? `${h}j ${m}m ${s}s` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+    return h > 0 ? `${h}h ${m}m ${s}s` : m > 0 ? `${m}m ${s}s` : `${s}s`;
   };
 
   return (
@@ -52,10 +52,10 @@ export default function ResultView() {
                 }`}
               >
                 {isSuccess
-                  ? "Training Selesai!"
+                  ? "Training Complete!"
                   : isFailed
-                    ? "Training Gagal"
-                    : "Training Dibatalkan"}
+                    ? "Training Failed"
+                    : "Training Cancelled"}
               </p>
             </div>
             <p
@@ -96,7 +96,7 @@ export default function ResultView() {
               )}
               {job.duration_seconds && (
                 <span className="flex items-center gap-1.5">
-                  Durasi{" "}
+                  Duration{" "}
                   <strong className="text-(--text-primary)">
                     {formatDur(job.duration_seconds)}
                   </strong>
@@ -113,25 +113,25 @@ export default function ResultView() {
             )}
           </div>
 
-          {/* Tombol train baru */}
+          {/* New train button */}
           <button
             onClick={resetToForm}
             className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-semibold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
             <RotateCcw size={16} />
-            Training Baru
+            New Training
           </button>
         </div>
       </div>
 
-      {/* Hasil evaluasi — hanya jika selesai */}
+      {/* Evaluation results — only if completed */}
       {isSuccess && <EvaluationResults job={job} />}
 
-      {/* Log epoch yang sempat masuk (untuk cancelled/failed) */}
+      {/* Partial Epoch Logs */}
       {!isSuccess && job.epoch_logs?.length > 0 && (
         <div className="animate-fade-in rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Log Epoch (Parsial)
+            Partial Epoch Logs
           </p>
           <div className="overflow-x-auto rounded-lg border border-(--border-subtle)">
             <table className="w-full text-xs">

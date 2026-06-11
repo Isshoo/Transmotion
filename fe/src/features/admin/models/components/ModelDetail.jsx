@@ -122,7 +122,7 @@ export default function ModelDetail({ modelId }) {
           onClick={() => router.push("/admin/models")}
           className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide text-(--text-tertiary) uppercase transition-colors hover:text-(--text-primary)"
         >
-          <ArrowLeft size={14} /> Kembali ke daftar model
+          <ArrowLeft size={14} /> Back to models list
         </button>
 
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -165,7 +165,7 @@ export default function ModelDetail({ modelId }) {
                   : "border-(--success-muted) bg-(--bg-surface) text-(--success) hover:bg-(--success-muted)/20"
               }`}
             >
-              {m.is_active ? "Nonaktifkan" : "Aktifkan"}
+              {m.is_active ? "Deactivate" : "Activate"}
             </button>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function ModelDetail({ modelId }) {
           <span className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)">
             <HardDrive size={13} className="text-(--text-tertiary)" />
             {formatSize(m.file_size)}
-            {m.is_drive_model ? " (Drive)" : " (Lokal)"}
+            {m.is_drive_model ? " (Drive)" : " (Local)"}
           </span>
           {/* dataset */}
           <span className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)">
@@ -192,11 +192,11 @@ export default function ModelDetail({ modelId }) {
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)">
             <Tag size={13} className="text-(--text-tertiary)" />
-            {m.num_labels ?? "—"} Kelas
+            {m.num_labels ?? "—"} Classes
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)">
             <BarChart3 size={13} className="text-(--text-tertiary)" />
-            {(m.prediction_count || 0).toLocaleString("id")} Prediksi
+            {(m.prediction_count || 0).toLocaleString("id")} Predictions
           </span>
           {m.job && (
             <>
@@ -222,7 +222,7 @@ export default function ModelDetail({ modelId }) {
         <div className="flex flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
           <div className="rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
             <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Hyperparameter Training
+              Training Hyperparameters
             </h3>
           </div>
           <div className="flex-1 p-0">
@@ -255,7 +255,7 @@ export default function ModelDetail({ modelId }) {
               </table>
             ) : (
               <div className="flex h-full items-center justify-center p-6 text-center text-xs text-(--text-tertiary)">
-                Belum ada data hyperparameter.
+                No hyperparameter data yet.
               </div>
             )}
           </div>
@@ -265,7 +265,7 @@ export default function ModelDetail({ modelId }) {
         <div className="flex flex-col rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
           <div className="rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
             <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Informasi Dataset
+              Dataset Information
             </h3>
           </div>
           <div className="flex flex-1 flex-col space-y-6 p-6">
@@ -273,7 +273,7 @@ export default function ModelDetail({ modelId }) {
             {m.job?.split_info ? (
               <div>
                 <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Distribusi Data
+                  Data Distribution
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
@@ -320,7 +320,7 @@ export default function ModelDetail({ modelId }) {
             {m.label_map && Object.keys(m.label_map).length > 0 ? (
               <div>
                 <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Label Kelas
+                  Class Labels
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(m.label_map).map(([idx, label]) => (
@@ -375,7 +375,7 @@ export default function ModelDetail({ modelId }) {
             {/* Metrik KPI Cards */}
             <div>
               <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                Metrik Evaluasi
+                Evaluation Metrics
               </p>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
@@ -435,7 +435,7 @@ export default function ModelDetail({ modelId }) {
                 metrics.mcc == null &&
                 metrics.roc_auc == null && (
                   <p className="mt-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-                    💡 Metrik MCC, ROC-AUC, dan Mean Std dihitung dari test set.
+                    💡 MCC, ROC-AUC, and Mean Std metrics are calculated from the test set.
                   </p>
                 )}
             </div>
@@ -444,7 +444,7 @@ export default function ModelDetail({ modelId }) {
             {metrics.perClass && Object.keys(metrics.perClass).length > 0 && (
               <div>
                 <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Metrik Per Kelas
+                  Per-Class Metrics
                 </p>
                 <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
                   <div className="overflow-x-auto">
@@ -452,7 +452,7 @@ export default function ModelDetail({ modelId }) {
                       <thead>
                         <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
                           {[
-                            "Kelas",
+                            "Class",
                             "Precision",
                             "Recall",
                             "F1-Score",
@@ -570,7 +570,7 @@ export default function ModelDetail({ modelId }) {
         <div className="">
           <div className="mb-3 px-2">
             <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Log Per Epoch
+              Per-Epoch Logs
             </h3>
           </div>
           <div className="shadow-sm">

@@ -16,7 +16,7 @@ export default function PerClassComparison({ mbert, xlmr }) {
   return (
     <div>
       <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-        Metrik Per Kelas (Model Terbaik)
+        Per-Class Metrics (Best Model)
       </p>
       <div className="overflow-hidden rounded-xl border border-(--border-default) shadow-(--shadow-sm)">
         <div className="scrollbar-thin scrollbar-thumb-(--border-strong) overflow-x-auto">
@@ -27,7 +27,7 @@ export default function PerClassComparison({ mbert, xlmr }) {
                   rowSpan={2}
                   className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-left text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase"
                 >
-                  Kelas
+                  Class
                 </th>
                 <th
                   colSpan={3}

@@ -37,11 +37,11 @@ export default function TrainingPage() {
         }
         if (eventType === "complete") {
           setActiveJob(data);
-          toast.success("Training selesai!");
+          toast.success("Training complete!");
         }
         if (eventType === "error_event") {
           setActiveJob(data);
-          toast.error("Training gagal: " + (data?.error_message ?? ""));
+          toast.error("Training failed: " + (data?.error_message ?? ""));
         }
       },
     }
@@ -57,20 +57,20 @@ export default function TrainingPage() {
         </h1>
         <p className="mt-1 text-sm text-(--text-secondary)">
           {view === "form" &&
-            "Konfigurasi dan mulai pelatihan model mBERT / XLM-R"}
+            "Configure and start training an mBERT / XLM-R model"}
           {view === "progress" &&
-            "Training sedang berjalan — progress diperbarui otomatis"}
+            "Training is running — progress updates automatically"}
           {view === "result" &&
-            "Training selesai — lihat hasil evaluasi atau mulai training baru"}
+            "Training complete — view evaluation results or start a new training"}
         </p>
       </div>
 
       {/* Step indicator */}
       <div className="flex items-center gap-2">
         {[
-          { key: "form", label: "Konfigurasi" },
+          { key: "form", label: "Configuration" },
           { key: "progress", label: "Training" },
-          { key: "result", label: "Hasil" },
+          { key: "result", label: "Result" },
         ].map(({ key, label }, i) => (
           <div key={key} className="flex items-center gap-2">
             {i > 0 && (
@@ -105,7 +105,7 @@ export default function TrainingPage() {
             <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-(--accent)" />
               <p className="text-xs font-medium">
-                Memeriksa status training...
+                Checking training status...
               </p>
             </div>
           </div>

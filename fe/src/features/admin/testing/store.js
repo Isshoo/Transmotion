@@ -195,7 +195,7 @@ const useTestingStore = create((set, get) => ({
     try {
       if (inputMode === "single") {
         if (!inputText.trim()) {
-          set({ error: "Masukkan teks terlebih dahulu", isClassifying: false });
+          set({ error: "Please enter text first", isClassifying: false });
           return;
         }
         const { data: res } = await testingApi.classifySingle({
@@ -207,8 +207,8 @@ const useTestingStore = create((set, get) => ({
         if (csvTexts.length === 0) {
           const msg =
             selectedTextColumn === null
-              ? "Pilih kolom teks terlebih dahulu"
-              : "Upload file CSV terlebih dahulu atau kolom yang dipilih kosong";
+              ? "Please select a text column first"
+              : "Please upload a CSV file first or the selected column is empty";
           set({
             error: msg,
             isClassifying: false,

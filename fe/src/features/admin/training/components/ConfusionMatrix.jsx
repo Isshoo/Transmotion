@@ -32,7 +32,7 @@ export default function ConfusionMatrix({ data }) {
           <thead>
             <tr>
               <th className="w-28 bg-(--bg-surface) px-3 py-2 text-right text-[10px] font-medium tracking-wider text-(--text-tertiary) uppercase">
-                Aktual ↓ / Prediksi →
+                Actual ↓ / Predicted →
               </th>
               {labels.map((l) => (
                 <th
@@ -78,7 +78,7 @@ export default function ConfusionMatrix({ data }) {
         </table>
       </div>
       <p className="mt-2 text-right text-[10px] font-medium tracking-wide text-(--text-tertiary) uppercase">
-        Total sampel:{" "}
+        Total samples:{" "}
         <span className="font-bold text-(--text-secondary)">{total}</span>
       </p>
     </div>

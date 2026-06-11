@@ -69,7 +69,7 @@ export default function PreprocessedTab({ dataset }) {
   const handleDelete = async (row) => {
     const result = await deletePreprocessedRow(datasetId, row.id);
     if (result.success) {
-      toast.success("Data berhasil dihapus");
+      toast.success("Data successfully deleted");
       setDeleteTarget(null);
     } else toast.error(result.message);
   };
@@ -93,16 +93,14 @@ export default function PreprocessedTab({ dataset }) {
           <Cpu size={28} className="text-(--accent)" />
         </div>
         <h3 className="mb-2 text-base font-semibold tracking-tight text-(--text-primary)">
-          Dataset Belum Dipreprocess
+          Dataset Not Preprocessed
         </h3>
         <p className="mb-1 max-w-sm text-sm text-(--text-secondary)">
-          Lakukan preprocessing untuk membersihkan teks dari noise (URL,
-          mention, dll) dan menghasilkan dataset siap training.
+          Perform preprocessing to clean text from noise (URLs, mentions, etc.) and generate a training-ready dataset.
         </p>
         {isNotConfigured && (
           <p className="mb-4 text-xs font-medium text-(--warning)">
-            ⚠ Atur kolom teks dan label terlebih dahulu di bagian
-            &quot;Pengaturan Kolom&quot; di atas.
+            ⚠ Configure text and label columns first in the &quot;Column Settings&quot; section above.
           </p>
         )}
         <button
@@ -110,7 +108,7 @@ export default function PreprocessedTab({ dataset }) {
           disabled={isNotConfigured}
           className="mt-5 inline-flex items-center gap-2 rounded-md bg-(--accent) px-5 py-2.5 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <Cpu size={15} /> Mulai Preprocessing
+          <Cpu size={15} /> Start Preprocessing
         </button>
         {showPreprocessModal && (
           <PreprocessModal
@@ -129,11 +127,10 @@ export default function PreprocessedTab({ dataset }) {
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <Loader2 size={36} className="mb-5 animate-spin text-(--accent)" />
         <h3 className="mb-1 text-base font-semibold tracking-tight text-(--text-primary)">
-          Preprocessing Berjalan
+          Preprocessing in Progress
         </h3>
         <p className="max-w-sm text-sm text-(--text-secondary)">
-          Sedang memproses {dataset.num_rows_raw?.toLocaleString("id")} baris
-          data. Halaman ini akan otomatis diperbarui saat selesai.
+          Processing {dataset.num_rows_raw?.toLocaleString("id")} rows of data. This page will automatically update when finished.
         </p>
       </div>
     );
@@ -153,7 +150,7 @@ export default function PreprocessedTab({ dataset }) {
             type="text"
             value={localSearch}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Cari teks asli atau preprocessed..."
+            placeholder="Search raw or preprocessed text..."
             className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) py-1.5 pr-8 pl-8 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           {localSearch && (
@@ -176,7 +173,7 @@ export default function PreprocessedTab({ dataset }) {
             }
             className="w-full max-w-[160px] rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           >
-            <option value="">Semua Label</option>
+            <option value="">All Labels</option>
             {labels.map((l) => (
               <option key={l} value={l}>
                 {l}
@@ -185,7 +182,7 @@ export default function PreprocessedTab({ dataset }) {
           </select>
         )}
         <span className="ml-auto text-xs text-(--text-tertiary)">
-          {preprocessedTotal.toLocaleString("id")} baris
+          {preprocessedTotal.toLocaleString("id")} rows
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -193,14 +190,14 @@ export default function PreprocessedTab({ dataset }) {
             className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-1.5 text-xs font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             <RefreshCw size={12} />{" "}
-            <span className="max-md:hidden">Preprocess Ulang</span>
+            <span className="max-md:hidden">Re-preprocess</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="inline-flex items-center gap-1.5 rounded-md bg-(--accent) px-3 py-1.5 text-xs font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
             <Plus size={12} />{" "}
-            <span className="max-md:hidden">Tambah Data</span>
+            <span className="max-md:hidden">Add Data</span>
           </button>
         </div>
       </div>
@@ -215,16 +212,16 @@ export default function PreprocessedTab({ dataset }) {
                   #
                 </th>
                 <th className="px-4 py-2.5 text-left text-xs font-semibold tracking-wider text-(--text-tertiary) uppercase">
-                  Teks Asli
+                  Raw Text
                 </th>
                 <th className="px-4 py-2.5 text-left text-xs font-semibold tracking-wider text-(--text-tertiary) uppercase">
-                  Teks Preprocessed
+                  Preprocessed Text
                 </th>
                 <th className="px-4 py-2.5 text-left text-xs font-semibold tracking-wider text-(--text-tertiary) uppercase">
                   Label
                 </th>
                 <th className="px-4 py-2.5 text-right text-xs font-semibold tracking-wider text-(--text-tertiary) uppercase">
-                  Aksi
+                  Action
                 </th>
               </tr>
             </thead>
@@ -245,7 +242,7 @@ export default function PreprocessedTab({ dataset }) {
                     colSpan={5}
                     className="px-4 py-12 text-center text-sm text-(--text-disabled)"
                   >
-                    Tidak ada data ditemukan
+                    No data found
                   </td>
                 </tr>
               ) : (
@@ -289,7 +286,7 @@ export default function PreprocessedTab({ dataset }) {
                         </button>
                         <button
                           onClick={() => setDeleteTarget(row)}
-                          title="Hapus"
+                          title="Delete"
                           className="rounded-md p-1.5 text-(--text-tertiary) transition-all duration-150 hover:bg-(--error-muted) hover:text-(--error)"
                         >
                           <Trash2 size={13} />
@@ -311,7 +308,7 @@ export default function PreprocessedTab({ dataset }) {
             <span className="font-medium text-(--text-secondary)">
               {from}–{to}
             </span>{" "}
-            dari{" "}
+            of{" "}
             <span className="font-medium text-(--text-secondary)">
               {preprocessedTotal.toLocaleString("id")}
             </span>
@@ -384,10 +381,10 @@ export default function PreprocessedTab({ dataset }) {
               <Trash2 size={20} className="text-(--error)" />
             </div>
             <h2 className="mb-1.5 text-base font-semibold tracking-tight text-(--text-primary)">
-              Hapus Data?
+              Delete Data?
             </h2>
             <p className="mb-3 text-sm text-(--text-secondary)">
-              Data berikut akan dihapus secara permanen:
+              The following data will be permanently deleted:
             </p>
             <div className="mb-5 line-clamp-3 rounded-lg border border-(--border-default) bg-(--bg-elevated) p-3 text-xs leading-relaxed text-(--text-secondary)">
               {deleteTarget.preprocessed_text}
@@ -398,14 +395,14 @@ export default function PreprocessedTab({ dataset }) {
                 disabled={isSubmitting}
                 className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
               >
-                Batal
+                Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteTarget)}
                 disabled={isSubmitting}
                 className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
               >
-                {isSubmitting ? "Menghapus..." : "Ya, Hapus"}
+                {isSubmitting ? "Deleting..." : "Yes, Delete"}
               </button>
             </div>
           </div>

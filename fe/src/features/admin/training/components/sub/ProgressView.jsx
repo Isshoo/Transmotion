@@ -34,7 +34,7 @@ export default function ProgressView() {
             <div className="mb-1.5 flex items-center gap-2">
               <Loader2 size={18} className="animate-spin text-(--accent)" />
               <p className="text-base font-semibold tracking-tight text-(--text-primary)">
-                Training Berjalan...
+                Training Running...
               </p>
             </div>
             <p className="text-sm font-medium text-(--accent) opacity-90">
@@ -145,7 +145,7 @@ export default function ProgressView() {
         <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
           <div className="border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3">
             <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Log Per Epoch
+              Per-Epoch Logs
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -221,7 +221,7 @@ export default function ProgressView() {
       {job.hyperparams && (
         <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
           <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Konfigurasi Training
+            Training Configuration
           </p>
           <div className="flex flex-wrap gap-2">
             {[
@@ -246,20 +246,20 @@ export default function ProgressView() {
         </div>
       )}
 
-      {/* Tombol batal */}
+      {/* Cancel button */}
       {!showCancelConfirm ? (
         <div className="flex justify-end">
           <button
             onClick={() => setShowCancelConfirm(true)}
             className="inline-flex items-center gap-2 rounded-lg border border-(--error)/30 px-4 py-2 text-sm font-medium text-(--error) transition-all duration-150 hover:bg-(--error-muted)"
           >
-            <Ban size={15} /> Batalkan Training
+            <Ban size={15} /> Cancel Training
           </button>
         </div>
       ) : (
         <div className="animate-scale-in rounded-xl border border-(--error)/30 bg-(--error-muted)/50 p-4">
           <p className="mb-3 text-sm font-medium text-(--error)">
-            Yakin ingin membatalkan training?
+            Are you sure you want to cancel training?
           </p>
           <div className="flex gap-2">
             <button
@@ -267,13 +267,13 @@ export default function ProgressView() {
               disabled={isSubmitting}
               className="rounded-lg bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
             >
-              {isSubmitting ? "Membatalkan..." : "Ya, Batalkan"}
+              {isSubmitting ? "Cancelling..." : "Yes, Cancel"}
             </button>
             <button
               onClick={() => setShowCancelConfirm(false)}
               className="rounded-lg border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             >
-              Tidak
+              No
             </button>
           </div>
         </div>

@@ -15,20 +15,20 @@ const FEATURES = [
   {
     num: "01",
     icon: Database,
-    title: "Manajemen Dataset",
-    desc: "Kelola dataset untuk berbagai studi kasus pelatihan model.",
+    title: "Dataset Management",
+    desc: "Manage datasets for various model training use cases.",
   },
   {
     num: "02",
     icon: BrainCircuit,
     title: "Fine-tuning Model",
-    desc: "Latih model dengan dataset anda langsung dari browser.",
+    desc: "Fine-tune models with your dataset directly from the browser.",
   },
   {
     num: "03",
     icon: Zap,
-    title: "Klasifikasi",
-    desc: "Gunakan model terlatih untuk melakukan klasifikasi.",
+    title: "Classification",
+    desc: "Use trained models to perform classification.",
   },
 ];
 
@@ -64,9 +64,9 @@ export default function HomePage() {
 
           {/* Description */}
           <p className="mb-10 max-w-xl text-lg leading-relaxed text-(--text-secondary)">
-            Platform manajemen dan deployment model NLP untuk klasifikasi teks
-            multibahasa secara real-time. Tingkatkan akurasi analisis Anda dalam
-            hitungan menit.
+          Platform for NLP model management and deployment for real-time
+            multilingual text classification. Improve your analysis accuracy in
+            minutes.
           </p>
 
           {/* Actions */}
@@ -78,7 +78,7 @@ export default function HomePage() {
               {/* Button shine effect */}
               <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
               <Zap size={16} className="fill-white" />
-              Coba Klasifikasi
+              Try Classification
               <ArrowRight
                 size={16}
                 className="ml-1 transition-transform group-hover:translate-x-1"

@@ -47,7 +47,7 @@ export default function ComparisonTable({ mbert, xlmr }) {
             <thead>
               <tr>
                 <th className="w-34 border-r border-b border-(--border-default) bg-(--bg-elevated) px-6 py-3.5 text-left text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Metrik
+                  Metric
                 </th>
                 <th className="border-r border-b border-(--border-default) bg-(--data-4)/10 px-6 py-3.5 text-center text-[10px] font-black tracking-wider text-(--data-4) uppercase">
                   XLM-R
@@ -82,7 +82,7 @@ export default function ComparisonTable({ mbert, xlmr }) {
                         {label}
                         {lowerBetter && (
                           <span className="ml-2 inline-flex items-center rounded-md border border-(--border-subtle) bg-(--bg-overlay) px-1.5 py-0.5 text-[9px] font-medium text-(--text-tertiary)">
-                            ↓ lebih baik
+                            ↓ lower is better
                           </span>
                         )}
                       </td>
@@ -125,14 +125,11 @@ export default function ComparisonTable({ mbert, xlmr }) {
       <div className="mt-3 flex items-start gap-2 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3">
         <span className="text-sm">💡</span>
         <p className="text-[11px] leading-relaxed text-(--text-tertiary)">
-          <strong className="text-(--success)">▲</strong> menandakan nilai lebih
-          baik. Best model dipilih berdasarkan{" "}
-          <strong className="text-(--text-secondary)">Accuracy</strong>{" "}
-          tertinggi.
+          <strong className="text-(--success)">▲</strong> indicates a better value. The best model is selected based on the highest{" "}
+          <strong className="text-(--text-secondary)">Accuracy</strong>.
           <br />
           <strong className="text-(--text-secondary)">Mean Std:</strong>{" "}
-          rata-rata standar deviasi confidence score (lebih rendah = lebih
-          confident).
+          average standard deviation of confidence scores (lower = more confident).
         </p>
       </div>
     </div>

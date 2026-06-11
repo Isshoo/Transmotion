@@ -39,10 +39,10 @@ export default function EvaluationPage() {
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <BarChart2 size={20} className="text-(--accent)" />
-            Evaluasi Performa
+            Performance Evaluation
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Komparasi XLM-R vs mBERT berdasarkan dataset dan split ratio
+            Compare XLM-R vs mBERT by dataset and split ratio
           </p>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function EvaluationPage() {
         {isLoadingDatasets ? (
           <div className="flex items-center gap-2 text-sm font-medium text-(--text-tertiary)">
             <Loader2 size={16} className="animate-spin text-(--accent)" />{" "}
-            Memuat dataset...
+            Loading datasets...
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -67,7 +67,7 @@ export default function EvaluationPage() {
                   : "border-(--border-default) bg-(--bg-elevated) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
               }`}
             >
-              Semua Dataset
+              All Datasets
             </button>
             {datasets.map((ds) => (
               <button
@@ -93,23 +93,22 @@ export default function EvaluationPage() {
             <Loader2 size={24} className="animate-spin text-(--accent)" />
           </div>
           <span className="text-sm font-semibold text-(--text-tertiary)">
-            Memuat data evaluasi...
+            Loading evaluation data...
           </span>
         </div>
       )}
 
-      {/* Tidak ada data */}
+      {/* No data */}
       {!isLoadingCompare && !hasData && (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-(--border-default) bg-(--bg-surface) py-20 text-center transition-colors hover:border-(--border-strong)">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
             <BarChart2 size={32} className="text-(--text-tertiary)" />
           </div>
           <p className="mb-2 text-base font-bold text-(--text-primary)">
-            Belum ada data komparasi
+            No comparison data yet
           </p>
           <p className="max-w-sm text-sm leading-relaxed font-medium text-(--text-secondary)">
-            Latih model XLM-R dan mBERT dengan dataset yang sama untuk melihat
-            perbandingan performa.
+            Train XLM-R and mBERT with the same dataset to see a performance comparison.
           </p>
         </div>
       )}

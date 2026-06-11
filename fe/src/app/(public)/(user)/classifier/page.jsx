@@ -1,6 +1,6 @@
 import ClassifyForm from "@/features/user/classify/components/ClassifyForm";
 
-export const metadata = { title: "Klasifikasi" };
+export const metadata = { title: "Classifier" };
 
 export default function ClassifierPage() {
   return (
