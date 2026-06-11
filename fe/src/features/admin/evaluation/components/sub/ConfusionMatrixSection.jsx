@@ -1,4 +1,6 @@
 import ConfusionMatrix from "@/features/admin/training/components/ConfusionMatrix";
+import InfoPopup from "@/components/ui/InfoPopup";
+import { CONFUSION_MATRIX_COMPARISON_INFO } from "@/components/ui/InfoContents";
 
 export default function ConfusionMatrixSection({ mbert, xlmr }) {
   const bMbert = mbert.find((m) => m.confusion_matrix);
@@ -8,9 +10,14 @@ export default function ConfusionMatrixSection({ mbert, xlmr }) {
 
   return (
     <div>
-      <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-        Confusion Matrix (Best Model)
-      </p>
+      <div className="mb-4 flex items-center gap-1.5">
+        <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+          Confusion Matrix (Best Model)
+        </p>
+        <InfoPopup title="Confusion Matrix Comparison — Guide">
+          {CONFUSION_MATRIX_COMPARISON_INFO}
+        </InfoPopup>
+      </div>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {bXlmr?.confusion_matrix && (
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">

@@ -19,7 +19,7 @@ export default function HistoryTable() {
 
   if (!isLoadingHistory && historyTotal === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
+      <div className="animate-fade-in flex flex-col items-center justify-center py-12 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
           <History size={32} className="text-(--text-tertiary)" />
         </div>

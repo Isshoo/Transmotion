@@ -59,7 +59,8 @@ function ResetPasswordContent() {
           Invalid Link
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
-          The password reset link is invalid or has expired. Please request a new link.
+          The password reset link is invalid or has expired. Please request a
+          new link.
         </p>
         <Link
           href="/forgot-password"
@@ -80,7 +81,8 @@ function ResetPasswordContent() {
           Password Successfully Reset!
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
-          Your password has been successfully changed. Please login with your new password.
+          Your password has been successfully changed. Please login with your
+          new password.
         </p>
         <button
           onClick={() => router.push("/login")}

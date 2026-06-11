@@ -25,16 +25,21 @@ export function HistoryTable() {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["No", "Text", "Prediction", "Confidence", "Model", "Time"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-4 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
-                    >
-                      {h}
-                    </th>
-                  )
-                )}
+                {[
+                  "No",
+                  "Text",
+                  "Prediction",
+                  "Confidence",
+                  "Model",
+                  "Time",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-(--border-subtle)">

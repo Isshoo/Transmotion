@@ -223,7 +223,8 @@ export default function CreateJobModal() {
                   </div>
                 ) : datasets.length === 0 ? (
                   <div className="rounded-md border border-(--warning-muted) bg-(--warning-muted) px-4 py-3 text-sm text-(--warning) opacity-90">
-                    No datasets are ready yet. Please preprocess a dataset first.
+                    No datasets are ready yet. Please preprocess a dataset
+                    first.
                   </div>
                 ) : (
                   <div className="space-y-2.5">

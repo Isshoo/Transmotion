@@ -3,6 +3,11 @@ import ComparisonTable from "./ComparisonTable";
 import ConfusionMatrixSection from "./ConfusionMatrixSection";
 import IterationTable from "./IterationTable";
 import PerClassComparison from "./PerClassComparison";
+import InfoPopup from "@/components/ui/InfoPopup";
+import {
+  ITERATION_TABLE_INFO,
+  METRIC_COMPARISON_INFO,
+} from "@/components/ui/InfoContents";
 
 export default function DatasetSection({ group }) {
   const { mbert, xlmr } = group;
@@ -57,12 +62,17 @@ export default function DatasetSection({ group }) {
       {/* Tabel iterasi */}
       <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
         <div className="mb-5">
-          <p className="text-sm font-bold tracking-tight text-(--text-primary)">
-            Iteration Table — Accuracy
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-bold tracking-tight text-(--text-primary)">
+              Iteration Table — Accuracy
+            </p>
+            <InfoPopup title="Iteration Table — Guide">
+              {ITERATION_TABLE_INFO}
+            </InfoPopup>
+          </div>
           <p className="mt-1 text-xs font-medium text-(--text-secondary)">
-            Each row = training iteration N with the same split.
-            The average is calculated from all iterations per column.
+            Each row = training iteration N with the same split. The average is
+            calculated from all iterations per column.
           </p>
         </div>
         <IterationTable mbert={mbert} xlmr={xlmr} metric="accuracy" />
@@ -71,9 +81,14 @@ export default function DatasetSection({ group }) {
       {/* Tabel perbandingan */}
       <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
         <div className="mb-5">
-          <p className="text-sm font-bold tracking-tight text-(--text-primary)">
-            Metric Comparison — Best Model
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-bold tracking-tight text-(--text-primary)">
+              Metric Comparison — Best Model
+            </p>
+            <InfoPopup title="Metric Comparison — Guide">
+              {METRIC_COMPARISON_INFO}
+            </InfoPopup>
+          </div>
           <p className="mt-1 text-xs font-medium text-(--text-secondary)">
             Compared from the model with the highest Accuracy of each type.
           </p>

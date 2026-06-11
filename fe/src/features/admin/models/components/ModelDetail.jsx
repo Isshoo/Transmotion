@@ -22,6 +22,13 @@ import useModelStore from "../store";
 import EditModelModal from "./modal/EditModelModal";
 import ConfusionMatrix from "@/features/admin/training/components/ConfusionMatrix";
 import EpochLogsTable from "@/features/admin/training/components/EpochLogsTable";
+import InfoPopup from "@/components/ui/InfoPopup";
+import {
+  METRICS_INFO,
+  PER_CLASS_INFO,
+  CONFUSION_MATRIX_INFO,
+  EPOCH_LOGS_INFO,
+} from "@/components/ui/InfoContents";
 
 export default function ModelDetail({ modelId }) {
   const router = useRouter();
@@ -374,9 +381,14 @@ export default function ModelDetail({ modelId }) {
           <div className="space-y-8 p-6">
             {/* Metrik KPI Cards */}
             <div>
-              <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                Evaluation Metrics
-              </p>
+              <div className="mb-4 flex items-center gap-1.5">
+                <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Evaluation Metrics
+                </p>
+                <InfoPopup title="Evaluation Metrics — Guide">
+                  {METRICS_INFO}
+                </InfoPopup>
+              </div>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
                   ["Accuracy", metrics.accuracy, "text-(--accent)"],
@@ -444,9 +456,14 @@ export default function ModelDetail({ modelId }) {
             {/* Metrik Per Kelas + Rata-rata (footer tabel) */}
             {metrics.perClass && Object.keys(metrics.perClass).length > 0 && (
               <div>
-                <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Per-Class Metrics
-                </p>
+                <div className="mb-4 flex items-center gap-1.5">
+                  <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                    Per-Class Metrics
+                  </p>
+                  <InfoPopup title="Per-Class Metrics — Guide">
+                    {PER_CLASS_INFO}
+                  </InfoPopup>
+                </div>
                 <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
@@ -554,9 +571,14 @@ export default function ModelDetail({ modelId }) {
             {/* Confusion Matrix */}
             {metrics.cm && (
               <div>
-                <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Confusion Matrix
-                </p>
+                <div className="mb-4 flex items-center gap-1.5">
+                  <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                    Confusion Matrix
+                  </p>
+                  <InfoPopup title="Confusion Matrix — Guide">
+                    {CONFUSION_MATRIX_INFO}
+                  </InfoPopup>
+                </div>
                 <div className="animate-fade-in">
                   <ConfusionMatrix data={metrics.cm} />
                 </div>
@@ -570,9 +592,14 @@ export default function ModelDetail({ modelId }) {
       {m.epoch_logs?.length > 0 && (
         <div className="">
           <div className="mb-3 px-2">
-            <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Per-Epoch Logs
-            </h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                Per-Epoch Logs
+              </h3>
+              <InfoPopup title="Per-Epoch Logs — Guide">
+                {EPOCH_LOGS_INFO}
+              </InfoPopup>
+            </div>
           </div>
           <div className="shadow-sm">
             <EpochLogsTable logs={m.epoch_logs} />

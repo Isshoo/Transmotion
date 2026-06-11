@@ -64,7 +64,7 @@ export default function HomePage() {
 
           {/* Description */}
           <p className="mb-10 max-w-xl text-lg leading-relaxed text-(--text-secondary)">
-          Platform for NLP model management and deployment for real-time
+            Platform for NLP model management and deployment for real-time
             multilingual text classification. Improve your analysis accuracy in
             minutes.
           </p>

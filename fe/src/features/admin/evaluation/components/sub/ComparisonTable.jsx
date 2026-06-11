@@ -125,11 +125,12 @@ export default function ComparisonTable({ mbert, xlmr }) {
       <div className="mt-3 flex items-start gap-2 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3">
         <span className="text-sm">💡</span>
         <p className="text-[11px] leading-relaxed text-(--text-tertiary)">
-          <strong className="text-(--success)">▲</strong> indicates a better value. The best model is selected based on the highest{" "}
+          <strong className="text-(--success)">▲</strong> indicates a better
+          value. The best model is selected based on the highest{" "}
           <strong className="text-(--text-secondary)">Accuracy</strong>.
           <br />
-          <strong className="text-(--text-secondary)">Mean Std:</strong>{" "}
-          average standard deviation of confidence scores (lower = more confident).
+          <strong className="text-(--text-secondary)">Mean Std:</strong> average
+          standard deviation of confidence scores (lower = more confident).
         </p>
       </div>
     </div>

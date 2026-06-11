@@ -133,7 +133,7 @@ export default function TestingPage() {
               </div>
             ) : activeModels.length === 0 ? (
               <div className="rounded-xl border border-(--warning-muted)/50 bg-(--warning-muted)/10 px-4 py-3.5 text-sm font-medium text-(--warning)">
-              No active models for this filter.
+                No active models for this filter.
               </div>
             ) : (
               <div className="relative">

@@ -237,7 +237,8 @@ export default function DatasetDetail({ datasetId }) {
             Column Settings
           </h2>
           <p className="mb-4 text-xs text-(--text-secondary)">
-            Determine which column contains text and which contains class labels.
+            Determine which column contains text and which contains class
+            labels.
           </p>
 
           {availableColumns.length === 0 ? (

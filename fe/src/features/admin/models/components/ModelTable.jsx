@@ -138,7 +138,7 @@ export default function ModelTable() {
             </button>
           )}
         </div>
-        
+
         <select
           value={datasetFilter}
           onChange={(e) => setDatasetFilter(e.target.value)}

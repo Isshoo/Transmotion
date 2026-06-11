@@ -56,7 +56,9 @@ export default function DatasetUploadModal() {
         );
       }
     } catch {
-      setPreviewError("Failed to read file. Make sure the file format is correct.");
+      setPreviewError(
+        "Failed to read file. Make sure the file format is correct."
+      );
     } finally {
       setIsParsing(false);
     }
@@ -228,7 +230,8 @@ export default function DatasetUploadModal() {
                   </span>
                 </p>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
-                  CSV, XLS, or XLSX — min 1500 rows, 2 columns. Dataset name must be unique.
+                  CSV, XLS, or XLSX — min 1500 rows, 2 columns. Dataset name
+                  must be unique.
                 </p>
               </div>
             ) : (
@@ -409,7 +412,8 @@ export default function DatasetUploadModal() {
           {isValid && (
             <div className="rounded-md border border-(--border-default) bg-(--accent-muted) px-3 py-2.5 text-xs leading-relaxed text-(--text-secondary)">
               <span className="mr-1 font-medium text-(--accent)">Info:</span>
-              After upload, the server will automatically remove empty rows and duplicates, then re-validate before saving.
+              After upload, the server will automatically remove empty rows and
+              duplicates, then re-validate before saving.
             </div>
           )}
         </div>

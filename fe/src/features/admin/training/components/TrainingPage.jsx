@@ -104,9 +104,7 @@ export default function TrainingPage() {
           <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
             <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-(--accent)" />
-              <p className="text-xs font-medium">
-                Checking training status...
-              </p>
+              <p className="text-xs font-medium">Checking training status...</p>
             </div>
           </div>
         ) : (

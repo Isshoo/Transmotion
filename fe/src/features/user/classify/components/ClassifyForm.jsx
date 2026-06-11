@@ -410,8 +410,7 @@ export default function ClassifyForm() {
           >
             {isClassifying ? (
               <>
-                <Loader2 size={18} className="animate-spin" />{" "}
-                Classifying...
+                <Loader2 size={18} className="animate-spin" /> Classifying...
               </>
             ) : (
               <>

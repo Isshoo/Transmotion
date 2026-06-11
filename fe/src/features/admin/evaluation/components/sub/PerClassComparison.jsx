@@ -1,4 +1,6 @@
 import { bestModel } from "../ui/Helpers";
+import InfoPopup from "@/components/ui/InfoPopup";
+import { PER_CLASS_COMPARISON_INFO } from "@/components/ui/InfoContents";
 
 export default function PerClassComparison({ mbert, xlmr }) {
   const bMbert = bestModel(mbert);
@@ -15,9 +17,14 @@ export default function PerClassComparison({ mbert, xlmr }) {
 
   return (
     <div>
-      <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-        Per-Class Metrics (Best Model)
-      </p>
+      <div className="mb-4 flex items-center gap-1.5">
+        <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+          Per-Class Metrics (Best Model)
+        </p>
+        <InfoPopup title="Per-Class Comparison — Guide">
+          {PER_CLASS_COMPARISON_INFO}
+        </InfoPopup>
+      </div>
       <div className="overflow-hidden rounded-xl border border-(--border-default) shadow-(--shadow-sm)">
         <div className="scrollbar-thin scrollbar-thumb-(--border-strong) overflow-x-auto">
           <table className="w-full border-collapse text-xs">

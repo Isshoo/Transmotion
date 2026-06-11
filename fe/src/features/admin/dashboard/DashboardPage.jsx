@@ -79,11 +79,12 @@ export default function DashboardPage() {
             Failed to Load Dashboard
           </h3>
           <p className="max-w-md text-sm text-(--text-secondary)">
-            Unable to load statistical data. This might happen because the backend is not responding or there is a network issue.
+            Unable to load statistical data. This might happen because the
+            backend is not responding or there is a network issue.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-6 flex items-center gap-2 rounded-lg bg-(--accent) px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-opacity-90 active:scale-95"
+            className="hover:bg-opacity-90 mt-6 flex items-center gap-2 rounded-lg bg-(--accent) px-5 py-2.5 text-sm font-medium text-white transition-all active:scale-95"
           >
             Try Reloading
           </button>

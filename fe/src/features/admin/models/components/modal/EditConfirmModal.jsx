@@ -38,7 +38,8 @@ export default function DeleteConfirmModal() {
           <span className="font-semibold text-(--text-primary)">
             {deleteTarget.name}
           </span>{" "}
-          and its files will be permanently deleted. This action cannot be undone.
+          and its files will be permanently deleted. This action cannot be
+          undone.
         </p>
         <div className="flex justify-end gap-3">
           <button

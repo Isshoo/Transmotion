@@ -183,16 +183,14 @@ export default function UserTable() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["User", "Role", "Status", "Verified", "Joined"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
-                    >
-                      {h}
-                    </th>
-                  )
-                )}
+                {["User", "Role", "Status", "Verified", "Joined"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
+                  >
+                    {h}
+                  </th>
+                ))}
                 <th className="px-5 py-3.5 text-right text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
                   Action
                 </th>

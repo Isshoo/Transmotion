@@ -48,8 +48,8 @@ export default function ForgotPasswordForm() {
           {activeTab === "forgot"
             ? "Password reset link has been sent to "
             : "Verification link has been resent to "}
-          <strong className="text-(--text-primary)">{email}</strong>. Check your inbox
-          or spam folder.
+          <strong className="text-(--text-primary)">{email}</strong>. Check your
+          inbox or spam folder.
         </p>
         <Link
           href="/login"

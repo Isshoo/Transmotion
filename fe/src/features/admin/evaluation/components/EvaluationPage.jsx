@@ -108,7 +108,8 @@ export default function EvaluationPage() {
             No comparison data yet
           </p>
           <p className="max-w-sm text-sm leading-relaxed font-medium text-(--text-secondary)">
-            Train XLM-R and mBERT with the same dataset to see a performance comparison.
+            Train XLM-R and mBERT with the same dataset to see a performance
+            comparison.
           </p>
         </div>
       )}

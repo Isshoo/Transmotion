@@ -9,6 +9,8 @@ import {
   Send,
 } from "lucide-react";
 import SplitPreviewCard from "../SplitPreviewCard";
+import InfoPopup from "@/components/ui/InfoPopup";
+import { MODEL_ARCH_INFO, HYPERPARAM_INFO } from "@/components/ui/InfoContents";
 
 const MODEL_OPTIONS = [
   {
@@ -196,7 +198,8 @@ export default function FormView() {
             </span>
           </p>
           <p className="mb-5 text-xs text-(--text-secondary)">
-            Data is split into 3: train for training, validation for per-epoch monitoring, test for final evaluation.
+            Data is split into 3: train for training, validation for per-epoch
+            monitoring, test for final evaluation.
           </p>
 
           <div className="mb-6 space-y-5 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
@@ -300,9 +303,14 @@ export default function FormView() {
 
       {/* ── Step 3: Select Model ──────────────────────────────── */}
       <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
-        <p className="mb-1 text-sm font-semibold tracking-tight text-(--text-primary)">
-          Model Architecture
-        </p>
+        <div className="mb-1 flex items-center gap-1.5">
+          <p className="text-sm font-semibold tracking-tight text-(--text-primary)">
+            Model Architecture
+          </p>
+          <InfoPopup title="Model Architecture — mBERT vs XLM-R">
+            {MODEL_ARCH_INFO}
+          </InfoPopup>
+        </div>
         <p className="mb-5 text-xs text-(--text-secondary)">
           Choose the transformer model to fine-tune.
         </p>
@@ -341,9 +349,14 @@ export default function FormView() {
 
       {/* ── Step 4: Hyperparameter ───────────────────────────── */}
       <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
-        <p className="mb-1 text-sm font-semibold tracking-tight text-(--text-primary)">
-          Hyperparameter
-        </p>
+        <div className="mb-1 flex items-center gap-1.5">
+          <p className="text-sm font-semibold tracking-tight text-(--text-primary)">
+            Hyperparameter
+          </p>
+          <InfoPopup title="Training Hyperparameters — Parameter Guide">
+            {HYPERPARAM_INFO}
+          </InfoPopup>
+        </div>
         <p className="mb-5 text-xs text-(--text-secondary)">
           Training configuration. Defaults are already optimized.
         </p>
@@ -426,7 +439,8 @@ export default function FormView() {
             </select>
             {hyperparams.max_length === "auto" && (
               <p className="mt-1.5 text-[10px] leading-tight text-(--text-tertiary)">
-                Max length will be calculated from the 99th percentile token length in the dataset.
+                Max length will be calculated from the 99th percentile token
+                length in the dataset.
               </p>
             )}
           </div>

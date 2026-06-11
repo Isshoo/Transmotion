@@ -18,8 +18,7 @@ export default function GlobalError({ error, reset }) {
           An Error Occurred
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
-          {error?.message ||
-            "Something went wrong. Please try again."}
+          {error?.message || "Something went wrong. Please try again."}
         </p>
 
         <div className="flex justify-center gap-3">

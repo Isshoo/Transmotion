@@ -96,11 +96,13 @@ export default function PreprocessedTab({ dataset }) {
           Dataset Not Preprocessed
         </h3>
         <p className="mb-1 max-w-sm text-sm text-(--text-secondary)">
-          Perform preprocessing to clean text from noise (URLs, mentions, etc.) and generate a training-ready dataset.
+          Perform preprocessing to clean text from noise (URLs, mentions, etc.)
+          and generate a training-ready dataset.
         </p>
         {isNotConfigured && (
           <p className="mb-4 text-xs font-medium text-(--warning)">
-            ⚠ Configure text and label columns first in the &quot;Column Settings&quot; section above.
+            ⚠ Configure text and label columns first in the &quot;Column
+            Settings&quot; section above.
           </p>
         )}
         <button
@@ -130,7 +132,8 @@ export default function PreprocessedTab({ dataset }) {
           Preprocessing in Progress
         </h3>
         <p className="max-w-sm text-sm text-(--text-secondary)">
-          Processing {dataset.num_rows_raw?.toLocaleString("id")} rows of data. This page will automatically update when finished.
+          Processing {dataset.num_rows_raw?.toLocaleString("id")} rows of data.
+          This page will automatically update when finished.
         </p>
       </div>
     );
@@ -196,8 +199,7 @@ export default function PreprocessedTab({ dataset }) {
             onClick={() => setShowAddModal(true)}
             className="inline-flex items-center gap-1.5 rounded-md bg-(--accent) px-3 py-1.5 text-xs font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
-            <Plus size={12} />{" "}
-            <span className="max-md:hidden">Add Data</span>
+            <Plus size={12} /> <span className="max-md:hidden">Add Data</span>
           </button>
         </div>
       </div>
