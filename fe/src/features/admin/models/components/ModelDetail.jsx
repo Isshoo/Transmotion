@@ -142,11 +142,11 @@ export default function ModelDetail({ modelId }) {
 
           <div className="flex items-center gap-2.5">
             {m.is_active ? (
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-(--success-muted)/50 bg-(--success-muted)/20 px-3 py-2 text-sm font-semibold tracking-wide text-(--success) shadow-(--shadow-sm)">
+              <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold tracking-wide text-(--success)">
                 <CheckCircle size={14} /> Active
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-(--border-strong) bg-(--bg-elevated) px-3 py-2 text-sm font-semibold tracking-wide text-(--text-secondary) shadow-(--shadow-sm)">
+              <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold tracking-wide text-(--error)">
                 <XCircle size={14} /> Inactive
               </span>
             )}
@@ -159,10 +159,10 @@ export default function ModelDetail({ modelId }) {
             <button
               onClick={handleToggleActive}
               disabled={isSubmitting}
-              className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium tracking-wide shadow-(--shadow-sm) transition-all duration-150 disabled:opacity-50 ${
+              className={`inline-flex items-center gap-2 rounded-lg border border-(--border-default) bg-(--bg-surface) px-4 py-2 text-sm font-medium tracking-wide shadow-(--shadow-sm) transition-all duration-150 disabled:opacity-50 ${
                 m.is_active
-                  ? "border-(--error-muted) bg-(--bg-surface) text-(--error) hover:bg-(--error-muted)/20"
-                  : "border-(--success-muted) bg-(--bg-surface) text-(--success) hover:bg-(--success-muted)/20"
+                  ? "text-(--error) hover:border-(--error-muted) hover:bg-(--error-muted)"
+                  : "text-(--success) hover:border-(--success-muted) hover:bg-(--success-muted)"
               }`}
             >
               {m.is_active ? "Deactivate" : "Activate"}
@@ -435,7 +435,8 @@ export default function ModelDetail({ modelId }) {
                 metrics.mcc == null &&
                 metrics.roc_auc == null && (
                   <p className="mt-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-                    💡 MCC, ROC-AUC, and Mean Std metrics are calculated from the test set.
+                    💡 MCC, ROC-AUC, and Mean Std metrics are calculated from
+                    the test set.
                   </p>
                 )}
             </div>
