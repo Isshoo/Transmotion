@@ -2,16 +2,16 @@ from marshmallow import Schema, fields, validate
 
 
 class CreateTrainingJobSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     dataset_id = fields.String(
         required=True,
-        error_messages={"required": "Dataset harus dipilih"},
+        error_messages={"required": "Dataset must be selected"},
     )
     model_type = fields.String(
         required=True,
         validate=validate.OneOf(["mbert", "xlmr"]),
-        error_messages={"required": "Tipe model harus dipilih"},
+        error_messages={"required": "Model type must be selected"},
     )
     job_name = fields.String(
         validate=validate.Length(min=1, max=255),
@@ -22,7 +22,7 @@ class CreateTrainingJobSchema(Schema):
     test_size = fields.Float(
         required=True,
         validate=validate.Range(min=0.05, max=0.4),
-        error_messages={"required": "Ukuran test set harus diisi"},
+        error_messages={"required": "Test set size is required"},
     )
     val_size = fields.Float(
         load_default=0.1,
@@ -63,7 +63,7 @@ class CreateTrainingJobSchema(Schema):
 
 
 class SplitPreviewSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     dataset_id = fields.String(required=True)
     test_size = fields.Float(
         required=True,
@@ -76,7 +76,7 @@ class SplitPreviewSchema(Schema):
 
 
 class UpdateJobProgressSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     current_epoch = fields.Integer(required=True)
     total_epochs = fields.Integer(required=True)
     progress = fields.Integer(
@@ -97,7 +97,7 @@ class UpdateJobProgressSchema(Schema):
 
 
 class CompleteJobSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     model_name = fields.String(required=True)
     # Eval set metrics
     val_accuracy = fields.Float(load_default=None)
@@ -131,7 +131,7 @@ class CompleteJobSchema(Schema):
 
 
 class JobListQuerySchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
     status = fields.String(

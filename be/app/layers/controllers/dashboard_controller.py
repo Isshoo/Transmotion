@@ -122,5 +122,5 @@ def get_stats():
             "recent_models": [m.to_dict() for m in recent_models],
             "active_jobs": [j.to_dict() for j in active_jobs],
         },
-        message="Statistik dashboard berhasil diambil",
+        message="Dashboard statistics retrieved successfully",
     )

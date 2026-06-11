@@ -40,7 +40,7 @@ def sse_auth_required(fn):
 
         token = _get_token_from_request()
         if not token:
-            return error_response("Token diperlukan", 401)
+            return error_response("Token required", 401)
 
         try:
             decoded = decode_token(token)
@@ -49,10 +49,10 @@ def sse_auth_required(fn):
 
             user = db.session.get(User, user_id)
             if not user or not user.is_active:
-                return error_response("Akun tidak valid", 401)
+                return error_response("Invalid account", 401)
             request.current_user = user
         except Exception:
-            return error_response("Token tidak valid", 401)
+            return error_response("Invalid token", 401)
 
         return fn(*args, **kwargs)
 
@@ -88,7 +88,7 @@ def stream_dataset(dataset_id):
         dataset = db.session.get(Dataset, dataset_id)
         if not dataset:
             yield sse_manager._format(
-                {"error": "Dataset tidak ditemukan"}, "error_event"
+                {"error": "Dataset not found"}, "error_event"
             )
             return
 
@@ -136,7 +136,7 @@ def stream_job(job_id):
     def generate():
         job = db.session.get(TrainingJob, job_id)
         if not job:
-            yield sse_manager._format({"error": "Job tidak ditemukan"}, "error_event")
+            yield sse_manager._format({"error": "Job not found"}, "error_event")
             return
 
         yield sse_manager._format(job.to_dict(include_model=True), "init")

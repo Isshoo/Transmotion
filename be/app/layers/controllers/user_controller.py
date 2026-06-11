@@ -15,7 +15,7 @@ from app.utils.response import error_response, paginated_response, success_respo
 
 def get_me():
     return success_response(
-        data=request.current_user.to_dict(), message="Profil berhasil diambil"
+        data=request.current_user.to_dict(), message="Profile retrieved successfully"
     )
 
 
@@ -24,7 +24,7 @@ def update_me():
         data = UpdateUserSchema().load(request.get_json() or {})
     except ValidationError as err:
         return error_response(
-            message=f"Validasi gagal: {', '.join([f'Kolom {k} tidak dikenal' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
+            message=f"Validation failed: {', '.join([f'Column {k} unknown' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
             errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
             status_code=422,
         )
@@ -36,17 +36,17 @@ def update_me():
     else:
         user = request.current_user
 
-    return success_response(data=user.to_dict(), message="Profil berhasil diperbarui")
+    return success_response(data=user.to_dict(), message="Profile updated successfully")
 
 
 def upload_avatar():
     if "avatar" not in request.files:
-        return error_response(message="File tidak ditemukan", status_code=400)
+        return error_response(message="File not found", status_code=400)
 
     file = request.files["avatar"]
 
     if file.filename == "":
-        return error_response(message="Tidak ada file yang dipilih", status_code=400)
+        return error_response(message="No file selected", status_code=400)
 
     from app.lib.cloudinary import upload_image
 
@@ -56,11 +56,11 @@ def upload_avatar():
     )
 
     if not upload_result:
-        return error_response(message="Gagal mengunggah gambar", status_code=500)
+        return error_response(message="Failed to upload image", status_code=500)
 
     user = user_service.upload_avatar(request.current_user, upload_result["url"])
 
-    return success_response(data=user.to_dict(), message="Avatar berhasil diperbarui")
+    return success_response(data=user.to_dict(), message="Avatar updated successfully")
 
 
 def get_users():
@@ -68,7 +68,7 @@ def get_users():
         query_params = UserListQuerySchema().load(request.args)
     except ValidationError as err:
         return error_response(
-            message=f"Validasi gagal: {', '.join([f'Kolom {k} tidak dikenal' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
+            message=f"Validation failed: {', '.join([f'Column {k} unknown' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
             errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
             status_code=422,
         )
@@ -89,14 +89,14 @@ def get_users():
         total=total,
         page=query_params.get("page", 1),
         per_page=query_params.get("per_page", 20),
-        message="Daftar pengguna berhasil diambil",
+        message="Users list retrieved successfully",
     )
 
 
 def get_user(user_id):
     user = user_service.get_by_id(user_id)
     return success_response(
-        data=user.to_dict(), message="Data pengguna berhasil diambil"
+        data=user.to_dict(), message="User detail retrieved successfully"
     )
 
 
@@ -105,7 +105,7 @@ def create_user():
         data = CreateUserSchema().load(request.get_json() or {})
     except ValidationError as err:
         return error_response(
-            message=f"Validasi gagal: {', '.join([f'Kolom {k} tidak dikenal' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
+            message=f"Validation failed: {', '.join([f'Column {k} unknown' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
             errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
             status_code=422,
         )
@@ -116,7 +116,7 @@ def create_user():
         password=data["password"],
         role=data["role"],
     )
-    return success_response(data=user.to_dict(), message="Pengguna berhasil dibuat")
+    return success_response(data=user.to_dict(), message="User created successfully")
 
 
 def update_user(user_id):
@@ -124,7 +124,7 @@ def update_user(user_id):
         data = UpdateUserAdminSchema().load(request.get_json() or {})
     except ValidationError as err:
         return error_response(
-            message=f"Validasi gagal: {', '.join([f'Kolom {k} tidak dikenal' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
+            message=f"Validation failed: {', '.join([f'Column {k} unknown' if 'tidak dikenal' in v[0].lower() or 'unknown field' in v[0].lower() else v[0] for k, v in err.messages.items()])}",
             errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
             status_code=422,
         )
@@ -135,36 +135,36 @@ def update_user(user_id):
     if update_data:
         user = user_service.update(user, **update_data)
 
-    return success_response(data=user.to_dict(), message="Pengguna berhasil diperbarui")
+    return success_response(data=user.to_dict(), message="User updated successfully")
 
 
 def delete_user(user_id):
     if user_id == request.current_user.id:
         return error_response(
-            message="Tidak bisa menghapus akun sendiri", status_code=400
+            message="Cannot delete own account", status_code=400
         )
 
     user_service.delete(user_id)
-    return success_response(message="Pengguna berhasil dihapus")
+    return success_response(message="User deleted successfully")
 
 
 def deactivate_user(user_id):
     if user_id == request.current_user.id:
         return error_response(
-            message="Tidak bisa menonaktifkan akun sendiri", status_code=400
+            message="Cannot deactivate own account", status_code=400
         )
 
     user = user_service.deactivate(user_id)
     return success_response(
-        data=user.to_dict(), message="Pengguna berhasil dinonaktifkan"
+        data=user.to_dict(), message="User deactivated successfully"
     )
 
 
 def activate_user(user_id):
     if user_id == request.current_user.id:
         return error_response(
-            message="Tidak bisa mengaktifkan akun sendiri", status_code=400
+            message="Cannot activate own account", status_code=400
         )
 
     user = user_service.activate(user_id)
-    return success_response(data=user.to_dict(), message="Pengguna berhasil diaktifkan")
+    return success_response(data=user.to_dict(), message="User activated successfully")

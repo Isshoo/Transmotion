@@ -18,7 +18,7 @@ from app.utils.response import error_response, paginated_response, success_respo
 
 def _parse_err(err: ValidationError):
     return error_response(
-        message=f"Validasi gagal: {', '.join([v[0] for v in err.messages.values()])}",
+        message=f"Validation failed: {', '.join([v[0] for v in err.messages.values()])}",
         errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
         status_code=422,
     )
@@ -43,7 +43,7 @@ def list_datasets():
         total=total,
         page=params["page"],
         per_page=params["per_page"],
-        message="Daftar dataset berhasil diambil",
+        message="Datasets list retrieved successfully",
     )
 
 
@@ -51,7 +51,7 @@ def get_dataset(dataset_id):
     ds = dataset_service.get_by_id(dataset_id)
     return success_response(
         data=ds.to_dict(include_jobs=True),
-        message="Detail dataset berhasil diambil",
+        message="Dataset detail retrieved successfully",
     )
 
 
@@ -62,10 +62,10 @@ def upload_dataset():
         return _parse_err(err)
 
     if "file" not in request.files:
-        return error_response(message="File dataset harus disertakan", status_code=400)
+        return error_response(message="Dataset file must be included", status_code=400)
     file = request.files["file"]
     if not file or file.filename == "":
-        return error_response(message="File tidak dipilih", status_code=400)
+        return error_response(message="No file selected", status_code=400)
 
     ds = dataset_service.upload(
         file=file,
@@ -74,7 +74,7 @@ def upload_dataset():
         user_id=request.current_user.id,
     )
     return success_response(
-        data=ds.to_dict(), message="Dataset berhasil diupload", status_code=201
+        data=ds.to_dict(), message="Dataset uploaded successfully", status_code=201
     )
 
 
@@ -90,7 +90,7 @@ def set_columns(dataset_id):
         label_column=data["label_column"],
     )
     return success_response(
-        data=ds.to_dict(), message="Pengaturan kolom berhasil disimpan"
+        data=ds.to_dict(), message="Column settings saved successfully"
     )
 
 
@@ -112,7 +112,7 @@ def get_raw_data(dataset_id):
         total=total,
         page=params["page"],
         per_page=params["per_page"],
-        message="Data raw berhasil diambil",
+        message="Raw data retrieved successfully",
     )
 
 
@@ -140,7 +140,7 @@ def get_preprocessed_data(dataset_id):
         total=total,
         page=params["page"],
         per_page=params["per_page"],
-        message="Data preprocessed berhasil diambil",
+        message="Preprocessed data retrieved successfully",
     )
 
 
@@ -157,7 +157,7 @@ def add_preprocessed_row(dataset_id):
         label=data["label"],
     )
     return success_response(
-        data=row.to_dict(), message="Data berhasil ditambahkan", status_code=201
+        data=row.to_dict(), message="Data added successfully", status_code=201
     )
 
 
@@ -173,14 +173,14 @@ def update_preprocessed_row(dataset_id, row_id):
         preprocessed_text=data.get("preprocessed_text"),
         label=data.get("label"),
     )
-    return success_response(data=row.to_dict(), message="Data berhasil diperbarui")
+    return success_response(data=row.to_dict(), message="Data updated successfully")
 
 
 def delete_preprocessed_row(dataset_id, row_id):
     dataset_service.delete_preprocessed_row(dataset_id=dataset_id, row_id=int(row_id))
-    return success_response(message="Data berhasil dihapus")
+    return success_response(message="Data deleted successfully")
 
 
 def delete_dataset(dataset_id):
     dataset_service.delete(dataset_id)
-    return success_response(message="Dataset berhasil dihapus")
+    return success_response(message="Dataset deleted successfully")

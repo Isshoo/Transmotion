@@ -23,9 +23,9 @@ def register_colab():
     session_id = data.get("session_id", "").strip()
 
     if not url:
-        return error_response("URL harus diisi", 400)
+        return error_response("URL must be provided", 400)
     if not session_id:
-        return error_response("Session ID harus diisi", 400)
+        return error_response("Session ID must be provided", 400)
 
     session = colab_service.register(url, session_id)
 
@@ -34,7 +34,7 @@ def register_colab():
 
     return success_response(
         data=session,
-        message=f"Colab berhasil terdaftar: {url}",
+        message=f"Colab registered successfully: {url}",
         status_code=201,
     )
 
@@ -50,7 +50,7 @@ def unregister_colab():
 
     sse_manager.publish("colab:status", colab_service.get_status(), event="update")
 
-    return success_response(message="Colab berhasil unregister")
+    return success_response(message="Colab unregistered successfully")
 
 
 def ping_colab():
@@ -68,7 +68,7 @@ def get_colab_status():
     """GET /api/colab/status — untuk admin UI."""
     return success_response(
         data=colab_service.get_status(),
-        message="Status Colab berhasil diambil",
+        message="Colab status retrieved successfully",
     )
 
 
@@ -79,7 +79,7 @@ def colab_get_next_job():
     """
     job = training_job_service.get_next_queued_job()
     if not job:
-        return success_response(data=None, message="Tidak ada job yang menunggu")
+        return success_response(data=None, message="No pending jobs")
 
     job_data = job.to_dict()
     if job.dataset:
@@ -88,7 +88,7 @@ def colab_get_next_job():
         job_data["dataset_label_column"] = job.dataset.label_column
         job_data["dataset_labels"] = job.dataset.class_distribution_preprocessed or {}
 
-    return success_response(data=job_data, message="Job ditemukan")
+    return success_response(data=job_data, message="Job found")
 
 
 def colab_mark_running(job_id):
@@ -109,7 +109,7 @@ def colab_update_progress(job_id):
         data = UpdateJobProgressSchema().load(request.get_json() or {})
     except ValidationError as err:
         return error_response(
-            message="Validasi gagal",
+            message="Validation failed",
             errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
             status_code=422,
         )
@@ -123,7 +123,7 @@ def colab_complete_job(job_id):
         form_data = CompleteJobSchema().load(request.form.to_dict())
     except ValidationError as err:
         return error_response(
-            message="Validasi gagal",
+            message="Validation failed",
             errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
             status_code=422,
         )
@@ -132,7 +132,7 @@ def colab_complete_job(job_id):
         job_id=job_id, model_file=model_file, data=form_data
     )
     return success_response(
-        data=result.to_dict(), message="Training selesai, model berhasil disimpan"
+        data=result.to_dict(), message="Training completed, model saved successfully"
     )
 
 
@@ -141,4 +141,4 @@ def colab_fail_job(job_id):
     body = request.get_json() or {}
     error_message = body.get("error_message", "Unknown error")
     job = training_job_service.fail_job(job_id, error_message)
-    return success_response(data=job.to_dict(), message="Job ditandai gagal")
+    return success_response(data=job.to_dict(), message="Job marked as failed")

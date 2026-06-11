@@ -79,7 +79,7 @@ def _load_model(model_record: TrainedModel):
 
     except Exception as e:
         logger.error(f"Failed to load model {model_id}: {e}")
-        raise BadRequestError(f"Gagal memuat model: {e}") from None
+        raise BadRequestError(f"Failed to load model: {e}") from None
 
 
 # ── Trained Model CRUD ─────────────────────────────────────────────────────────
@@ -88,7 +88,7 @@ def _load_model(model_record: TrainedModel):
 def get_model_by_id(model_id: str) -> TrainedModel:
     model = db.session.get(TrainedModel, model_id)
     if not model:
-        raise NotFoundError("Model tidak ditemukan")
+        raise NotFoundError("Model not found")
     return model
 
 
@@ -219,9 +219,9 @@ def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
     model_record = get_model_by_id(model_id)
 
     if not model_record.is_active:
-        raise BadRequestError("Model tidak aktif")
+        raise BadRequestError("Model is not active")
     if not model_record.file_path:
-        raise BadRequestError("File model tidak tersedia")
+        raise BadRequestError("Model file is not available")
 
     file_path = model_record.file_path
 
@@ -262,8 +262,8 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
     session = colab_service.get_active_session()
     if not session:
         raise BadRequestError(
-            "Colab tidak aktif. Model ini tersimpan di Google Drive dan "
-            "memerlukan Colab untuk inference. Hidupkan Colab terlebih dahulu."
+            "Colab is not active. This model is stored in Google Drive and "
+            "requires Colab for inference. Please start Colab first."
         )
 
     api_key = app.config.get("COLAB_API_KEY", "")
@@ -293,16 +293,16 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
         )
 
         if not data.get("success"):
-            raise BadRequestError(f"Colab inference gagal: {data.get('error')}")
+            raise BadRequestError(f"Colab inference failed: {data.get('error')}")
 
         return data["data"]
 
     except http_requests.exceptions.Timeout:
         raise BadRequestError(
-            "Inference timeout. Coba lagi — model mungkin sedang dimuat pertama kali."
+            "Inference timeout. Try again — the model might be loading for the first time."
         ) from None
     except http_requests.exceptions.RequestException as e:
-        raise BadRequestError(f"Gagal menghubungi Colab: {e}") from None
+        raise BadRequestError(f"Failed to contact Colab: {e}") from None
 
 
 def _classify_local(model_record, text: str) -> dict:
@@ -318,7 +318,7 @@ def _classify_local(model_record, text: str) -> dict:
     if model_id not in _model_cache:
         if not os.path.exists(model_record.file_path):
             raise BadRequestError(
-                f"File model tidak ditemukan: {model_record.file_path}"
+                f"Model file not found: {model_record.file_path}"
             )
 
         base = model_record.base_model_name or (

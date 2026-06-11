@@ -11,7 +11,7 @@ from app.utils.password import hash_password
 def get_by_id(user_id):
     user = db.session.get(User, user_id)
     if not user:
-        raise NotFoundError("Pengguna tidak ditemukan")
+        raise NotFoundError("User not found")
     return user
 
 
@@ -64,7 +64,7 @@ def create(name, email, password, role):
     # Check for unique constraints
     existing = db.session.query(User).filter(User.email == email.lower()).first()
     if existing:
-        raise ConflictError("Email sudah digunakan")
+        raise ConflictError("Email is already in use")
 
     user = User(
         email=email.lower(),
@@ -89,7 +89,7 @@ def update(user, **kwargs):
             .first()
         )
         if existing:
-            raise ConflictError("Email sudah terdaftar")
+            raise ConflictError("Email is already registered")
         kwargs["email"] = kwargs["email"].lower()
 
     if "password" in kwargs and kwargs["password"]:
@@ -111,7 +111,7 @@ def update(user, **kwargs):
 def delete(user_id):
     user = db.session.get(User, user_id)
     if not user:
-        raise NotFoundError("Pengguna tidak ditemukan")
+        raise NotFoundError("User not found")
 
     db.session.delete(user)
     db.session.commit()
@@ -126,7 +126,7 @@ def upload_avatar(user, file_url):
 def deactivate(user_id):
     user = db.session.get(User, user_id)
     if not user:
-        raise NotFoundError("Pengguna tidak ditemukan")
+        raise NotFoundError("User not found")
 
     user.is_active = False
     db.session.commit()
@@ -137,7 +137,7 @@ def deactivate(user_id):
 def activate(user_id):
     user = db.session.get(User, user_id)
     if not user:
-        raise NotFoundError("Pengguna tidak ditemukan")
+        raise NotFoundError("User not found")
 
     user.is_active = True
     db.session.commit()

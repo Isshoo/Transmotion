@@ -12,51 +12,49 @@ def _validate_password_strength(value: str) -> None:
     if value is None:
         return
     if len(value) < _PASSWORD_MIN_LEN:
-        raise ValidationError(f"Password minimal {_PASSWORD_MIN_LEN} karakter")
+        raise ValidationError(f"Minimum Password is {_PASSWORD_MIN_LEN} characters")
     if not _PASSWORD_REGEX.match(value):
-        raise ValidationError(
-            "Password harus mengandung huruf besar, huruf kecil, dan angka"
-        )
+        raise ValidationError("Password must contain uppercase, lowercase, and numbers")
 
 
 class UpdateUserSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     name = fields.String(
-        validate=validate.Length(max=100, error="Nama lengkap maksimal 100 karakter")
+        validate=validate.Length(max=100, error="Maximum Name is 100 characters")
     )
-    avatar_url = fields.URL(error_messages={"invalid": "Format URL avatar tidak valid"})
+    avatar_url = fields.URL(error_messages={"invalid": "Invalid avatar URL format"})
 
 
 class CreateUserSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     email = fields.Email(
         required=True,
         error_messages={
-            "required": "Email harus diisi",
-            "invalid": "Format email tidak valid",
+            "required": "Email is required",
+            "invalid": "Invalid email format",
         },
     )
     password = fields.String(
         required=True,
         load_only=True,
-        error_messages={"required": "Password harus diisi"},
+        error_messages={"required": "Password is required"},
     )
     name = fields.String(
         required=True,
-        validate=validate.Length(max=100, error="Nama maksimal 100 karakter"),
-        error_messages={"required": "Nama harus diisi"},
+        validate=validate.Length(max=100, error="Maximum name is 100 characters"),
+        error_messages={"required": "Name is required"},
     )
     role = fields.String(
         validate=validate.OneOf(
-            ["user", "admin"], error="Role harus berupa 'user' atau 'admin'"
+            ["user", "admin"], error="Role must be 'user' or 'admin'"
         )
     )
     is_verified = fields.Boolean(
-        error_messages={"invalid": "Format status verifikasi tidak valid"}
+        error_messages={"invalid": "Invalid verification status format"}
     )
     is_active = fields.Boolean(
-        error_messages={"invalid": "Format status aktif tidak valid"}
+        error_messages={"invalid": "Invalid active status format"}
     )
 
     @validates("password")
@@ -65,28 +63,28 @@ class CreateUserSchema(Schema):
 
 
 class UpdateUserAdminSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     email = fields.Email(
         error_messages={
-            "invalid": "Format email tidak valid",
+            "invalid": "Invalid email format",
         },
     )
     password = fields.String(
         load_only=True,
     )
     name = fields.String(
-        validate=validate.Length(max=100, error="Nama maksimal 100 karakter"),
+        validate=validate.Length(max=100, error="Maximum name is 100 characters"),
     )
     role = fields.String(
         validate=validate.OneOf(
-            ["user", "admin"], error="Role harus berupa 'user' atau 'admin'"
+            ["user", "admin"], error="Role must be 'user' or 'admin'"
         )
     )
     is_verified = fields.Boolean(
-        error_messages={"invalid": "Format status verifikasi tidak valid"}
+        error_messages={"invalid": "Invalid verification status format"}
     )
     is_active = fields.Boolean(
-        error_messages={"invalid": "Format status aktif tidak valid"}
+        error_messages={"invalid": "Invalid active status format"}
     )
 
     @validates("password")
@@ -95,40 +93,40 @@ class UpdateUserAdminSchema(Schema):
 
 
 class UserListQuerySchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     page = fields.Integer(
-        load_default=1, validate=validate.Range(min=1, error="Halaman minimal 1")
+        load_default=1, validate=validate.Range(min=1, error="Minimum page is 1")
     )
     per_page = fields.Integer(
         load_default=20,
         validate=validate.Range(
-            min=1, max=100, error="Per halaman antara 1 sampai 100"
+            min=1, max=100, error="Per page must be between 1 and 100"
         ),
     )
     search = fields.String(
-        validate=validate.Length(max=100, error="Pencarian maksimal 100 karakter")
+        validate=validate.Length(max=100, error="Search maximum is 100 characters")
     )
     role = fields.String(
         validate=validate.OneOf(
-            ["user", "admin"], error="Role harus berupa 'user' atau 'admin'"
+            ["user", "admin"], error="Role must be 'user' or 'admin'"
         )
     )
     is_verified = fields.Boolean(
-        error_messages={"invalid": "Format status verifikasi tidak valid"}
+        error_messages={"invalid": "Invalid verification status format"}
     )
     is_active = fields.Boolean(
-        error_messages={"invalid": "Format status aktif tidak valid"}
+        error_messages={"invalid": "Invalid active status format"}
     )
     sort_by = fields.String(
         load_default="created_at",
         validate=validate.OneOf(
             ["created_at", "username", "email"],
-            error="Penyortiran hanya berdasarkan created_at, username, atau email",
+            error="Sort by only based on created_at, username, or email",
         ),
     )
     sort_order = fields.String(
         load_default="desc",
         validate=validate.OneOf(
-            ["asc", "desc"], error="Urutan penyortiran harus 'asc' atau 'desc'"
+            ["asc", "desc"], error="Sort order must be 'asc' or 'desc'"
         ),
     )

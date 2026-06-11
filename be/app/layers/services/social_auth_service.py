@@ -24,12 +24,12 @@ def verify_google_token(access_token: str) -> dict:
             timeout=10,
         )
     except Exception:
-        raise BadRequestError("Gagal terhubung ke server Google") from None
+        raise BadRequestError("Failed to connect to Google server") from None
     if response.status_code != 200:
-        raise UnauthorizedError("Token Google tidak valid")
+        raise UnauthorizedError("Invalid Google token")
     data = response.json()
     if not data.get("email"):
-        raise BadRequestError("Email tidak tersedia dari Google")
+        raise BadRequestError("Email not available from Google")
     return {
         "email": data.get("email"),
         "name": data.get("name"),
@@ -56,13 +56,13 @@ def google_auth(access_token: str, intent: str = "login"):
     # ── LOGIN ──
     if intent == "login":
         if not existing:
-            raise NotFoundError("Akun tidak ditemukan. Silakan daftar terlebih dahulu.")
+            raise NotFoundError("Account not found. Please register first.")
         if not existing.is_active:
-            raise UnauthorizedError("Akun telah dinonaktifkan.")
+            raise UnauthorizedError("Account has been disabled.")
         if existing.auth_provider == "local" and existing.provider_id != provider_id:
             raise ConflictError(
-                "Email ini sudah terdaftar menggunakan email dan password. "
-                "Silakan masuk dengan email dan password kamu."
+                "This email is already registered using email and password. "
+                "Please login with your email and password."
             )
         # Link provider jika belum
         if not existing.provider_id:
@@ -84,11 +84,11 @@ def google_auth(access_token: str, intent: str = "login"):
         if existing:
             if existing.auth_provider == "local":
                 raise ConflictError(
-                    "Email ini sudah terdaftar menggunakan email dan password. "
-                    "Silakan masuk dengan email dan password kamu."
+                    "This email is already registered using email and password. "
+                    "Please login with your email and password."
                 )
             else:
-                raise ConflictError("Email ini sudah terdaftar. Silakan masuk.")
+                raise ConflictError("This email is already registered. Please login.")
 
         new_user = User(
             email=email,
@@ -109,4 +109,4 @@ def google_auth(access_token: str, intent: str = "login"):
             create_refresh_token(identity=new_user.id),
             True,
         )
-    raise BadRequestError("Intent tidak valid.")
+    raise BadRequestError("Invalid intent.")

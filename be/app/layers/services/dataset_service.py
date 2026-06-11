@@ -90,7 +90,7 @@ def preprocess_text(text: str) -> str:
 def get_by_id(dataset_id: str) -> Dataset:
     ds = db.session.get(Dataset, dataset_id)
     if not ds:
-        raise NotFoundError("Dataset tidak ditemukan")
+        raise NotFoundError("Dataset not found")
     return ds
 
 
@@ -135,17 +135,17 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
 
     filename = file.filename
     if not filename:
-        raise BadRequestError("Nama file tidak valid")
+        raise BadRequestError("Invalid file name")
 
     ext = os.path.splitext(filename)[1].lower()
     if ext not in (".csv", ".tsv", ".txt", ".xls", ".xlsx"):
-        raise BadRequestError("Format file harus CSV, TSV, TXT, XLS, atau XLSX")
+        raise BadRequestError("File format must be CSV, TSV, TXT, XLS, or XLSX")
 
     # Validasi nama dataset unik
     existing = db.session.query(Dataset).filter(Dataset.name == name).first()
     if existing:
         raise BadRequestError(
-            f"Dataset dengan nama '{name}' sudah ada. Gunakan nama yang berbeda."
+            f"Dataset with name '{name}' already exists. Use a different name."
         )
 
     unique_name = f"{_uuid.uuid4().hex}{ext}"
@@ -162,13 +162,13 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
         # Validasi sebelum cleaning
         if len(df.columns) < MIN_COLS:
             raise BadRequestError(
-                f"Dataset harus memiliki minimal {MIN_COLS} kolom "
-                f"(ditemukan {len(df.columns)} kolom)"
+                f"Dataset must have at least {MIN_COLS} columns "
+                f"(found {len(df.columns)} columns)"
             )
         if len(df) < MIN_ROWS:
             raise BadRequestError(
-                f"Dataset harus memiliki minimal {MIN_ROWS} baris "
-                f"(ditemukan {len(df)} baris)"
+                f"Dataset must have at least {MIN_ROWS} rows "
+                f"(found {len(df)} rows)"
             )
 
         # Cleaning dasar
@@ -179,7 +179,7 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
         # Validasi setelah cleaning
         if len(df) < MIN_ROWS:
             raise BadRequestError(
-                f"Setelah menghapus baris kosong dan duplikat, tersisa {len(df)} baris. "
+                f"After removing empty and duplicate rows, {len(df)} rows remain. "
                 f"Minimal {MIN_ROWS} baris diperlukan."
             )
 
@@ -222,11 +222,11 @@ def set_columns(dataset_id: str, text_column: str, label_column: str) -> Dataset
     dataset = get_by_id(dataset_id)
 
     if text_column not in (dataset.columns or []):
-        raise BadRequestError(f"Kolom '{text_column}' tidak ada dalam dataset")
+        raise BadRequestError(f"Column '{text_column}' does not exist in dataset")
     if label_column not in (dataset.columns or []):
-        raise BadRequestError(f"Kolom '{label_column}' tidak ada dalam dataset")
+        raise BadRequestError(f"Column '{label_column}' does not exist in dataset")
     if text_column == label_column:
-        raise BadRequestError("Kolom teks dan label harus berbeda")
+        raise BadRequestError("Text and label columns must be different")
 
     # Hitung distribusi kelas dari raw data
     try:
@@ -314,7 +314,7 @@ def start_preprocessing(dataset_id: str, app) -> Dataset:
 
     if not dataset.columns_configured():
         raise BadRequestError(
-            "Kolom teks dan label harus diatur terlebih dahulu sebelum preprocessing"
+            "Text and label columns must be configured before preprocessing"
         )
 
     updated = (
@@ -487,7 +487,7 @@ def add_preprocessed_row(
     valid_labels = set((dataset.class_distribution_preprocessed or {}).keys())
     if valid_labels and label not in valid_labels:
         raise BadRequestError(
-            f"Label '{label}' tidak valid. Label yang tersedia: {', '.join(valid_labels)}"
+            f"Label '{label}' is invalid. Available labels: {', '.join(valid_labels)}"
         )
 
     # Cek duplikat
@@ -501,17 +501,17 @@ def add_preprocessed_row(
         .first()
     )
     if existing:
-        raise BadRequestError("Data dengan teks dan label yang sama sudah ada")
+        raise BadRequestError("Data with the same text and label already exists")
 
     cleaned = preprocessed_text.strip()
     if not cleaned:
-        raise BadRequestError("Teks terpreproses tidak boleh kosong")
+        raise BadRequestError("Preprocessed text cannot be empty")
 
     # Validasi noise
     violations = _validate_preprocessed_text(cleaned)
     if violations:
         raise BadRequestError(
-            f"Teks terpreproses mengandung elemen yang tidak valid: {', '.join(violations)}"
+            f"Preprocessed text contains invalid elements: {', '.join(violations)}"
         )
 
     row = PreprocessedRow(
@@ -542,20 +542,20 @@ def update_preprocessed_row(
     row = db.session.get(PreprocessedRow, row_id)
 
     if not row or row.dataset_id != dataset_id:
-        raise NotFoundError("Data tidak ditemukan")
+        raise NotFoundError("Data not found")
 
     old_label = row.label
 
     if preprocessed_text is not None:
         cleaned = preprocessed_text.strip()
         if not cleaned:
-            raise BadRequestError("Teks terpreproses tidak boleh kosong")
+            raise BadRequestError("Preprocessed text cannot be empty")
 
         # Validasi noise
         violations = _validate_preprocessed_text(cleaned)
         if violations:
             raise BadRequestError(
-                f"Teks terpreproses mengandung elemen yang tidak valid: {', '.join(violations)}"
+                f"Preprocessed text contains invalid elements: {', '.join(violations)}"
             )
 
         effective_label = label if (label is not None) else old_label
@@ -570,13 +570,13 @@ def update_preprocessed_row(
             .first()
         )
         if dup:
-            raise BadRequestError("Data dengan teks dan label yang sama sudah ada")
+            raise BadRequestError("Data with the same text and label already exists")
         row.preprocessed_text = cleaned
 
     if label is not None and label != old_label:
         valid_labels = set((dataset.class_distribution_preprocessed or {}).keys())
         if valid_labels and label not in valid_labels:
-            raise BadRequestError(f"Label '{label}' tidak valid")
+            raise BadRequestError(f"Label '{label}' is invalid")
 
         # Update distribusi
         dist = dict(dataset.class_distribution_preprocessed or {})
@@ -596,7 +596,7 @@ def delete_preprocessed_row(dataset_id: str, row_id: int):
     row = db.session.get(PreprocessedRow, row_id)
 
     if not row or row.dataset_id != dataset_id:
-        raise NotFoundError("Data tidak ditemukan")
+        raise NotFoundError("Data not found")
 
     label = row.label
     db.session.delete(row)
@@ -627,7 +627,7 @@ def delete(dataset_id: str):
     )
     if active > 0:
         raise BadRequestError(
-            "Dataset tidak bisa dihapus karena sedang digunakan oleh training job yang aktif"
+            "Dataset cannot be deleted because it is being used by an active training job"
         )
 
     if dataset.file_path and os.path.exists(dataset.file_path):

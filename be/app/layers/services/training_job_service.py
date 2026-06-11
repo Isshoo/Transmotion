@@ -20,7 +20,7 @@ MIN_TOTAL_TRAIN = 700
 def get_by_id(job_id: str) -> TrainingJob:
     job = db.session.get(TrainingJob, job_id)
     if not job:
-        raise NotFoundError("Training job tidak ditemukan")
+        raise NotFoundError("Training job not found")
     return job
 
 
@@ -43,17 +43,17 @@ def compute_split_preview(
 ) -> dict:
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
-        raise NotFoundError("Dataset tidak ditemukan")
+        raise NotFoundError("Dataset not found")
     if dataset.preprocessing_status != PreprocessingStatus.COMPLETED:
-        raise BadRequestError("Dataset belum memiliki data preprocessed")
+        raise BadRequestError("Dataset does not have preprocessed data yet")
 
     total = dataset.num_rows_preprocessed or 0
     if total == 0:
-        raise BadRequestError("Dataset preprocessed kosong")
+        raise BadRequestError("Preprocessed dataset is empty")
 
     dist = dataset.class_distribution_preprocessed or {}
     if not dist:
-        raise BadRequestError("Informasi distribusi kelas tidak tersedia")
+        raise BadRequestError("Class distribution information is not available")
 
     train_per_class = {}
     val_per_class = {}
@@ -116,16 +116,16 @@ def create(
 
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
-        raise NotFoundError("Dataset tidak ditemukan")
+        raise NotFoundError("Dataset not found")
     if dataset.preprocessing_status != PreprocessingStatus.COMPLETED:
-        raise BadRequestError("Dataset harus sudah melalui preprocessing")
+        raise BadRequestError("Dataset must have been preprocessed")
     if not dataset.columns_configured():
-        raise BadRequestError("Kolom teks dan label belum dikonfigurasi")
+        raise BadRequestError("Text and label columns have not been configured")
 
     split_info = compute_split_preview(dataset_id, test_size, val_size)
     if not split_info["is_valid"]:
         raise BadRequestError(
-            "Data tidak cukup: " + "; ".join(split_info["validation_errors"])
+            "Insufficient data: " + "; ".join(split_info["validation_errors"])
         )
 
     if not job_name:
@@ -172,7 +172,7 @@ def create(
 def cancel(job_id: str) -> TrainingJob:
     job = get_by_id(job_id)
     if job.status not in (JobStatus.QUEUED, JobStatus.RUNNING):
-        raise BadRequestError(f"Job tidak bisa dibatalkan: status {job.status.value}")
+        raise BadRequestError(f"Job cannot be cancelled: status {job.status.value}")
 
     job.status = JobStatus.CANCELLED
     job.finished_at = datetime.now(timezone.utc)
@@ -219,7 +219,7 @@ def mark_running(job_id: str, colab_session_id: str = None) -> TrainingJob:
 def update_progress(job_id: str, data: dict) -> TrainingJob:
     job = get_by_id(job_id)
     if job.status != JobStatus.RUNNING:
-        raise BadRequestError("Job tidak dalam status running")
+        raise BadRequestError("Job is not in running status")
 
     job.current_epoch = data["current_epoch"]
     job.total_epochs = data["total_epochs"]
