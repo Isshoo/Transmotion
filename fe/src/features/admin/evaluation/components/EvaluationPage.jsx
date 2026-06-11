@@ -60,7 +60,7 @@ export default function EvaluationPage() {
               <select
                 value={selectedDatasetId}
                 onChange={(e) => setSelectedDataset(e.target.value)}
-                className="w-full appearance-none rounded-lg border border-(--border-default) bg-(--bg-surface) py-1.5 pl-3 pr-8 text-xs font-semibold text-(--text-primary) shadow-(--shadow-sm) outline-none transition-all duration-200 hover:border-(--border-strong) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)/30 cursor-pointer"
+                className="w-full cursor-pointer appearance-none rounded-lg border border-(--border-default) bg-(--bg-surface) py-1.5 pr-8 pl-3 text-xs font-semibold text-(--text-primary) shadow-(--shadow-sm) transition-all duration-200 outline-none hover:border-(--border-strong) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)/30"
               >
                 <option value="">All Datasets</option>
                 {datasets.map((ds) => (
@@ -89,7 +89,10 @@ export default function EvaluationPage() {
           {/* Skeleton Mini Cards */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-[116px] rounded-2xl bg-(--bg-elevated)" />
+              <div
+                key={i}
+                className="h-[116px] rounded-2xl bg-(--bg-elevated)"
+              />
             ))}
           </div>
           {/* Skeleton Tabs */}

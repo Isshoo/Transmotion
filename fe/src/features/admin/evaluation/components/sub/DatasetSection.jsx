@@ -36,7 +36,9 @@ export default function DatasetSection({ group }) {
             <span className="rounded-full bg-(--data-4)/10 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--data-4) uppercase">
               XLM-R
             </span>
-            <span className="text-xs font-semibold text-(--text-tertiary)">Models Trained</span>
+            <span className="text-xs font-semibold text-(--text-tertiary)">
+              Models Trained
+            </span>
           </div>
           <p className="mt-4 text-3xl font-black tracking-tight text-(--text-primary)">
             {xlmr.length}
@@ -48,7 +50,9 @@ export default function DatasetSection({ group }) {
             <span className="rounded-full bg-(--data-1)/10 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--data-1) uppercase">
               MBERT
             </span>
-            <span className="text-xs font-semibold text-(--text-tertiary)">Models Trained</span>
+            <span className="text-xs font-semibold text-(--text-tertiary)">
+              Models Trained
+            </span>
           </div>
           <p className="mt-4 text-3xl font-black tracking-tight text-(--text-primary)">
             {mbert.length}
@@ -80,7 +84,7 @@ export default function DatasetSection({ group }) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-bold transition-all duration-200 ${
+            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-bold whitespace-nowrap transition-all duration-200 ${
               activeTab === tab.id
                 ? "bg-(--bg-elevated) text-(--text-primary) shadow-(--shadow-sm) ring-1 ring-(--border-strong)"
                 : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
@@ -92,9 +96,9 @@ export default function DatasetSection({ group }) {
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[400px] animate-fade-in">
+      <div className="animate-fade-in min-h-[400px]">
         {activeTab === "iteration" && (
-          <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm) animate-slide-up">
+          <div className="animate-slide-up rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
             <div className="mb-5">
               <div className="flex items-center gap-1.5">
                 <p className="text-sm font-bold tracking-tight text-(--text-primary)">
@@ -105,8 +109,8 @@ export default function DatasetSection({ group }) {
                 </InfoPopup>
               </div>
               <p className="mt-1 text-xs font-medium text-(--text-secondary)">
-                Each row = training iteration N with the same split. The average is
-                calculated from all iterations per column.
+                Each row = training iteration N with the same split. The average
+                is calculated from all iterations per column.
               </p>
             </div>
             <IterationTable mbert={mbert} xlmr={xlmr} metric="accuracy" />
@@ -114,7 +118,7 @@ export default function DatasetSection({ group }) {
         )}
 
         {activeTab === "comparison" && (
-          <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm) animate-slide-up">
+          <div className="animate-slide-up rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
             <div className="mb-5">
               <div className="flex items-center gap-1.5">
                 <p className="text-sm font-bold tracking-tight text-(--text-primary)">
@@ -133,13 +137,13 @@ export default function DatasetSection({ group }) {
         )}
 
         {activeTab === "perclass" && (
-          <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm) animate-slide-up">
+          <div className="animate-slide-up rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
             <PerClassComparison mbert={mbert} xlmr={xlmr} />
           </div>
         )}
 
         {activeTab === "confusion" && (
-          <div className="rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm) animate-slide-up">
+          <div className="animate-slide-up rounded-2xl border border-(--border-default) bg-(--bg-surface) p-6 shadow-(--shadow-sm)">
             <ConfusionMatrixSection mbert={mbert} xlmr={xlmr} />
           </div>
         )}
