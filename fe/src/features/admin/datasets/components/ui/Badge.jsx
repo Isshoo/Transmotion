@@ -40,7 +40,7 @@ export function PreprocessBadge({ status }) {
   const PREPROCESS_STYLE = {
     idle: "bg-(--bg-elevated) text-(--text-tertiary)",
     running: "bg-(--warning-muted) text-(--warning)",
-    completed: "bg-(--accent-muted) text-(--accent)",
+    completed: "bg-(--success-muted) text-(--success)",
     error: "bg-(--error-muted) text-(--error)",
   };
   const PREPROCESS_LABEL = {

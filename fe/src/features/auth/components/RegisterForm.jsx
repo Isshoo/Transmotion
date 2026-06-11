@@ -51,7 +51,7 @@ export default function RegisterForm() {
   // Tampilan sukses — minta user cek email
   if (success) {
     return (
-      <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+      <div className="animate-scale-in mx-auto my-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
         <div className="mb-4 text-5xl">📧</div>
         <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
           Cek email kamu!
@@ -72,7 +72,7 @@ export default function RegisterForm() {
   }
 
   return (
-    <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
+    <div className="animate-scale-in mx-auto my-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
       <h1 className="mb-2 text-3xl font-black tracking-tight text-(--text-primary)">
         Daftar
       </h1>

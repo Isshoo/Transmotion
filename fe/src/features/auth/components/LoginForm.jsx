@@ -29,7 +29,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
+    <div className="animate-scale-in mx-auto my-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
       <h1 className="mb-2 text-3xl font-black tracking-tight text-(--text-primary)">
         Masuk
       </h1>

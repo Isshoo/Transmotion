@@ -209,21 +209,22 @@ export default function DatasetTable() {
                 <div className="grid grid-cols-2 gap-3 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3">
                   <div>
                     <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-                      Row (Raw)
+                      Raw
                     </p>
                     <p className="mt-0.5 text-sm font-medium text-(--text-primary)">
                       {ds.num_rows_raw !== null
-                        ? ds.num_rows_raw.toLocaleString("id")
+                        ? ds.num_rows_raw.toLocaleString("id") + " rows"
                         : "—"}
                     </p>
                   </div>
                   <div>
                     <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-                      Row (Prep)
+                      Preprocessed
                     </p>
                     <p className="mt-0.5 text-sm font-medium text-(--text-primary)">
                       {ds.num_rows_preprocessed !== null
-                        ? ds.num_rows_preprocessed.toLocaleString("id")
+                        ? ds.num_rows_preprocessed.toLocaleString("id") +
+                          " rows"
                         : "—"}
                     </p>
                   </div>
