@@ -101,11 +101,12 @@ export default function TrainingPage() {
       {/* Content */}
       <div className="animate-fade-in">
         {isCheckingActive ? (
-          <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
-            <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-(--accent)" />
-              <p className="text-xs font-medium">Checking training status...</p>
-            </div>
+          <div className="animate-pulse space-y-6">
+            <div className="h-36 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-64 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-40 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-72 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-14 w-full rounded-xl bg-(--bg-elevated)" />
           </div>
         ) : (
           <>

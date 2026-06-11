@@ -25,14 +25,7 @@ export function HistoryTable() {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {[
-                  "No",
-                  "Text",
-                  "Prediction",
-                  "Confidence",
-                  "Model",
-                  "Time",
-                ].map((h) => (
+                {["No", "Text", "Prediction", "Confidence", "Time"].map((h) => (
                   <th
                     key={h}
                     className="px-4 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
@@ -78,12 +71,9 @@ export function HistoryTable() {
                           <ConfidenceBar value={item.confidence} />
                         )}
                       </td>
-                      <td className="px-4 py-3 text-[11px] font-medium whitespace-nowrap text-(--text-tertiary)">
-                        {item.model_name ?? "—"}
-                      </td>
                       <td className="px-4 py-3 text-[10px] font-medium whitespace-nowrap text-(--text-tertiary)">
                         {item.created_at
-                          ? new Date(item.created_at).toLocaleString("id-ID", {
+                          ? new Date(item.created_at).toLocaleString("en-EN", {
                               day: "2-digit",
                               month: "short",
                               hour: "2-digit",

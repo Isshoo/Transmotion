@@ -10,7 +10,6 @@ import {
   ChevronRight,
   Plus,
   Play,
-  Loader2,
   Server,
   MessageSquareText,
   Trophy,
@@ -44,10 +43,38 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
-        <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
-          <Loader2 className="h-8 w-8 animate-spin text-(--accent)" />
-          <p className="text-sm font-medium">Loading Dashboard...</p>
+      <div className="animate-pulse space-y-6 pb-5">
+        {/* Header Skeleton */}
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <div className="mb-2 h-7 w-48 rounded-md bg-(--bg-elevated)" />
+            <div className="h-4 w-72 rounded-md bg-(--bg-elevated)" />
+          </div>
+          <div className="h-10 w-48 rounded-full bg-(--bg-elevated)" />
+        </div>
+
+        {/* Stats Grid Skeleton */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-28 rounded-xl bg-(--bg-elevated)" />
+          ))}
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Left Column Skeleton */}
+          <div className="space-y-6 lg:col-span-2">
+            <div className="h-48 rounded-xl bg-(--bg-elevated)" />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="h-36 rounded-xl bg-(--bg-elevated)" />
+              <div className="h-36 rounded-xl bg-(--bg-elevated)" />
+            </div>
+          </div>
+          {/* Right Column Skeleton */}
+          <div className="space-y-6">
+            <div className="h-48 rounded-xl bg-(--bg-elevated)" />
+            <div className="h-64 rounded-xl bg-(--bg-elevated)" />
+          </div>
         </div>
       </div>
     );

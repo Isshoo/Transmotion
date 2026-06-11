@@ -80,21 +80,22 @@ export default function EvaluationPage() {
       {/* Loading Skeleton */}
       {isLoadingCompare && (
         <div className="animate-pulse space-y-6">
+          {/* Skeleton Dataset Header */}
           <div className="flex items-center gap-4">
             <div className="h-px flex-1 bg-(--border-default)" />
             <div className="h-8 w-32 rounded-full bg-(--bg-elevated)" />
             <div className="h-px flex-1 bg-(--border-default)" />
           </div>
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              <div className="h-8 w-24 rounded-full bg-(--bg-elevated)" />
-              <div className="h-8 w-24 rounded-full bg-(--bg-elevated)" />
-              <div className="h-8 w-40 rounded-full bg-(--bg-elevated)" />
-              <div className="h-8 w-40 rounded-full bg-(--bg-elevated)" />
-            </div>
-            <div className="h-10 w-full max-w-xl rounded-full bg-(--bg-elevated)" />
-            <div className="h-64 rounded-2xl bg-(--bg-elevated)" />
+          {/* Skeleton Mini Cards */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-[116px] rounded-2xl bg-(--bg-elevated)" />
+            ))}
           </div>
+          {/* Skeleton Tabs */}
+          <div className="h-[44px] w-full rounded-xl bg-(--bg-elevated)" />
+          {/* Skeleton Content Area */}
+          <div className="h-[400px] rounded-2xl bg-(--bg-elevated)" />
         </div>
       )}
 
