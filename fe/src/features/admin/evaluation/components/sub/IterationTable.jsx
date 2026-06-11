@@ -39,7 +39,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
             <tr>
               <th
                 rowSpan={2}
-                className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
+                className="sticky left-0 z-20 border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase shadow-[2px_0_4px_rgba(0,0,0,0.05)]"
               >
                 ITERATION
               </th>
@@ -81,7 +81,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                 key={iter}
                 className="transition-colors duration-150 hover:bg-(--bg-overlay)"
               >
-                <td className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-center font-black text-(--text-primary)">
+                <td className="sticky left-0 z-10 border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-center font-black text-(--text-primary) shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                   {iter + 1}
                 </td>
                 {SPLITS.map((s) => {
@@ -128,7 +128,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
 
             {/* Baris rata-rata */}
             <tr className="bg-(--bg-elevated)">
-              <td className="border-r border-(--border-default) px-5 py-3.5 text-center text-[10px] font-black tracking-wider text-(--text-secondary) uppercase">
+              <td className="sticky left-0 z-10 border-r border-(--border-default) bg-(--bg-elevated) px-5 py-3.5 text-center text-[10px] font-black tracking-wider text-(--text-secondary) uppercase shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                 Average
               </td>
               {SPLITS.map((s) => {
