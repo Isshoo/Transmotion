@@ -193,41 +193,39 @@ export default function DashboardPage() {
         {/* Left Column */}
         <div className="space-y-6 lg:col-span-2">
           {/* mBERT vs XLM-R Comparison */}
-          {(mbertCount > 0 || xlmrCount > 0) && (
-            <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-sm">
-              <div className="flex items-center justify-between border-b border-(--border-default) px-5 py-4">
-                <h2 className="font-medium text-(--text-primary)">
-                  <BarChart3
-                    size={16}
-                    className="mr-2 inline text-(--accent)"
-                  />
-                  mBERT vs XLM-R Comparison
-                </h2>
-              </div>
-              <div className="grid grid-cols-2 divide-x divide-(--border-default)">
-                <ModelTypeColumn
-                  label="mBERT"
-                  count={mbertCount}
-                  avgF1={mbertF1}
-                  color="text-(--data-2)"
-                  bgBar="bg-(--data-2)"
-                  total={mbertCount + xlmrCount}
+          <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-sm">
+            <div className="flex items-center justify-between border-b border-(--border-default) px-5 py-4">
+              <h2 className="font-medium text-(--text-primary)">
+                <BarChart3
+                  size={16}
+                  className="mr-2 inline text-(--accent)"
                 />
-                <ModelTypeColumn
-                  label="XLM-R"
-                  count={xlmrCount}
-                  avgF1={xlmrF1}
-                  color="text-(--data-7)"
-                  bgBar="bg-(--data-7)"
-                  total={mbertCount + xlmrCount}
-                />
-              </div>
+                mBERT vs XLM-R Comparison
+              </h2>
             </div>
-          )}
+            <div className="grid grid-cols-2 divide-x divide-(--border-default)">
+              <ModelTypeColumn
+                label="mBERT"
+                count={mbertCount}
+                avgF1={mbertF1}
+                color="text-(--data-2)"
+                bgBar="bg-(--data-2)"
+                total={mbertCount + xlmrCount}
+              />
+              <ModelTypeColumn
+                label="XLM-R"
+                count={xlmrCount}
+                avgF1={xlmrF1}
+                color="text-(--data-7)"
+                bgBar="bg-(--data-7)"
+                total={mbertCount + xlmrCount}
+              />
+            </div>
+          </div>
 
           {/* Best Model & Most Used */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {best_model && (
+            {best_model ? (
               <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
                   <Trophy size={16} className="text-(--warning)" />
@@ -251,8 +249,18 @@ export default function DashboardPage() {
                   {(best_model.accuracy * 100).toFixed(1)}%
                 </p>
               </div>
+            ) : (
+              <div className="flex min-h-[140px] flex-col items-center justify-center rounded-xl border border-dashed border-(--border-default) bg-(--bg-surface)/50 p-5 text-center shadow-sm">
+                <Trophy size={24} className="mb-2 text-(--text-tertiary)" />
+                <p className="text-sm font-medium text-(--text-secondary)">
+                  No Best Model Yet
+                </p>
+                <p className="mt-1 text-xs text-(--text-tertiary)">
+                  Train a model to see statistics
+                </p>
+              </div>
             )}
-            {most_used_model && (
+            {most_used_model ? (
               <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
                   <Star size={16} className="text-(--data-5)" />
@@ -273,6 +281,16 @@ export default function DashboardPage() {
                 </div>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
                   {most_used_model.model_type.toUpperCase()}
+                </p>
+              </div>
+            ) : (
+              <div className="flex min-h-[140px] flex-col items-center justify-center rounded-xl border border-dashed border-(--border-default) bg-(--bg-surface)/50 p-5 text-center shadow-sm">
+                <Star size={24} className="mb-2 text-(--text-tertiary)" />
+                <p className="text-sm font-medium text-(--text-secondary)">
+                  No Most Used Model
+                </p>
+                <p className="mt-1 text-xs text-(--text-tertiary)">
+                  Make predictions to see statistics
                 </p>
               </div>
             )}
@@ -557,9 +575,13 @@ function ModelTypeColumn({ label, count, avgF1, color, bgBar, total }) {
           model ({pct}%)
         </span>
       </p>
-      {avgF1 != null && (
+      {avgF1 != null ? (
         <p className="mt-1 text-xs text-(--text-secondary)">
           Average F1: {(avgF1 * 100).toFixed(1)}%
+        </p>
+      ) : (
+        <p className="mt-1 text-xs text-(--text-tertiary)">
+          Average F1: —
         </p>
       )}
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-(--bg-elevated)">

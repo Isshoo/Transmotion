@@ -153,7 +153,7 @@ const useDatasetStore = create((set, get) => ({
         isLoadingRaw: false,
       });
     } catch {
-      set({ isLoadingRaw: false });
+      set({ rawRows: [], rawTotal: 0, isLoadingRaw: false });
     }
   },
 

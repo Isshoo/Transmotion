@@ -127,7 +127,7 @@ export default function RawDataTab({ dataset }) {
                     ))}
                   </tr>
                 ))
-              ) : rawRows.length === 0 ? (
+              ) : !rawRows || rawRows.length === 0 ? (
                 <tr>
                   <td
                     colSpan={columns.length + 1}
