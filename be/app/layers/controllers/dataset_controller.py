@@ -153,7 +153,6 @@ def add_preprocessed_row(dataset_id):
     row = dataset_service.add_preprocessed_row(
         dataset_id=dataset_id,
         raw_text=data["raw_text"],
-        preprocessed_text=data["preprocessed_text"],
         label=data["label"],
     )
     return success_response(

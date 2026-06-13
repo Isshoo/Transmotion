@@ -167,8 +167,7 @@ def upload(file, name: str, description: str | None, user_id: str | None) -> Dat
             )
         if len(df) < MIN_ROWS:
             raise BadRequestError(
-                f"Dataset must have at least {MIN_ROWS} rows "
-                f"(found {len(df)} rows)"
+                f"Dataset must have at least {MIN_ROWS} rows (found {len(df)} rows)"
             )
 
         # Cleaning dasar
@@ -300,7 +299,9 @@ def get_raw_data(
     page_df = df.iloc[start : start + per_page]
 
     # Convert to object dtype first so None is not cast back to NaN in numeric columns
-    rows = page_df.astype(object).where(pd.notna(page_df), None).to_dict(orient="records")
+    rows = (
+        page_df.astype(object).where(pd.notna(page_df), None).to_dict(orient="records")
+    )
 
     return rows, total
 
@@ -478,9 +479,7 @@ def _validate_preprocessed_text(text: str) -> list[str]:
     return violations
 
 
-def add_preprocessed_row(
-    dataset_id: str, raw_text: str, preprocessed_text: str, label: str
-) -> PreprocessedRow:
+def add_preprocessed_row(dataset_id: str, raw_text: str, label: str) -> PreprocessedRow:
     dataset = get_by_id(dataset_id)
 
     # Validasi label
@@ -490,34 +489,24 @@ def add_preprocessed_row(
             f"Label '{label}' is invalid. Available labels: {', '.join(valid_labels)}"
         )
 
+    preprocessed_text = preprocess_text(raw_text)
+
     # Cek duplikat
     existing = (
         db.session.query(PreprocessedRow)
-        .filter_by(
-            dataset_id=dataset_id,
-            preprocessed_text=preprocessed_text.strip(),
-            label=label,
+        .filter(
+            PreprocessedRow.dataset_id == dataset_id,
+            PreprocessedRow.preprocessed_text == preprocessed_text.strip(),
         )
         .first()
     )
     if existing:
-        raise BadRequestError("Data with the same text and label already exists")
-
-    cleaned = preprocessed_text.strip()
-    if not cleaned:
-        raise BadRequestError("Preprocessed text cannot be empty")
-
-    # Validasi noise
-    violations = _validate_preprocessed_text(cleaned)
-    if violations:
-        raise BadRequestError(
-            f"Preprocessed text contains invalid elements: {', '.join(violations)}"
-        )
+        raise BadRequestError("Data with the same preprocessed text already exists")
 
     row = PreprocessedRow(
         dataset_id=dataset_id,
         raw_text=raw_text.strip(),
-        preprocessed_text=cleaned,
+        preprocessed_text=preprocessed_text,
         label=label,
     )
     db.session.add(row)
@@ -558,19 +547,17 @@ def update_preprocessed_row(
                 f"Preprocessed text contains invalid elements: {', '.join(violations)}"
             )
 
-        effective_label = label if (label is not None) else old_label
         dup = (
             db.session.query(PreprocessedRow)
             .filter(
                 PreprocessedRow.dataset_id == dataset_id,
                 PreprocessedRow.id != row_id,
                 PreprocessedRow.preprocessed_text == cleaned,
-                PreprocessedRow.label == effective_label,
             )
             .first()
         )
         if dup:
-            raise BadRequestError("Data with the same text and label already exists")
+            raise BadRequestError("Data with the same preprocessed text already exists")
         row.preprocessed_text = cleaned
 
     if label is not None and label != old_label:

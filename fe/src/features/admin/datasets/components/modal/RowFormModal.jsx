@@ -18,18 +18,32 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
   });
   const [errors, setErrors] = useState({});
 
-  const validate = () => {
+  const addValidate = () => {
     const e = {};
     if (!form.raw_text.trim()) e.raw_text = "Raw text is required";
+    if (form.raw_text.trim().split(" ").length < 5)
+      e.raw_text = "Raw text must be at least 5 words";
+    if (form.raw_text.trim().length < 10)
+      e.raw_text = "Raw text must be at least 10 characters";
+    if (!form.label) e.label = "Label is required";
+    return e;
+  };
+
+  const editValidate = () => {
+    const e = {};
     if (!form.preprocessed_text.trim())
       e.preprocessed_text = "Preprocessed text is required";
+    if (form.preprocessed_text.trim().split(" ").length < 5)
+      e.preprocessed_text = "Preprocessed text must be at least 5 words";
+    if (form.preprocessed_text.trim().length < 10)
+      e.preprocessed_text = "Preprocessed text must be at least 10 characters";
     if (!form.label) e.label = "Label is required";
     return e;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
+    const errs = isEdit ? editValidate() : addValidate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -42,7 +56,6 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
         })
       : await addPreprocessedRow(datasetId, {
           raw_text: form.raw_text.trim(),
-          preprocessed_text: form.preprocessed_text.trim(),
           label: form.label,
         });
 
@@ -71,7 +84,7 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
 
         <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
           {/* Raw text (only when adding) */}
-          {!isEdit && (
+          {!isEdit ? (
             <div>
               <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
                 Raw Text
@@ -96,33 +109,32 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                 </p>
               )}
             </div>
+          ) : (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
+                Preprocessed Text
+              </label>
+              <textarea
+                value={form.preprocessed_text}
+                onChange={(e) => {
+                  setForm((p) => ({ ...p, preprocessed_text: e.target.value }));
+                  setErrors((p) => ({ ...p, preprocessed_text: undefined }));
+                }}
+                rows={2}
+                placeholder="Text after preprocessing..."
+                className={`min-h-[100px] w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+                  errors.preprocessed_text
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
+              />
+              {errors.preprocessed_text && (
+                <p className="mt-1.5 text-xs text-(--error)">
+                  {errors.preprocessed_text}
+                </p>
+              )}
+            </div>
           )}
-
-          {/* Preprocessed text */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-              Preprocessed Text
-            </label>
-            <textarea
-              value={form.preprocessed_text}
-              onChange={(e) => {
-                setForm((p) => ({ ...p, preprocessed_text: e.target.value }));
-                setErrors((p) => ({ ...p, preprocessed_text: undefined }));
-              }}
-              rows={2}
-              placeholder="Text after preprocessing..."
-              className={`min-h-[100px] w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
-                errors.preprocessed_text
-                  ? "border-(--error) focus:ring-(--error-muted)"
-                  : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
-              }`}
-            />
-            {errors.preprocessed_text && (
-              <p className="mt-1.5 text-xs text-(--error)">
-                {errors.preprocessed_text}
-              </p>
-            )}
-          </div>
 
           {/* Label */}
           <div>

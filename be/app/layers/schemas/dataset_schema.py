@@ -52,13 +52,8 @@ class AddPreprocessedRowSchema(Schema):
     error_messages = {"unknown": "Unknown field"}
     raw_text = fields.String(
         required=True,
-        validate=validate.Length(min=1, max=10000),
+        validate=validate.Length(min=10, max=10000),
         error_messages={"required": "Original text is required"},
-    )
-    preprocessed_text = fields.String(
-        required=True,
-        validate=validate.Length(min=1, max=10000),
-        error_messages={"required": "Preprocessed text is required"},
     )
     label = fields.String(
         required=True,
@@ -68,7 +63,7 @@ class AddPreprocessedRowSchema(Schema):
 
 class UpdatePreprocessedRowSchema(Schema):
     error_messages = {"unknown": "Unknown field"}
-    preprocessed_text = fields.String(validate=validate.Length(min=1, max=10000))
+    preprocessed_text = fields.String(validate=validate.Length(min=10, max=10000))
     label = fields.String()
 
 
