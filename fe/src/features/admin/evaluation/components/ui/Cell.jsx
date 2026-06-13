@@ -11,7 +11,7 @@ export function MetricCell({ value, highlight, onClick, cursor, raw }) {
     <td
       className={`border border-(--border-default) px-3 py-2 text-center text-xs font-semibold transition-colors duration-150 ${
         highlight
-          ? "bg-(--accent-muted)/20 text-(--accent)"
+          ? "text-(--text-primary) hover:bg-(--bg-overlay)"
           : "text-(--text-primary) hover:bg-(--bg-overlay)"
       }`}
       onClick={onClick}

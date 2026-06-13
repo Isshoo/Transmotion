@@ -1,6 +1,17 @@
 export default function EpochLogsTable({ logs }) {
   if (!logs || logs.length === 0) return null;
 
+  const calculateAverage = (key) => {
+    const validLogs = logs.filter((log) => log[key] != null);
+    if (validLogs.length === 0) return null;
+    return validLogs.reduce((acc, log) => acc + log[key], 0) / validLogs.length;
+  };
+
+  const avgAccuracy = calculateAverage("val_accuracy");
+  const avgPrecision = calculateAverage("val_precision");
+  const avgRecall = calculateAverage("val_recall");
+  const avgF1 = calculateAverage("val_f1");
+
   return (
     <div>
       <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
@@ -11,11 +22,8 @@ export default function EpochLogsTable({ logs }) {
                 <th className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)">
                   Epoch
                 </th>
-                <th className="bg-(--accent-muted)/20 px-4 py-3 text-left font-semibold text-(--text-secondary)">
-                  Train Loss
-                </th>
                 <th className="border-l border-(--border-subtle) bg-(--accent-muted)/20 px-4 py-3 text-left font-semibold text-(--text-secondary)">
-                  Val Loss
+                  Loss
                 </th>
                 <th className="bg-(--accent-muted)/20 px-4 py-3 text-left font-semibold text-(--text-secondary)">
                   Acc
@@ -33,17 +41,13 @@ export default function EpochLogsTable({ logs }) {
             </thead>
             <tbody className="divide-y divide-(--border-subtle) bg-(--bg-surface)">
               {logs.map((log, i) => {
-                const isLast = i === logs.length - 1;
                 return (
                   <tr
                     key={i}
-                    className={`transition-colors duration-150 ${isLast ? "bg-(--accent-muted)/10" : "hover:bg-(--bg-overlay)"}`}
+                    className="transition-colors duration-150 hover:bg-(--bg-overlay)"
                   >
                     <td className="px-4 py-3 font-semibold text-(--text-primary)">
                       {log.epoch}
-                    </td>
-                    <td className="bg-(--accent-muted)/5 px-4 py-3 font-mono text-(--text-secondary)">
-                      {log.train_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="border-l border-(--border-subtle) bg-(--accent-muted)/5 px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_loss?.toFixed(4) ?? "—"}
@@ -72,6 +76,33 @@ export default function EpochLogsTable({ logs }) {
                 );
               })}
             </tbody>
+            <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
+              <tr>
+                <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                  Average
+                </td>
+
+                <td className="border-l border-(--border-subtle) bg-(--accent-muted)/5 px-4 py-3 font-mono text-(--text-secondary)">
+                  —
+                </td>
+                <td className="bg-(--accent-muted)/5 px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                  {avgAccuracy != null
+                    ? `${(avgAccuracy * 100).toFixed(2)}%`
+                    : "—"}
+                </td>
+                <td className="bg-(--accent-muted)/5 px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                  {avgPrecision != null
+                    ? `${(avgPrecision * 100).toFixed(2)}%`
+                    : "—"}
+                </td>
+                <td className="bg-(--accent-muted)/5 px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                  {avgRecall != null ? `${(avgRecall * 100).toFixed(2)}%` : "—"}
+                </td>
+                <td className="bg-(--accent-muted)/5 px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                  {avgF1 != null ? `${(avgF1 * 100).toFixed(2)}%` : "—"}
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>

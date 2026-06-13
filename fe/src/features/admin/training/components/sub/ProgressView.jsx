@@ -106,21 +106,26 @@ export default function ProgressView() {
       {job.epoch_logs?.length > 0 &&
         (() => {
           const last = job.epoch_logs[job.epoch_logs.length - 1];
+          const bestAcc = job.epoch_logs.reduce((prev, curr) =>
+            prev.val_accuracy > curr.val_accuracy ? prev : curr
+          );
+          const bestF1 = job.epoch_logs.reduce((prev, curr) =>
+            prev.val_f1 > curr.val_f1 ? prev : curr
+          );
           return (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {[
-                ["Train Loss", last.train_loss?.toFixed(4)],
-                ["Val Loss", last.val_loss?.toFixed(4)],
+                ["Loss", last.val_loss?.toFixed(4)],
                 [
-                  "Accuracy",
-                  last.val_accuracy !== null
-                    ? `${(last.val_accuracy * 100).toFixed(2)}%`
+                  "Best Accuracy",
+                  bestAcc.val_accuracy !== null
+                    ? `${(bestAcc.val_accuracy * 100).toFixed(2)}%`
                     : null,
                 ],
                 [
-                  "F1-Score",
-                  last.val_f1 !== null
-                    ? `${(last.val_f1 * 100).toFixed(2)}%`
+                  "Best F1-Score",
+                  bestF1.val_f1 !== null
+                    ? `${(bestF1.val_f1 * 100).toFixed(2)}%`
                     : null,
                 ],
               ].map(([label, value]) => (
@@ -154,8 +159,7 @@ export default function ProgressView() {
                 <tr className="border-b border-(--border-default) bg-(--bg-surface)">
                   {[
                     "Epoch",
-                    "Train Loss",
-                    "Val Loss",
+                    "Loss",
                     "Accuracy",
                     "Precision",
                     "Recall",
@@ -183,9 +187,7 @@ export default function ProgressView() {
                     <td className="px-4 py-3 font-semibold text-(--text-primary)">
                       {log.epoch}
                     </td>
-                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
-                      {log.train_loss?.toFixed(4) ?? "—"}
-                    </td>
+
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_loss?.toFixed(4) ?? "—"}
                     </td>
@@ -212,6 +214,51 @@ export default function ProgressView() {
                   </tr>
                 ))}
               </tbody>
+              {(() => {
+                const calcAvg = (key) => {
+                  const valid = job.epoch_logs.filter(
+                    (log) => log[key] != null
+                  );
+                  if (valid.length === 0) return null;
+                  return (
+                    valid.reduce((acc, log) => acc + log[key], 0) / valid.length
+                  );
+                };
+                const avgAcc = calcAvg("val_accuracy");
+                const avgPrec = calcAvg("val_precision");
+                const avgRec = calcAvg("val_recall");
+                const avgF1 = calcAvg("val_f1");
+                return (
+                  <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                        Average
+                      </td>
+                      <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                        —
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgAcc !== null
+                          ? `${(avgAcc * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgPrec !== null
+                          ? `${(avgPrec * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgRec !== null
+                          ? `${(avgRec * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgF1 !== null ? `${(avgF1 * 100).toFixed(2)}%` : "—"}
+                      </td>
+                    </tr>
+                  </tfoot>
+                );
+              })()}
             </table>
           </div>
         </div>

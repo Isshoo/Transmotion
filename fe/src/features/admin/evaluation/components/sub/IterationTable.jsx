@@ -23,7 +23,7 @@ export default function IterationTable({
   }, 0);
 
   const iterations = Array.from(
-    { length: Math.min(Math.max(maxIter, 1), 5) },
+    { length: Math.max(maxIter, 1) },
     (_, i) => i
   );
 
@@ -82,10 +82,7 @@ export default function IterationTable({
           </thead>
           <tbody className="bg-(--bg-surface)">
             {iterations.map((iter) => (
-              <tr
-                key={iter}
-                className="transition-colors duration-150 hover:bg-(--bg-overlay)"
-              >
+              <tr key={iter} className="transition-colors duration-150">
                 <td className="sticky left-0 z-10 border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-center font-black text-(--text-primary) shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                   {iter + 1}
                 </td>

@@ -609,7 +609,7 @@ export const EPOCH_LOGS_INFO = (
               </span>
             </td>
           </tr>
-          <tr>
+          {/* <tr>
             <td>
               <span className="param-name">Train Loss</span>
             </td>
@@ -620,15 +620,15 @@ export const EPOCH_LOGS_INFO = (
                 convergence or a learning rate issue.
               </span>
             </td>
-          </tr>
+          </tr> */}
           <tr>
             <td>
-              <span className="param-name">Val Loss</span>
+              <span className="param-name">Loss</span>
             </td>
             <td>
               <span className="param-desc">
-                Loss on the validation set. If Val Loss starts increasing while
-                Train Loss keeps decreasing, the model is overfitting.
+                Loss on the validation set. If Loss starts increasing while
+                training, the model is overfitting.
               </span>
             </td>
           </tr>

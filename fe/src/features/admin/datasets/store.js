@@ -48,7 +48,8 @@ const useDatasetStore = create((set, get) => ({
   // ── List actions ───────────────────────────────────────────────
   fetchDatasets: async () => {
     const { page, perPage, search, statusFilter } = get();
-    if (get().datasets.length === 0) {
+    const hadData = (get().datasets ?? []).length > 0;
+    if (!hadData) {
       set({ isLoading: true });
     }
     try {
@@ -57,12 +58,13 @@ const useDatasetStore = create((set, get) => ({
       if (statusFilter) params.status = statusFilter;
       const { data: res } = await datasetsApi.getAll(params);
       set({
-        datasets: res.data,
+        datasets: res.data ?? [],
         total: res.meta?.pagination?.total ?? 0,
         totalPages: res.meta?.pagination?.total_pages ?? 1,
         isLoading: false,
       });
-    } catch {
+    } catch (err) {
+      console.warn("[fetchDatasets] failed:", err?.response?.status, err?.message);
       set({ isLoading: false });
     }
   },
@@ -139,7 +141,8 @@ const useDatasetStore = create((set, get) => ({
   // ── Raw data actions ───────────────────────────────────────────
   fetchRawData: async (id) => {
     const { rawPage, rawPerPage, rawSearch, rawFilterLabel } = get();
-    if (get().rawRows.length === 0) {
+    const hadData = (get().rawRows ?? []).length > 0;
+    if (!hadData) {
       set({ isLoadingRaw: true });
     }
     try {
@@ -148,12 +151,18 @@ const useDatasetStore = create((set, get) => ({
       if (rawFilterLabel) params.filter_label = rawFilterLabel;
       const { data: res } = await datasetsApi.getRawData(id, params);
       set({
-        rawRows: res.data,
+        rawRows: res.data ?? [],
         rawTotal: res.meta?.pagination?.total ?? 0,
         isLoadingRaw: false,
       });
-    } catch {
-      set({ rawRows: [], rawTotal: 0, isLoadingRaw: false });
+    } catch (err) {
+      console.warn("[fetchRawData] failed:", err?.response?.status, err?.message);
+      // Only reset data if we had nothing before; otherwise keep stale data visible
+      if (!hadData) {
+        set({ rawRows: [], rawTotal: 0, isLoadingRaw: false });
+      } else {
+        set({ isLoadingRaw: false });
+      }
     }
   },
 
@@ -203,7 +212,8 @@ const useDatasetStore = create((set, get) => ({
       preprocessedSearch,
       preprocessedFilterLabel,
     } = get();
-    if (get().preprocessedRows.length === 0) {
+    const hadData = (get().preprocessedRows ?? []).length > 0;
+    if (!hadData) {
       set({ isLoadingPreprocessed: true });
     }
     try {
@@ -213,12 +223,17 @@ const useDatasetStore = create((set, get) => ({
         params.filter_label = preprocessedFilterLabel;
       const { data: res } = await datasetsApi.getPreprocessedData(id, params);
       set({
-        preprocessedRows: res.data,
+        preprocessedRows: res.data ?? [],
         preprocessedTotal: res.meta?.pagination?.total ?? 0,
         isLoadingPreprocessed: false,
       });
-    } catch {
-      set({ isLoadingPreprocessed: false });
+    } catch (err) {
+      console.warn("[fetchPreprocessedData] failed:", err?.response?.status, err?.message);
+      if (!hadData) {
+        set({ preprocessedRows: [], preprocessedTotal: 0, isLoadingPreprocessed: false });
+      } else {
+        set({ isLoadingPreprocessed: false });
+      }
     }
   },
 

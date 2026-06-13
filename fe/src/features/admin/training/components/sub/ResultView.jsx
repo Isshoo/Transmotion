@@ -137,13 +137,7 @@ export default function ResultView() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-(--border-subtle) bg-(--bg-elevated)">
-                  {[
-                    "Epoch",
-                    "Train Loss",
-                    "Val Loss",
-                    "Val Accuracy",
-                    "Val F1",
-                  ].map((h) => (
+                  {["Epoch", "Loss", "Accuracy", "F1"].map((h) => (
                     <th
                       key={h}
                       className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
@@ -163,9 +157,6 @@ export default function ResultView() {
                       {log.epoch}
                     </td>
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
-                      {log.train_loss?.toFixed(4) ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
@@ -181,6 +172,39 @@ export default function ResultView() {
                   </tr>
                 ))}
               </tbody>
+              {(() => {
+                const calcAvg = (key) => {
+                  const valid = job.epoch_logs.filter(
+                    (log) => log[key] != null
+                  );
+                  if (valid.length === 0) return null;
+                  return (
+                    valid.reduce((acc, log) => acc + log[key], 0) / valid.length
+                  );
+                };
+                const avgAcc = calcAvg("val_accuracy");
+                const avgF1 = calcAvg("val_f1");
+                return (
+                  <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                        Average
+                      </td>
+                      <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                        —
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgAcc !== null
+                          ? `${(avgAcc * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgF1 !== null ? `${(avgF1 * 100).toFixed(2)}%` : "—"}
+                      </td>
+                    </tr>
+                  </tfoot>
+                );
+              })()}
             </table>
           </div>
         </div>
