@@ -267,6 +267,15 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
         )
 
     api_key = app.config.get("COLAB_API_KEY", "")
+
+    # Lakukan pengecekan aktif memastikan Colab benar-benar hidup
+    if not colab_service.health_check(api_key):
+        raise BadRequestError(
+            "Colab server is not responding. The connection might be lost. "
+            "Please check your Colab connection."
+        )
+
+    api_key = app.config.get("COLAB_API_KEY", "")
     url = f"{session['url']}/predict"
 
     try:
@@ -283,7 +292,24 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
             headers={"X-Backend-Key": api_key},
             timeout=120,
         )
-        res.raise_for_status()
+        if res.status_code in [502, 503, 504]:
+            colab_service.force_offline(session["session_id"])
+            raise BadRequestError(
+                "Colab tunnel is offline or not reachable. Please check your Colab server."
+            )
+
+        if res.status_code != 200:
+            try:
+                data = res.json()
+                error_msg = data.get(
+                    "error", f"Colab returned status {res.status_code}"
+                )
+            except Exception:
+                error_msg = (
+                    f"Colab returned status {res.status_code} - {res.text[:100]}"
+                )
+            raise BadRequestError(f"Colab inference failed: {error_msg}")
+
         data = res.json()
 
         logger.info(
@@ -298,8 +324,14 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
         return data["data"]
 
     except http_requests.exceptions.Timeout:
+        colab_service.force_offline(session["session_id"])
         raise BadRequestError(
             "Inference timeout. Try again — the model might be loading for the first time."
+        ) from None
+    except http_requests.exceptions.ConnectionError:
+        colab_service.force_offline(session["session_id"])
+        raise BadRequestError(
+            "Failed to contact Colab (Connection Error). The server might be offline."
         ) from None
     except http_requests.exceptions.RequestException as e:
         raise BadRequestError(f"Failed to contact Colab: {e}") from None
@@ -317,9 +349,7 @@ def _classify_local(model_record, text: str) -> dict:
 
     if model_id not in _model_cache:
         if not os.path.exists(model_record.file_path):
-            raise BadRequestError(
-                f"Model file not found: {model_record.file_path}"
-            )
+            raise BadRequestError(f"Model file not found: {model_record.file_path}")
 
         base = model_record.base_model_name or (
             "bert-base-multilingual-cased"

@@ -137,7 +137,14 @@ export default function ResultView() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-(--border-subtle) bg-(--bg-elevated)">
-                  {["Epoch", "Loss", "Accuracy", "F1"].map((h) => (
+                  {[
+                    "Epoch",
+                    "Loss",
+                    "Accuracy",
+                    "Precision",
+                    "Recall",
+                    "F1-Score",
+                  ].map((h) => (
                     <th
                       key={h}
                       className="px-4 py-3 text-left font-semibold whitespace-nowrap text-(--text-secondary)"
@@ -165,6 +172,16 @@ export default function ResultView() {
                         : "—"}
                     </td>
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                      {log.val_precision !== null
+                        ? `${(log.val_precision * 100).toFixed(2)}%`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                      {log.val_recall !== null
+                        ? `${(log.val_recall * 100).toFixed(2)}%`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_f1 !== null
                         ? `${(log.val_f1 * 100).toFixed(2)}%`
                         : "—"}
@@ -183,6 +200,8 @@ export default function ResultView() {
                   );
                 };
                 const avgAcc = calcAvg("val_accuracy");
+                const avgPre = calcAvg("val_precision");
+                const avgRec = calcAvg("val_recall");
                 const avgF1 = calcAvg("val_f1");
                 return (
                   <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
@@ -196,6 +215,16 @@ export default function ResultView() {
                       <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
                         {avgAcc !== null
                           ? `${(avgAcc * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgPre !== null
+                          ? `${(avgPre * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgRec !== null
+                          ? `${(avgRec * 100).toFixed(2)}%`
                           : "—"}
                       </td>
                       <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">

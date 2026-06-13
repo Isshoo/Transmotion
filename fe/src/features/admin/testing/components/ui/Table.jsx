@@ -56,7 +56,10 @@ export function HistoryTable() {
                           {(historyPage - 1) * historyPerPage + index + 1}
                         </span>
                       </td>
-                      <td className="max-w-[280px] px-4 py-3">
+                      <td
+                        className="max-w-[280px] px-4 py-3"
+                        title={item.input_text}
+                      >
                         <span className="line-clamp-2 font-mono text-[11px] leading-relaxed text-(--text-secondary)">
                           {item.input_text}
                         </span>

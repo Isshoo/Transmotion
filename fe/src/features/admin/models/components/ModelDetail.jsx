@@ -187,7 +187,10 @@ export default function ModelDetail({ modelId }) {
             <FileText size={13} className="text-(--text-tertiary)" />
             {m.base_model_name ?? "—"}
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)">
+          <span
+            className="inline-flex items-center gap-1.5 rounded-md border border-(--border-default) bg-(--bg-elevated) px-2.5 py-1.5 text-xs text-(--text-secondary)"
+            title={m.file_path}
+          >
             <HardDrive size={13} className="text-(--text-tertiary)" />
             {formatSize(m.file_size)}
             {m.is_drive_model ? " (Drive)" : " (Local)"}

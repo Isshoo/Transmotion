@@ -114,6 +114,21 @@ def create(
 ) -> TrainingJob:
     from flask import current_app
 
+    from app.layers.services import colab_service
+
+    api_key = current_app.config.get("COLAB_API_KEY", "")
+
+    if not colab_service.is_available():
+        raise BadRequestError(
+            "Colab is currently offline. Please start the Colab server before initiating training."
+        )
+
+    # Pengecekan aktif untuk memastikan worker masih hidup sebelum membuat job
+    if not colab_service.health_check(api_key):
+        raise BadRequestError(
+            "Colab server is not responding. Please check your Colab connection."
+        )
+
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
         raise NotFoundError("Dataset not found")
@@ -149,22 +164,21 @@ def create(
     # ── Broadcast ke list view SSE ─────────────────────────────
     _broadcast_job(job)
 
-    # ── Coba panggil Colab langsung ────────────────────────────
-    from app.layers.services import colab_service
+    # ── Panggil Colab langsung ────────────────────────────
+    job_data = job.to_dict()
+    job_data["dataset_file_path"] = dataset.file_path
+    job_data["dataset_text_column"] = dataset.text_column
+    job_data["dataset_label_column"] = dataset.label_column
+    job_data["dataset_labels"] = dataset.class_distribution_preprocessed or {}
 
-    api_key = current_app.config.get("COLAB_API_KEY", "")
-    if colab_service.is_available():
-        job_data = job.to_dict()
-        job_data["dataset_file_path"] = dataset.file_path
-        job_data["dataset_text_column"] = dataset.text_column
-        job_data["dataset_label_column"] = dataset.label_column
-        job_data["dataset_labels"] = dataset.class_distribution_preprocessed or {}
-
-        success = colab_service.call_train(job_data, api_key)
-        if not success:
-            logger.warning(f"Colab tidak merespons, job {job.id[:8]} tetap queued")
-    else:
-        logger.info("Colab tidak terdaftar — job akan menunggu Colab online")
+    success = colab_service.call_train(job_data, api_key)
+    if not success:
+        job.status = JobStatus.FAILED
+        job.error_message = "Koneksi ke Colab terputus saat mencoba memulai training. Silakan periksa koneksi server Colab."
+        job.finished_at = datetime.now(timezone.utc)
+        db.session.commit()
+        _broadcast_job(job)
+        raise BadRequestError("Gagal memulai training di Colab. Koneksi terputus.")
 
     return job
 

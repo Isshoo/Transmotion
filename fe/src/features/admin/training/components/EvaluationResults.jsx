@@ -292,9 +292,9 @@ export default function EvaluationResults({ job }) {
 
       {/* ── Epoch Logs ────────────────────────────────────────── */}
       {job.epoch_logs?.length > 0 && (
-        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
-          <div className="rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
-            <div className="flex items-center gap-1.5">
+        <div className="">
+          <div className="">
+            <div className="mb-4 ml-1 flex items-center gap-1.5">
               <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
                 Per-Epoch Logs
               </h3>
@@ -303,7 +303,7 @@ export default function EvaluationResults({ job }) {
               </InfoPopup>
             </div>
           </div>
-          <div className="p-5">
+          <div className="">
             <EpochLogsTable logs={job.epoch_logs} />
           </div>
         </div>

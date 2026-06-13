@@ -299,8 +299,8 @@ def get_raw_data(
     start = (page - 1) * per_page
     page_df = df.iloc[start : start + per_page]
 
-    # NaN → None untuk JSON dan descending order
-    rows = page_df.where(pd.notna(page_df), None).to_dict(orient="records")
+    # Convert to object dtype first so None is not cast back to NaN in numeric columns
+    rows = page_df.astype(object).where(pd.notna(page_df), None).to_dict(orient="records")
 
     return rows, total
 

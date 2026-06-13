@@ -34,6 +34,7 @@ const useTrainingStore = create((set, get) => ({
   // ── Active job (progress / result) ─────────────────────────
   activeJob: null,
   isLoadingActive: false,
+  dismissedJobId: null,
 
   // ── UI ─────────────────────────────────────────────────────
   isSubmitting: false,
@@ -52,11 +53,16 @@ const useTrainingStore = create((set, get) => ({
       const job = res.data;
       if (job && ["queued", "running"].includes(job.status)) {
         set({ activeJob: job, view: "progress", isCheckingActive: false });
-      } else if (job && job.status === "completed") {
-        // If a job is completed — show result if desired
-        // set({ activeJob: job, view: "result", isCheckingActive: false });
-        get().resetToForm();
-        set({ isCheckingActive: false });
+      } else if (
+        job &&
+        ["completed", "failed", "cancelled"].includes(job.status)
+      ) {
+        if (get().dismissedJobId === job.id) {
+          get().resetToForm();
+          set({ isCheckingActive: false });
+        } else {
+          set({ activeJob: job, view: "result", isCheckingActive: false });
+        }
       } else {
         get().resetToForm();
         set({ isCheckingActive: false });
@@ -69,8 +75,10 @@ const useTrainingStore = create((set, get) => ({
   },
 
   resetToForm: () => {
+    const active = get().activeJob;
     set({
       view: "form",
+      dismissedJobId: active ? active.id : get().dismissedJobId,
       activeJob: null,
       selectedDatasetId: "",
       testSize: 0.2,

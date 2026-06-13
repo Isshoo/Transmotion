@@ -170,7 +170,7 @@ export function BatchResults({ results, errors, csvTexts }) {
                   <td className="px-4 py-3 text-[11px] font-medium text-(--text-tertiary)">
                     {i + 1}
                   </td>
-                  <td className="max-w-[300px] px-4 py-3">
+                  <td className="max-w-[300px] px-4 py-3" title={r.input_text}>
                     <span className="line-clamp-2 text-[13px] leading-relaxed font-medium text-(--text-primary)">
                       {r.input_text}
                     </span>
