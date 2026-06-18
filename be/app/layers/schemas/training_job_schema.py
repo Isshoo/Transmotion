@@ -60,6 +60,10 @@ class CreateTrainingJobSchema(Schema):
         load_default="adamw",
         validate=validate.OneOf(["adamw", "adam", "sgd", "adafactor"]),
     )
+    seed = fields.Integer(
+        load_default=42,
+        validate=validate.Range(min=0, max=99999),
+    )
 
 
 class SplitPreviewSchema(Schema):

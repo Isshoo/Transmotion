@@ -125,6 +125,7 @@ def create_job():
         "weight_decay": data["weight_decay"],
         "dropout": data["dropout"],
         "optimizer": data["optimizer"],
+        "seed": data["seed"],
     }
 
     job = training_job_service.create(

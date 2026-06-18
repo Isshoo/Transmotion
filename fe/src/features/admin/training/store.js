@@ -25,6 +25,7 @@ const useTrainingStore = create((set, get) => ({
     weight_decay: 0.01,
     dropout: 0.1,
     optimizer: "adamw",
+    seed: 42,
   },
 
   // ── Split preview ──────────────────────────────────────────
@@ -95,6 +96,7 @@ const useTrainingStore = create((set, get) => ({
         weight_decay: 0.01,
         dropout: 0.1,
         optimizer: "adamw",
+        seed: 42,
       },
     });
   },

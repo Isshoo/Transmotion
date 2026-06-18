@@ -389,7 +389,7 @@ export default function FormView() {
               onChange={(e) => setHyperparam("epochs", Number(e.target.value))}
               className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             >
-              {[1, 2, 3, 4, 5, 8, 10].map((v) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
@@ -506,7 +506,7 @@ export default function FormView() {
         </button>
 
         {showAdvanced && (
-          <div className="animate-fade-in mt-4 grid grid-cols-2 gap-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
+          <div className="animate-fade-in mt-4 grid grid-cols-2 gap-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4 sm:grid-cols-3">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
                 Warmup Steps
@@ -535,6 +535,22 @@ export default function FormView() {
                 value={hyperparams.weight_decay}
                 onChange={(e) =>
                   setHyperparam("weight_decay", Number(e.target.value))
+                }
+                className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                Seed
+              </label>
+              <input
+                type="number"
+                min={0}
+                max={99999}
+                step={1}
+                value={hyperparams.seed}
+                onChange={(e) =>
+                  setHyperparam("seed", Number(e.target.value))
                 }
                 className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
               />
