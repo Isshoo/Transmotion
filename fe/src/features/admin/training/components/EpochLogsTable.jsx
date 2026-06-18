@@ -76,7 +76,7 @@ export default function EpochLogsTable({ logs }) {
                 );
               })}
             </tbody>
-            <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
+            {/* <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
               <tr>
                 <td className="px-4 py-3 font-semibold text-(--text-primary)">
                   Average
@@ -102,7 +102,7 @@ export default function EpochLogsTable({ logs }) {
                   {avgF1 != null ? `${(avgF1 * 100).toFixed(2)}%` : "—"}
                 </td>
               </tr>
-            </tfoot>
+            </tfoot> */}
           </table>
         </div>
       </div>

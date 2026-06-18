@@ -214,7 +214,7 @@ export default function ProgressView() {
                   </tr>
                 ))}
               </tbody>
-              {(() => {
+              {/* {(() => {
                 const calcAvg = (key) => {
                   const valid = job.epoch_logs.filter(
                     (log) => log[key] != null
@@ -258,7 +258,7 @@ export default function ProgressView() {
                     </tr>
                   </tfoot>
                 );
-              })()}
+              })()} */}
             </table>
           </div>
         </div>
