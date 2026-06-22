@@ -243,6 +243,23 @@ export const HYPERPARAM_INFO = (
               <span className="param-default">0.01</span>
             </td>
           </tr>
+          <tr>
+            <td>
+              <span className="param-name">Seed</span>
+            </td>
+            <td>
+              {/* desc in english */}
+              <span className="param-desc">
+                Seed is used to initialize the model parameters and the random
+                sampling process. The same Seed value will always produce the
+                same sequence of random numbers, thereby ensuring the
+                reproducibility of the experimental results.
+              </span>
+            </td>
+            <td>
+              <span className="param-default">42</span>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
