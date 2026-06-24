@@ -1,16 +1,16 @@
 export default function EpochLogsTable({ logs }) {
   if (!logs || logs.length === 0) return null;
 
-  const calculateAverage = (key) => {
-    const validLogs = logs.filter((log) => log[key] != null);
-    if (validLogs.length === 0) return null;
-    return validLogs.reduce((acc, log) => acc + log[key], 0) / validLogs.length;
-  };
+  // const calculateAverage = (key) => {
+  //   const validLogs = logs.filter((log) => log[key] != null);
+  //   if (validLogs.length === 0) return null;
+  //   return validLogs.reduce((acc, log) => acc + log[key], 0) / validLogs.length;
+  // };
 
-  const avgAccuracy = calculateAverage("val_accuracy");
-  const avgPrecision = calculateAverage("val_precision");
-  const avgRecall = calculateAverage("val_recall");
-  const avgF1 = calculateAverage("val_f1");
+  // const avgAccuracy = calculateAverage("val_accuracy");
+  // const avgPrecision = calculateAverage("val_precision");
+  // const avgRecall = calculateAverage("val_recall");
+  // const avgF1 = calculateAverage("val_f1");
 
   return (
     <div>

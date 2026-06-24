@@ -64,7 +64,11 @@ const useDatasetStore = create((set, get) => ({
         isLoading: false,
       });
     } catch (err) {
-      console.warn("[fetchDatasets] failed:", err?.response?.status, err?.message);
+      console.warn(
+        "[fetchDatasets] failed:",
+        err?.response?.status,
+        err?.message
+      );
       set({ isLoading: false });
     }
   },
@@ -156,7 +160,11 @@ const useDatasetStore = create((set, get) => ({
         isLoadingRaw: false,
       });
     } catch (err) {
-      console.warn("[fetchRawData] failed:", err?.response?.status, err?.message);
+      console.warn(
+        "[fetchRawData] failed:",
+        err?.response?.status,
+        err?.message
+      );
       // Only reset data if we had nothing before; otherwise keep stale data visible
       if (!hadData) {
         set({ rawRows: [], rawTotal: 0, isLoadingRaw: false });
@@ -228,9 +236,17 @@ const useDatasetStore = create((set, get) => ({
         isLoadingPreprocessed: false,
       });
     } catch (err) {
-      console.warn("[fetchPreprocessedData] failed:", err?.response?.status, err?.message);
+      console.warn(
+        "[fetchPreprocessedData] failed:",
+        err?.response?.status,
+        err?.message
+      );
       if (!hadData) {
-        set({ preprocessedRows: [], preprocessedTotal: 0, isLoadingPreprocessed: false });
+        set({
+          preprocessedRows: [],
+          preprocessedTotal: 0,
+          isLoadingPreprocessed: false,
+        });
       } else {
         set({ isLoadingPreprocessed: false });
       }

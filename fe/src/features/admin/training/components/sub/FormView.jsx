@@ -27,6 +27,14 @@ const MODEL_OPTIONS = [
   },
 ];
 
+// const learningRates = [
+//   { value: 1e-5, label: "1e-5" },
+//   { value: 2e-5, label: "2e-5" },
+//   { value: 3e-5, label: "3e-5" },
+//   { value: 4e-5, label: "4e-5" },
+//   { value: 5e-5, label: "5e-5" },
+// ];
+
 export default function FormView() {
   const {
     datasets,
@@ -455,7 +463,7 @@ export default function FormView() {
               }
               className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             >
-              {[1e-5, 2e-5, 3e-5, 5e-5].map((v) => (
+              {[1e-5, 2e-5, 3e-5, 4e-5, 5e-5].map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
@@ -549,9 +557,7 @@ export default function FormView() {
                 max={99999}
                 step={1}
                 value={hyperparams.seed}
-                onChange={(e) =>
-                  setHyperparam("seed", Number(e.target.value))
-                }
+                onChange={(e) => setHyperparam("seed", Number(e.target.value))}
                 className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
               />
             </div>

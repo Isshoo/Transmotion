@@ -22,10 +22,7 @@ export default function IterationTable({
     return Math.max(acc, xlmrCount, mbertCount);
   }, 0);
 
-  const iterations = Array.from(
-    { length: Math.max(maxIter, 1) },
-    (_, i) => i
-  );
+  const iterations = Array.from({ length: Math.max(maxIter, 1) }, (_, i) => i);
 
   // Hitung rata-rata per split per model type
   const average = (models, testSize) => {

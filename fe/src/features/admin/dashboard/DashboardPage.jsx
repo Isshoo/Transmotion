@@ -196,10 +196,7 @@ export default function DashboardPage() {
           <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-sm">
             <div className="flex items-center justify-between border-b border-(--border-default) px-5 py-4">
               <h2 className="font-medium text-(--text-primary)">
-                <BarChart3
-                  size={16}
-                  className="mr-2 inline text-(--accent)"
-                />
+                <BarChart3 size={16} className="mr-2 inline text-(--accent)" />
                 mBERT vs XLM-R Comparison
               </h2>
             </div>
@@ -580,9 +577,7 @@ function ModelTypeColumn({ label, count, avgF1, color, bgBar, total }) {
           Average F1: {(avgF1 * 100).toFixed(1)}%
         </p>
       ) : (
-        <p className="mt-1 text-xs text-(--text-tertiary)">
-          Average F1: —
-        </p>
+        <p className="mt-1 text-xs text-(--text-tertiary)">Average F1: —</p>
       )}
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-(--bg-elevated)">
         <div
