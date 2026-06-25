@@ -83,6 +83,12 @@ export default function ResultView() {
                   Dataset{" "}
                   <strong className="text-(--text-primary)">
                     {job.dataset_name}
+                    {job.split_info &&
+                      " (" +
+                        ((1 - job.split_info.test_size) * 100).toFixed(0) +
+                        ":" +
+                        (job.split_info.test_size * 100).toFixed(0) +
+                        ")"}
                   </strong>
                 </span>
               )}

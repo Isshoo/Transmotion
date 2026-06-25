@@ -65,6 +65,12 @@ export default function ProgressView() {
             <span className="text-(--text-tertiary)">Dataset</span>
             <strong className="text-(--text-primary)">
               {job.dataset_name}
+              {job.split_info &&
+                " (" +
+                  ((1 - job.split_info.test_size) * 100).toFixed(0) +
+                  ":" +
+                  (job.split_info.test_size * 100).toFixed(0) +
+                  ")"}
             </strong>
           </span>
           <span className="text-(--border-strong)">|</span>
@@ -81,19 +87,27 @@ export default function ProgressView() {
                 <span className="text-(--accent)">
                   Train{" "}
                   <strong className="text-(--text-primary)">
-                    {job.split_info.train_total?.toLocaleString("id")}
+                    {job.split_info.train_total?.toLocaleString("id")} (
+                    {(
+                      (1 -
+                        (job.split_info.test_size + job.split_info.val_size)) *
+                      100
+                    ).toFixed(0)}
+                    %)
                   </strong>
                 </span>
                 <span className="text-(--data-2)">
                   Val{" "}
                   <strong className="text-(--text-primary)">
-                    {job.split_info.val_total?.toLocaleString("id")}
+                    {job.split_info.val_total?.toLocaleString("id")} (
+                    {(job.split_info.val_size * 100).toFixed(0)}%)
                   </strong>
                 </span>
                 <span className="text-(--warning)">
                   Test{" "}
                   <strong className="text-(--text-primary)">
-                    {job.split_info.test_total?.toLocaleString("id")}
+                    {job.split_info.test_total?.toLocaleString("id")} (
+                    {(job.split_info.test_size * 100).toFixed(0)}%)
                   </strong>
                 </span>
               </span>
@@ -272,14 +286,15 @@ export default function ProgressView() {
           </p>
           <div className="flex flex-wrap gap-2">
             {[
-              ["LR", job.hyperparams.learning_rate],
+              ["Learning Rate", job.hyperparams.learning_rate],
               ["Epochs", job.hyperparams.epochs],
-              ["Batch", job.hyperparams.batch_size],
-              ["MaxLen", job.hyperparams.max_length],
+              ["Batch Size", job.hyperparams.batch_size],
+              ["Max Length", job.hyperparams.max_length],
               ["Dropout", job.hyperparams.dropout],
               ["Optimizer", job.hyperparams.optimizer],
-              ["Warmup", job.hyperparams.warmup_steps],
-              ["Decay", job.hyperparams.weight_decay],
+              ["Warmup Steps", job.hyperparams.warmup_steps],
+              ["Weight Decay", job.hyperparams.weight_decay],
+              ["Seed", job.hyperparams.seed],
             ].map(([l, v]) => (
               <span
                 key={l}

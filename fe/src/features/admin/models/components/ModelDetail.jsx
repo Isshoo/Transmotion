@@ -248,6 +248,7 @@ export default function ModelDetail({ modelId }) {
                     ["Optimizer", m.job.hyperparams.optimizer],
                     ["Warmup Steps", m.job.hyperparams.warmup_steps],
                     ["Weight Decay", m.job.hyperparams.weight_decay],
+                    ["Seed", m.job.hyperparams.seed],
                   ].map(([label, value]) => (
                     <tr
                       key={label}
@@ -283,7 +284,12 @@ export default function ModelDetail({ modelId }) {
             {m.job?.split_info ? (
               <div>
                 <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Data Distribution
+                  Data Distribution{" "}
+                  {" (" +
+                    ((1 - m.job.split_info.test_size) * 100).toFixed(0) +
+                    ":" +
+                    (m.job.split_info.test_size * 100).toFixed(0) +
+                    ")"}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
@@ -291,29 +297,39 @@ export default function ModelDetail({ modelId }) {
                       "Total Data",
                       m.job.split_info.total?.toLocaleString("id"),
                       "text-(--text-primary)",
+                      "",
                     ],
                     [
                       "Train Set",
                       m.job.split_info.train_total?.toLocaleString("id"),
                       "text-(--accent)",
+                      (
+                        (1 -
+                          (m.job.split_info.test_size +
+                            m.job.split_info.val_size)) *
+                        100
+                      ).toFixed(0) + "%",
                     ],
                     [
                       "Validation Set",
                       m.job.split_info.val_total?.toLocaleString("id"),
                       "text-(--data-2)",
+                      (m.job.split_info.val_size * 100).toFixed(0) + "%",
                     ],
                     [
                       "Test Set",
                       m.job.split_info.test_total?.toLocaleString("id"),
                       "text-(--warning)",
+                      (m.job.split_info.test_size * 100).toFixed(0) + "%",
                     ],
-                  ].map(([label, value, color]) => (
+                  ].map(([label, value, color, percentage]) => (
                     <div
                       key={label}
                       className="rounded-lg border border-(--border-subtle) bg-(--bg-elevated) px-4 py-3 text-center shadow-(--shadow-sm)"
                     >
                       <p className="text-[9px] font-bold tracking-wider text-(--text-tertiary) uppercase">
                         {label}
+                        {percentage && ` (${percentage})`}
                       </p>
                       <p
                         className={`mt-1.5 text-lg font-black tracking-tighter ${color}`}
