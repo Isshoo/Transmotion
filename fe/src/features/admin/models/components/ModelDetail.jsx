@@ -395,9 +395,9 @@ export default function ModelDetail({ modelId }) {
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
                   ["Accuracy", metrics.accuracy, "text-(--accent)"],
-                  ["F1 Score", metrics.f1, "text-(--success)"],
                   ["Precision", metrics.precision, "text-(--data-2)"],
                   ["Recall", metrics.recall, "text-(--warning)"],
+                  ["F1 Score", metrics.f1, "text-(--success)"],
                 ].map(([label, value, color]) => (
                   <div
                     key={label}

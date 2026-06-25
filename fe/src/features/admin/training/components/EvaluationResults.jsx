@@ -103,11 +103,6 @@ export default function EvaluationResults({ job }) {
                 color="text-(--accent)"
               />
               <MetricsCard
-                label="F1 Score"
-                value={metrics.f1}
-                color="text-(--success)"
-              />
-              <MetricsCard
                 label="Precision"
                 value={metrics.precision}
                 color="text-(--data-2)"
@@ -116,6 +111,11 @@ export default function EvaluationResults({ job }) {
                 label="Recall"
                 value={metrics.recall}
                 color="text-(--warning)"
+              />
+              <MetricsCard
+                label="F1 Score"
+                value={metrics.f1}
+                color="text-(--success)"
               />
             </div>
 

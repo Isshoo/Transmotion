@@ -223,9 +223,9 @@ export default function FormView() {
               </div>
               <input
                 type="range"
-                min="5"
+                min="10"
                 max="40"
-                step="5"
+                step="10"
                 value={Math.round(testSize * 100)}
                 onChange={(e) => setTestSize(e.target.value / 100)}
                 className="w-full cursor-pointer accent-(--warning)"
@@ -246,7 +246,7 @@ export default function FormView() {
                 type="range"
                 min="5"
                 max="10"
-                step="1"
+                step="5"
                 value={Math.round(evalSize * 100)}
                 onChange={(e) => setEvalSize(e.target.value / 100)}
                 className="w-full cursor-pointer accent-(--data-2)"
