@@ -62,7 +62,7 @@ export default function IterationTable({
               {SPLITS.map((s) => (
                 <th
                   key={`xlmr-${s.label}`}
-                  className="border-r border-b border-(--border-default) bg-(--bg-surface) px-4 py-2 text-center text-[9px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase"
+                  className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-4 py-2 text-center text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase"
                 >
                   {s.label}
                 </th>
@@ -70,7 +70,7 @@ export default function IterationTable({
               {SPLITS.map((s, i) => (
                 <th
                   key={`mbert-${s.label}`}
-                  className={`border-b ${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--bg-surface) px-4 py-2 text-center text-[9px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase`}
+                  className={`border-b ${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--bg-elevated) px-4 py-2 text-center text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase`}
                 >
                   {s.label}
                 </th>
@@ -137,7 +137,7 @@ export default function IterationTable({
                 return (
                   <td
                     key={`xlmr-avg-${s.label}`}
-                    className="border-r border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[11px] font-bold text-(--accent)"
+                    className="border-r border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[12px] font-bold text-(--accent)"
                   >
                     {fmt(avg, raw)}
                   </td>
@@ -148,7 +148,7 @@ export default function IterationTable({
                 return (
                   <td
                     key={`mbert-avg-${s.label}`}
-                    className={`${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[11px] font-bold text-(--accent)`}
+                    className={`${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[12px] font-bold text-(--accent)`}
                   >
                     {fmt(avg, raw)}
                   </td>
