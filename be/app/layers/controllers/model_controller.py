@@ -15,7 +15,7 @@ from app.utils.response import error_response, paginated_response, success_respo
 
 def _parse_err(err: ValidationError):
     return error_response(
-        message=f"Validasi gagal: {', '.join([v[0] for v in err.messages.values()])}",
+        message=f"Validation failed: {', '.join([v[0] for v in err.messages.values()])}",
         errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
         status_code=422,
     )
@@ -33,6 +33,8 @@ def list_models():
     models, total = model_service.get_all_models(
         page=params["page"],
         per_page=params["per_page"],
+        search=params.get("search"),
+        dataset_id=params.get("dataset_id"),
         model_type=params.get("model_type"),
         is_active=params.get("is_active"),
         is_public=params.get("is_public"),
@@ -44,7 +46,7 @@ def list_models():
         total=total,
         page=params["page"],
         per_page=params["per_page"],
-        message="Daftar model berhasil diambil",
+        message="Models list retrieved successfully",
     )
 
 
@@ -53,7 +55,7 @@ def get_model(model_id):
     stats = model_service.get_prediction_stats(model_id)
     data = model.to_dict(include_job=True)
     data.update(stats)
-    return success_response(data=data, message="Detail model berhasil diambil")
+    return success_response(data=data, message="Model detail retrieved successfully")
 
 
 def get_active_models():
@@ -73,7 +75,7 @@ def get_active_models():
             }
             for m in models
         ],
-        message="Model aktif berhasil diambil",
+        message="Active models retrieved successfully",
     )
 
 
@@ -84,12 +86,12 @@ def update_model(model_id):
         return _parse_err(err)
 
     model = model_service.update_model(model_id, **data)
-    return success_response(data=model.to_dict(), message="Model berhasil diperbarui")
+    return success_response(data=model.to_dict(), message="Model updated successfully")
 
 
 def delete_model(model_id):
     model_service.delete_model(model_id)
-    return success_response(message="Model berhasil dihapus")
+    return success_response(message="Model deleted successfully")
 
 
 # ── Classification ─────────────────────────────────────────────────────────────
@@ -119,11 +121,11 @@ def classify_batch():
     texts = data.get("texts", [])
 
     if not model_id:
-        return error_response("model_id harus diisi", 400)
+        return error_response("model_id is required", 400)
     if not texts or not isinstance(texts, list):
-        return error_response("texts harus berupa list", 400)
+        return error_response("texts must be a list", 400)
     if len(texts) > 500:
-        return error_response("Maksimal 500 teks per request", 400)
+        return error_response("Maximum 500 texts per request", 400)
 
     current_user = getattr(request, "current_user", None)
     user_id = current_user.id if current_user else None
@@ -175,7 +177,7 @@ def list_predictions():
         total=total,
         page=params["page"],
         per_page=params["per_page"],
-        message="Riwayat prediksi berhasil diambil",
+        message="Prediction history retrieved successfully",
     )
 
 

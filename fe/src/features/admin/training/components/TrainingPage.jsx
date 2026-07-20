@@ -37,11 +37,11 @@ export default function TrainingPage() {
         }
         if (eventType === "complete") {
           setActiveJob(data);
-          toast.success("Training selesai!");
+          toast.success("Training complete!");
         }
         if (eventType === "error_event") {
           setActiveJob(data);
-          toast.error("Training gagal: " + (data?.error_message ?? ""));
+          toast.error("Training failed: " + (data?.error_message ?? ""));
         }
       },
     }
@@ -57,20 +57,20 @@ export default function TrainingPage() {
         </h1>
         <p className="mt-1 text-sm text-(--text-secondary)">
           {view === "form" &&
-            "Konfigurasi dan mulai pelatihan model mBERT / XLM-R"}
+            "Configure and start training an mBERT / XLM-R model"}
           {view === "progress" &&
-            "Training sedang berjalan — progress diperbarui otomatis"}
+            "Training is running — progress updates automatically"}
           {view === "result" &&
-            "Training selesai — lihat hasil evaluasi atau mulai training baru"}
+            "Training complete — view evaluation results or start a new training"}
         </p>
       </div>
 
       {/* Step indicator */}
       <div className="flex items-center gap-2">
         {[
-          { key: "form", label: "Konfigurasi" },
+          { key: "form", label: "Configuration" },
           { key: "progress", label: "Training" },
-          { key: "result", label: "Hasil" },
+          { key: "result", label: "Result" },
         ].map(({ key, label }, i) => (
           <div key={key} className="flex items-center gap-2">
             {i > 0 && (
@@ -85,7 +85,7 @@ export default function TrainingPage() {
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium tracking-wide transition-colors duration-200 ${
                 view === key
-                  ? "bg-(--accent) text-white shadow-(--shadow-accent)"
+                  ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-accent)"
                   : (key === "progress" && view === "result") ||
                       (key === "form" && view !== "form")
                     ? "bg-(--accent-muted) text-(--accent)"
@@ -101,13 +101,12 @@ export default function TrainingPage() {
       {/* Content */}
       <div className="animate-fade-in">
         {isCheckingActive ? (
-          <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
-            <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-(--accent)" />
-              <p className="text-xs font-medium">
-                Memeriksa status training...
-              </p>
-            </div>
+          <div className="animate-pulse space-y-6">
+            <div className="h-36 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-64 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-40 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-72 w-full rounded-xl bg-(--bg-elevated)" />
+            <div className="h-14 w-full rounded-xl bg-(--bg-elevated)" />
           </div>
         ) : (
           <>

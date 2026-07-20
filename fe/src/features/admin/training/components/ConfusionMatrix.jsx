@@ -13,14 +13,14 @@ export default function ConfusionMatrix({ data }) {
     if (isCorrect) {
       // Diagonal — biru/accent
       if (intensity > 0.7)
-        return "bg-(--accent) text-white font-bold ring-1 ring-inset ring-(--accent-hover)";
-      if (intensity > 0.4) return "bg-(--accent)/70 text-white font-bold";
+        return "bg-(--accent) text-(--bg-base) font-bold ring-1 ring-inset ring-(--accent-hover)";
+      if (intensity > 0.4) return "bg-(--accent)/70 text-(--bg-base) font-bold";
       return "bg-(--accent-muted) text-(--accent)";
     } else {
       // Off-diagonal — merah/error
       if (intensity > 0.3)
-        return "bg-(--error) text-white font-bold ring-1 ring-inset ring-(--error-hover)";
-      if (intensity > 0.1) return "bg-(--error)/70 text-white font-bold";
+        return "bg-(--error) text-(--bg-base) font-bold ring-1 ring-inset ring-(--error-hover)";
+      if (intensity > 0.1) return "bg-(--error)/70 text-(--bg-base) font-bold";
       return "bg-(--error-muted) text-(--error)";
     }
   };
@@ -32,7 +32,7 @@ export default function ConfusionMatrix({ data }) {
           <thead>
             <tr>
               <th className="w-28 bg-(--bg-surface) px-3 py-2 text-right text-[10px] font-medium tracking-wider text-(--text-tertiary) uppercase">
-                Aktual ↓ / Prediksi →
+                Actual ↓ / Predicted →
               </th>
               {labels.map((l) => (
                 <th
@@ -78,7 +78,7 @@ export default function ConfusionMatrix({ data }) {
         </table>
       </div>
       <p className="mt-2 text-right text-[10px] font-medium tracking-wide text-(--text-tertiary) uppercase">
-        Total sampel:{" "}
+        Total samples:{" "}
         <span className="font-bold text-(--text-secondary)">{total}</span>
       </p>
     </div>

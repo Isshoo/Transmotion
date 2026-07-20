@@ -30,7 +30,7 @@ export default function RegisterForm() {
 
     if (form.password !== form.confirmPassword) {
       setLoading(false);
-      setError("Password dan konfirmasi password tidak cocok.");
+      setError("Password and confirm password do not match.");
       return;
     }
 
@@ -51,38 +51,38 @@ export default function RegisterForm() {
   // Tampilan sukses — minta user cek email
   if (success) {
     return (
-      <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
+      <div className="animate-scale-in mx-auto my-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
         <div className="mb-4 text-5xl">📧</div>
         <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
-          Cek email kamu!
+          Check your email!
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
-          Kami sudah kirim link verifikasi ke{" "}
+          We have sent a verification link to{" "}
           <strong className="text-(--text-primary)">{form.email}</strong>.
-          Silakan verifikasi akun kamu sebelum login.
+          Please verify your account before logging in.
         </p>
         <Link
           href="/login"
           className="text-sm font-bold tracking-wide text-(--accent) hover:underline"
         >
-          ← Kembali ke halaman masuk
+          ← Back to login page
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
+    <div className="animate-scale-in mx-auto my-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
       <h1 className="mb-2 text-3xl font-black tracking-tight text-(--text-primary)">
-        Daftar
+        Register
       </h1>
       <p className="mb-6 text-sm font-medium text-(--text-secondary)">
-        Sudah punya akun?{" "}
+        Already have an account?{" "}
         <Link
           href="/login"
           className="font-bold text-(--accent) hover:underline"
         >
-          Masuk di sini
+          Login here
         </Link>
       </p>
 
@@ -99,7 +99,7 @@ export default function RegisterForm() {
       <div className="my-6 flex items-center gap-4">
         <div className="h-px flex-1 bg-(--border-subtle)" />
         <span className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-          atau daftar dengan email
+          or register with email
         </span>
         <div className="h-px flex-1 bg-(--border-subtle)" />
       </div>
@@ -107,7 +107,7 @@ export default function RegisterForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Nama
+            Name
           </label>
           <input
             type="text"
@@ -115,7 +115,7 @@ export default function RegisterForm() {
             value={form.name}
             onChange={handleChange}
             required
-            placeholder="Nama kamu"
+            placeholder="Your name"
             className="w-full rounded-xl border border-(--border-strong) bg-(--bg-surface) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
         </div>
@@ -153,7 +153,7 @@ export default function RegisterForm() {
 
         <div>
           <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Konfirmasi Password
+            Confirm Password
           </label>
           <input
             type="password"
@@ -169,9 +169,9 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Memproses..." : "Daftar"}
+          {loading ? "Processing..." : "Register"}
         </button>
       </form>
     </div>

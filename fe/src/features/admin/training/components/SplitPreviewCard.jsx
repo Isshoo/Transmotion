@@ -9,7 +9,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
       <div className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-surface) p-4 shadow-(--shadow-sm)">
         <Loader2 size={15} className="animate-spin text-(--accent)" />
         <span className="text-sm font-medium text-(--text-secondary)">
-          Menghitung distribusi...
+          Calculating distribution...
         </span>
       </div>
     );
@@ -35,7 +35,7 @@ export default function SplitPreviewCard({ preview, isLoading }) {
         <span
           className={`text-sm font-semibold tracking-wide ${hasErrors ? "text-(--error)" : "text-(--success)"}`}
         >
-          {hasErrors ? "Data tidak mencukupi" : "Split valid"}
+          {hasErrors ? "Insufficient data" : "Split valid"}
         </span>
       </div>
 

@@ -1,7 +1,7 @@
 import VerifyEmailForm from "@/features/auth/components/VerifyEmailForm";
 
 export const metadata = {
-  title: "Verifikasi Email",
+  title: "Email Verification",
 };
 
 export default function VerifyEmailPage() {

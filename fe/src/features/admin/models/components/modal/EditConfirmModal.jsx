@@ -31,15 +31,15 @@ export default function DeleteConfirmModal() {
           <Trash2 size={24} className="text-(--error)" />
         </div>
         <h2 className="mb-2 text-lg font-bold tracking-tight text-(--text-primary)">
-          Hapus Model?
+          Delete Model?
         </h2>
         <p className="mb-6 text-sm leading-relaxed text-(--text-secondary)">
           Model{" "}
           <span className="font-semibold text-(--text-primary)">
             {deleteTarget.name}
           </span>{" "}
-          dan file-nya akan dihapus permanen. Tindakan ini tidak dapat
-          dibatalkan.
+          and its files will be permanently deleted. This action cannot be
+          undone.
         </p>
         <div className="flex justify-end gap-3">
           <button
@@ -47,14 +47,14 @@ export default function DeleteConfirmModal() {
             disabled={isSubmitting}
             className="rounded-lg border border-(--border-strong) bg-(--bg-elevated) px-4 py-2 text-sm font-medium tracking-wide text-(--text-secondary) transition-all hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Batal
+            Cancel
           </button>
           <button
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="rounded-lg bg-(--error) px-4 py-2 text-sm font-bold tracking-wide text-white shadow-(--shadow-sm) transition-all hover:bg-(--error-hover) hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-(--error) px-4 py-2 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-sm) transition-all hover:bg-(--error-hover) hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isSubmitting ? "Menghapus..." : "Ya, Hapus"}
+            {isSubmitting ? "Deleting..." : "Yes, Delete"}
           </button>
         </div>
       </div>

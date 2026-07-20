@@ -12,7 +12,7 @@ function VerifyEmailContent() {
 
   const [status, setStatus] = useState(token ? "loading" : "error");
   const [message, setMessage] = useState(
-    token ? "" : "Token verifikasi tidak ditemukan."
+    token ? "" : "Verification token not found."
   );
 
   useEffect(() => {
@@ -37,7 +37,7 @@ function VerifyEmailContent() {
       <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
         <div className="mb-6 animate-spin text-5xl">⏳</div>
         <p className="text-sm font-bold text-(--text-secondary)">
-          Memverifikasi email kamu...
+          Verifying your email...
         </p>
       </div>
     );
@@ -48,16 +48,16 @@ function VerifyEmailContent() {
       <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--success-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
         <div className="mb-4 text-5xl">✅</div>
         <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
-          Email Terverifikasi!
+          Email Verified!
         </h2>
         <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
-          Akun kamu sudah aktif. Silakan login untuk melanjutkan.
+          Your account is active. Please login to continue.
         </p>
         <Link
           href="/login"
-          className="inline-block w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+          className="inline-block w-full rounded-xl bg-(--accent) px-8 py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
-          Masuk Sekarang
+          Login Now
         </Link>
       </div>
     );
@@ -67,7 +67,7 @@ function VerifyEmailContent() {
     <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--error-muted)/30 bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
       <div className="mb-4 text-5xl">❌</div>
       <h2 className="mb-2 text-2xl font-black tracking-tight text-(--text-primary)">
-        Verifikasi Gagal
+        Verification Failed
       </h2>
       <p className="mb-8 text-sm leading-relaxed font-medium text-(--text-secondary)">
         {message}
@@ -76,7 +76,7 @@ function VerifyEmailContent() {
         href="/login"
         className="text-sm font-bold tracking-wide text-(--accent) hover:underline"
       >
-        ← Kembali ke halaman masuk
+        ← Back to login page
       </Link>
     </div>
   );
@@ -88,7 +88,7 @@ export default function VerifyEmailForm() {
       fallback={
         <div className="mx-auto mt-10 w-full max-w-md animate-pulse rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 text-center shadow-(--shadow-md)">
           <div className="mb-6 text-5xl text-(--text-disabled)">⏳</div>
-          <p className="text-sm font-bold text-(--text-tertiary)">Memuat...</p>
+          <p className="text-sm font-bold text-(--text-tertiary)">Loading...</p>
         </div>
       }
     >

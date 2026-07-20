@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Tentang Kami",
+  title: "About Us",
 };
 
 export default function AboutPage() {

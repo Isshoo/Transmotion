@@ -2,6 +2,13 @@ import { useState } from "react";
 import ConfusionMatrix from "./ConfusionMatrix";
 import EpochLogsTable from "./EpochLogsTable";
 import { MetricsCard } from "./ui/Card";
+import InfoPopup from "@/components/ui/InfoPopup";
+import {
+  METRICS_INFO,
+  PER_CLASS_INFO,
+  CONFUSION_MATRIX_INFO,
+  EPOCH_LOGS_INFO,
+} from "@/components/ui/InfoContents";
 
 export default function EvaluationResults({ job }) {
   const [activeSplit, setActiveSplit] = useState("test");
@@ -81,19 +88,19 @@ export default function EvaluationResults({ job }) {
         <div className="space-y-8 p-6">
           {/* Metrik KPI Cards */}
           <div>
-            <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Metrik Evaluasi
-            </p>
+            <div className="mb-4 flex items-center gap-1.5">
+              <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                Evaluation Metrics
+              </p>
+              <InfoPopup title="Evaluation Metrics — Guide">
+                {METRICS_INFO}
+              </InfoPopup>
+            </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <MetricsCard
                 label="Accuracy"
                 value={metrics.accuracy}
                 color="text-(--accent)"
-              />
-              <MetricsCard
-                label="F1 Score"
-                value={metrics.f1}
-                color="text-(--success)"
               />
               <MetricsCard
                 label="Precision"
@@ -104,6 +111,11 @@ export default function EvaluationResults({ job }) {
                 label="Recall"
                 value={metrics.recall}
                 color="text-(--warning)"
+              />
+              <MetricsCard
+                label="F1 Score"
+                value={metrics.f1}
+                color="text-(--success)"
               />
             </div>
 
@@ -140,7 +152,8 @@ export default function EvaluationResults({ job }) {
               metrics.mcc == null &&
               metrics.roc_auc == null && (
                 <p className="mt-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-                  💡 Metrik MCC, ROC-AUC, dan Mean Std dihitung dari test set.
+                  💡 MCC, ROC-AUC, and Mean Std metrics are calculated from the
+                  test set.
                 </p>
               )}
           </div>
@@ -148,16 +161,21 @@ export default function EvaluationResults({ job }) {
           {/* Metrik Per Kelas + Rata-rata (footer tabel) */}
           {metrics.perClass && Object.keys(metrics.perClass).length > 0 && (
             <div>
-              <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                Metrik Per Kelas
-              </p>
+              <div className="mb-4 flex items-center gap-1.5">
+                <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Per-Class Metrics
+                </p>
+                <InfoPopup title="Per-Class Metrics — Guide">
+                  {PER_CLASS_INFO}
+                </InfoPopup>
+              </div>
               <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
                       <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
                         {[
-                          "Kelas",
+                          "Class",
                           "Precision",
                           "Recall",
                           "F1-Score",
@@ -256,9 +274,14 @@ export default function EvaluationResults({ job }) {
           {/* Confusion Matrix */}
           {metrics.cm && (
             <div>
-              <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                Confusion Matrix
-              </p>
+              <div className="mb-4 flex items-center gap-1.5">
+                <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                  Confusion Matrix
+                </p>
+                <InfoPopup title="Confusion Matrix — Guide">
+                  {CONFUSION_MATRIX_INFO}
+                </InfoPopup>
+              </div>
               <div className="animate-fade-in">
                 <ConfusionMatrix data={metrics.cm} />
               </div>
@@ -269,13 +292,18 @@ export default function EvaluationResults({ job }) {
 
       {/* ── Epoch Logs ────────────────────────────────────────── */}
       {job.epoch_logs?.length > 0 && (
-        <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
-          <div className="rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
-            <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Log Per Epoch
-            </h3>
+        <div className="">
+          <div className="">
+            <div className="mb-4 ml-1 flex items-center gap-1.5">
+              <h3 className="text-[13px] font-bold tracking-wider text-(--text-secondary) uppercase">
+                Per-Epoch Logs
+              </h3>
+              <InfoPopup title="Per-Epoch Logs — Guide">
+                {EPOCH_LOGS_INFO}
+              </InfoPopup>
+            </div>
           </div>
-          <div className="p-5">
+          <div className="">
             <EpochLogsTable logs={job.epoch_logs} />
           </div>
         </div>

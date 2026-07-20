@@ -16,11 +16,11 @@ export function RoleBadge({ role }) {
 export function StatusBadge({ isActive }) {
   return isActive ? (
     <span className="inline-flex rounded-md border border-(--success-muted)/50 bg-(--success-muted)/20 px-2 py-0.5 text-[10px] font-bold tracking-wider text-(--success) uppercase shadow-(--shadow-sm)">
-      Aktif
+      Active
     </span>
   ) : (
     <span className="inline-flex rounded-md border border-(--error-muted)/50 bg-(--error-muted)/20 px-2 py-0.5 text-[10px] font-bold tracking-wider text-(--error) uppercase">
-      Nonaktif
+      Inactive
     </span>
   );
 }
@@ -28,11 +28,11 @@ export function StatusBadge({ isActive }) {
 export function VerifiedBadge({ isVerified }) {
   return isVerified ? (
     <span className="inline-flex rounded-md border border-(--info-muted)/50 bg-(--info-muted)/20 px-2 py-0.5 text-[10px] font-bold tracking-wider text-(--info) uppercase shadow-(--shadow-sm)">
-      Terverifikasi
+      Verified
     </span>
   ) : (
     <span className="inline-flex rounded-md border border-(--warning-muted)/50 bg-(--warning-muted)/20 px-2 py-0.5 text-[10px] font-bold tracking-wider text-(--warning) uppercase">
-      Belum
+      Unverified
     </span>
   );
 }

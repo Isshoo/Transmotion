@@ -11,11 +11,11 @@ VERIFICATION_EMAIL_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <h1>Verifikasi Email Kamu</h1>
-        <p>Terima kasih telah mendaftar. Silakan klik tombol di bawah ini untuk memverifikasi alamat email kamu:</p>
-        <a href="{{ verification_url }}" class="button">Verifikasi Email</a>
-        <p>Atau salin link ini: {{ verification_url }}</p>
-        <p>Link ini akan kedaluwarsa dalam 24 jam.</p>
+        <h1>Verify Your Email</h1>
+        <p>Thank you for registering. Please click the button below to verify your email address:</p>
+        <a href="{{ verification_url }}" class="button">Verify Email</a>
+        <p>Or copy this link: {{ verification_url }}</p>
+        <p>This link will expire in 24 hours.</p>
     </div>
 </body>
 </html>
@@ -34,11 +34,11 @@ PASSWORD_RESET_EMAIL_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <h1>Reset Password Kamu</h1>
-        <p>Klik tombol di bawah ini untuk membuat password baru:</p>
+        <h1>Reset Your Password</h1>
+        <p>Click the button below to create a new password:</p>
         <a href="{{ reset_url }}" class="button">Reset Password</a>
-        <p>Atau salin link ini: {{ reset_url }}</p>
-        <p>Link ini akan kedaluwarsa dalam 1 jam.</p>
+        <p>Or copy this link: {{ reset_url }}</p>
+        <p>This link will expire in 1 hour.</p>
     </div>
 </body>
 </html>

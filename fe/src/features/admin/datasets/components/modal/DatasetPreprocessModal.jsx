@@ -40,12 +40,12 @@ export default function DatasetPreprocessModal() {
 
   const validate = () => {
     const e = {};
-    if (!textColumn) e.textColumn = "Kolom teks harus dipilih";
-    if (!labelColumn) e.labelColumn = "Kolom label harus dipilih";
+    if (!textColumn) e.textColumn = "Text column must be selected";
+    if (!labelColumn) e.labelColumn = "Label column must be selected";
     if (textColumn === labelColumn)
-      e.labelColumn = "Kolom teks dan label harus berbeda";
+      e.labelColumn = "Text and label columns must be different";
     if (testSize + valSize >= 0.8)
-      e.split = "Total test + val tidak boleh melebihi 80%";
+      e.split = "Total test + val cannot exceed 80%";
     return e;
   };
 
@@ -65,10 +65,10 @@ export default function DatasetPreprocessModal() {
     });
 
     if (result.success) {
-      toast.success("Preprocessing berhasil!");
+      toast.success("Preprocessing successful!");
       if (result.data?.labels) {
         toast.info(
-          `Ditemukan ${result.data.num_labels} label: ${result.data.labels.join(", ")}`
+          `Found ${result.data.num_labels} labels: ${result.data.labels.join(", ")}`
         );
       }
       closePreprocessModal();
@@ -103,7 +103,7 @@ export default function DatasetPreprocessModal() {
           {columns.length > 0 && (
             <div className="rounded-md border border-(--accent-muted) bg-(--accent-muted) px-3 py-2.5 opacity-80">
               <p className="text-xs font-medium text-(--accent)">
-                Kolom tersedia:
+                Available columns:
               </p>
               <p className="mt-1 text-xs text-(--accent)">
                 {columns.join(", ")}
@@ -114,7 +114,7 @@ export default function DatasetPreprocessModal() {
           {/* Kolom Teks */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-              Kolom Teks
+              Text Column
             </label>
             {columns.length > 0 ? (
               <select
@@ -129,7 +129,7 @@ export default function DatasetPreprocessModal() {
                     : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
                 }`}
               >
-                <option value="">-- Pilih kolom --</option>
+                <option value="">-- Select column --</option>
                 {columns.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -144,7 +144,7 @@ export default function DatasetPreprocessModal() {
                   setTextColumn(e.target.value);
                   setErrors((p) => ({ ...p, textColumn: undefined }));
                 }}
-                placeholder="cth. text"
+                placeholder="e.g. text"
                 className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:ring-2 ${
                   errors.textColumn
                     ? "border-(--error) focus:ring-(--error-muted)"
@@ -162,7 +162,7 @@ export default function DatasetPreprocessModal() {
           {/* Kolom Label */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-              Kolom Label
+              Label Column
             </label>
             {columns.length > 0 ? (
               <select
@@ -177,7 +177,7 @@ export default function DatasetPreprocessModal() {
                     : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
                 }`}
               >
-                <option value="">-- Pilih kolom --</option>
+                <option value="">-- Select column --</option>
                 {columns.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -192,7 +192,7 @@ export default function DatasetPreprocessModal() {
                   setLabelColumn(e.target.value);
                   setErrors((p) => ({ ...p, labelColumn: undefined }));
                 }}
-                placeholder="cth. label"
+                placeholder="e.g. label"
                 className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:ring-2 ${
                   errors.labelColumn
                     ? "border-(--error) focus:ring-(--error-muted)"
@@ -210,7 +210,7 @@ export default function DatasetPreprocessModal() {
           {/* Split Ratio */}
           <div className="rounded-lg border border-(--border-default) bg-(--bg-surface) p-4 shadow-sm">
             <label className="mb-3 block text-sm font-medium text-(--text-secondary)">
-              Pembagian Data
+              Data Split
             </label>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -258,19 +258,19 @@ export default function DatasetPreprocessModal() {
             {/* Visual bar */}
             <div className="mt-4 flex h-3.5 overflow-hidden rounded-full bg-(--bg-elevated)">
               <div
-                className="flex items-center justify-center bg-(--accent) text-[9px] font-bold text-white transition-all duration-300"
+                className="flex items-center justify-center bg-(--accent) text-[9px] font-bold text-(--bg-base) transition-all duration-300"
                 style={{ width: `${trainPct}%` }}
               >
                 {trainPct >= 15 && `Train ${trainPct}%`}
               </div>
               <div
-                className="flex items-center justify-center bg-(--data-2) text-[9px] font-bold text-white transition-all duration-300"
+                className="flex items-center justify-center bg-(--data-2) text-[9px] font-bold text-(--bg-base) transition-all duration-300"
                 style={{ width: `${valPct}%` }}
               >
                 {valPct >= 10 && `${valPct}%`}
               </div>
               <div
-                className="flex items-center justify-center bg-(--warning) text-[9px] font-bold text-white transition-all duration-300"
+                className="flex items-center justify-center bg-(--warning) text-[9px] font-bold text-(--bg-base) transition-all duration-300"
                 style={{ width: `${testPct}%` }}
               >
                 {testPct >= 10 && `${testPct}%`}
@@ -306,14 +306,14 @@ export default function DatasetPreprocessModal() {
               disabled={isSubmitting}
               className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
-              Batal
+              Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? "Memproses..." : "Jalankan Preprocessing"}
+              {isSubmitting ? "Processing..." : "Run Preprocessing"}
             </button>
           </div>
         </form>

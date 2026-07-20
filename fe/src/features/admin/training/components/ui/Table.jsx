@@ -5,14 +5,14 @@ export function PerClassTable({ perClass, labels }) {
   return (
     <div>
       <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-        Metrik Per Kelas
+        Per Class Metrics
       </p>
       <div className="overflow-hidden rounded-lg border border-(--border-default) shadow-(--shadow-sm)">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["Kelas", "Precision", "Recall", "F1-Score", "Support"].map(
+                {["Class", "Precision", "Recall", "F1-Score", "Support"].map(
                   (h) => (
                     <th
                       key={h}

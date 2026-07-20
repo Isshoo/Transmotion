@@ -100,18 +100,18 @@ export default function UserTable() {
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <Users size={20} className="text-(--accent)" />
-            Manajemen Pengguna
+            User Management
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Kelola semua akun pengguna di sini
+            Manage all user accounts here
           </p>
         </div>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Plus size={16} />
-          Tambah Pengguna
+          Add User
         </button>
       </div>
 
@@ -127,7 +127,7 @@ export default function UserTable() {
             type="text"
             value={localSearch}
             onChange={handleSearchChange}
-            placeholder="Cari nama atau email..."
+            placeholder="Search name or email..."
             className="w-full rounded-lg border border-(--border-default) bg-(--bg-elevated) py-2 pr-9 pl-9 text-sm font-medium text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
           {localSearch && (
@@ -146,7 +146,7 @@ export default function UserTable() {
           onChange={(e) => setRole(e.target.value)}
           className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm font-medium text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="">Semua Role</option>
+          <option value="">All Roles</option>
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
@@ -157,9 +157,9 @@ export default function UserTable() {
           onChange={(e) => setIsActive(e.target.value)}
           className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm font-medium text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="">Semua Status</option>
-          <option value="true">Aktif</option>
-          <option value="false">Nonaktif</option>
+          <option value="">All Statuses</option>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
         </select>
 
         {/* Reset */}
@@ -183,18 +183,16 @@ export default function UserTable() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["Pengguna", "Role", "Status", "Verifikasi", "Bergabung"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
-                    >
-                      {h}
-                    </th>
-                  )
-                )}
+                {["User", "Role", "Status", "Verified", "Joined"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
+                  >
+                    {h}
+                  </th>
+                ))}
                 <th className="px-5 py-3.5 text-right text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Aksi
+                  Action
                 </th>
               </tr>
             </thead>
@@ -208,11 +206,11 @@ export default function UserTable() {
                       <Search size={24} className="text-(--text-tertiary)" />
                     </div>
                     <p className="text-sm font-bold text-(--text-primary)">
-                      Tidak ada pengguna ditemukan
+                      No users found
                     </p>
                     {hasActiveFilters && (
                       <p className="mt-1 text-xs font-medium text-(--text-tertiary)">
-                        Coba ubah filter atau kata kunci pencarian
+                        Try changing the filter or search keyword
                       </p>
                     )}
                   </td>
@@ -234,7 +232,7 @@ export default function UserTable() {
                               {user.name ?? "—"}
                               {isSelf && (
                                 <span className="ml-1.5 rounded-md border border-(--accent-muted)/50 bg-(--accent-muted)/20 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-(--accent) uppercase">
-                                  Kamu
+                                  You
                                 </span>
                               )}
                             </p>
@@ -273,7 +271,7 @@ export default function UserTable() {
                           {/* Edit */}
                           <ActionButton
                             onClick={() => openEditModal(user)}
-                            title="Edit pengguna"
+                            title="Edit user"
                             className="text-(--text-tertiary) hover:bg-(--accent-muted)/30 hover:text-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
                           >
                             <Pencil size={14} />
@@ -286,8 +284,8 @@ export default function UserTable() {
                               disabled={isSubmitting}
                               title={
                                 user.is_active
-                                  ? "Nonaktifkan akun"
-                                  : "Aktifkan akun"
+                                  ? "Deactivate account"
+                                  : "Activate account"
                               }
                               className={
                                 user.is_active
@@ -303,11 +301,11 @@ export default function UserTable() {
                             </ActionButton>
                           )}
 
-                          {/* Hapus */}
+                          {/* Delete */}
                           {!isSelf && (
                             <ActionButton
                               onClick={() => openDeleteModal(user)}
-                              title="Hapus pengguna"
+                              title="Delete user"
                               className="text-(--text-tertiary) hover:bg-(--error-muted)/30 hover:text-(--error) focus:ring-2 focus:ring-(--error-muted)"
                             >
                               <Trash2 size={14} />
@@ -327,20 +325,20 @@ export default function UserTable() {
         {!isLoading && total > 0 && (
           <div className="flex items-center justify-between border-t border-(--border-default) bg-(--bg-elevated) px-5 py-3">
             <p className="text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-              Menampilkan{" "}
+              Showing{" "}
               <span className="font-bold text-(--text-primary)">
                 {from}–{to}
               </span>{" "}
-              dari{" "}
+              of{" "}
               <span className="font-bold text-(--text-primary)">{total}</span>{" "}
-              pengguna
+              users
             </p>
 
             <div className="flex items-center gap-1">
               <PaginationButton
                 onClick={() => setPage(page - 1)}
                 disabled={page <= 1}
-                title="Halaman sebelumnya"
+                title="Previous page"
               >
                 <ChevronLeft size={14} />
               </PaginationButton>
@@ -367,7 +365,7 @@ export default function UserTable() {
               <PaginationButton
                 onClick={() => setPage(page + 1)}
                 disabled={page >= totalPages}
-                title="Halaman berikutnya"
+                title="Next page"
               >
                 <ChevronRight size={14} />
               </PaginationButton>

@@ -10,6 +10,7 @@ import {
   X,
   ChevronDown,
   Filter,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
 import useClassifyStore from "../store";
@@ -46,6 +47,7 @@ export default function ClassifyForm() {
   } = useClassifyStore();
 
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const selectedModel = activeModels.find((m) => m.id === selectedModelId);
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
@@ -67,11 +69,11 @@ export default function ClassifyForm() {
     if (!file) return;
     const ext = file.name.split(".").pop().toLowerCase();
     if (!["csv", "tsv", "txt", "xlsx", "xls"].includes(ext)) {
-      toast.error("Format harus CSV, TSV, TXT, XLSX, atau XLS");
+      toast.error("Format must be CSV, TSV, TXT, XLSX, or XLS");
       return;
     }
     await setCsvFile(file);
-    toast.success(`${file.name} dimuat`);
+    toast.success(`${file.name} loaded`);
   };
 
   const canClassify =
@@ -88,28 +90,35 @@ export default function ClassifyForm() {
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="animate-fade-in w-full">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <BrainCircuit size={20} className="text-(--accent)" />
-            Klasifikasi
+            Classification
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Uji model dengan teks tunggal atau batch dari file CSV / Excel
+            Test models with a single text or a batch from a CSV / Excel file
           </p>
         </div>
+        <button
+          onClick={() => setIsHistoryModalOpen(true)}
+          className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-surface) px-4 py-2 text-sm font-bold text-(--text-primary) shadow-(--shadow-sm) transition hover:border-(--border-strong) hover:bg-(--bg-elevated) active:scale-[0.98]"
+        >
+          <History size={16} className="text-(--text-secondary)" />
+          History
+        </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* Input panel (3/5) */}
         <div className="space-y-5 lg:col-span-3">
-          {/* Pilih model */}
+          {/* Select model */}
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
             <div className="mb-3 flex items-center justify-between">
               <label className="text-sm font-bold text-(--text-secondary) uppercase">
-                Pilih Model
+                Select Model
               </label>
               {/* Filter arsitektur */}
               <div className="flex items-center gap-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-1">
@@ -120,11 +129,11 @@ export default function ClassifyForm() {
                     onClick={() => setModelTypeFilter(v)}
                     className={`rounded-md px-2 py-1 text-[10px] font-bold tracking-wider uppercase transition-all duration-150 ${
                       modelTypeFilter === v
-                        ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                        ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                         : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                     }`}
                   >
-                    {v === "" ? "Semua" : v}
+                    {v === "" ? "All" : v}
                   </button>
                 ))}
               </div>
@@ -133,11 +142,11 @@ export default function ClassifyForm() {
             {isLoadingModels ? (
               <div className="flex items-center gap-2 rounded-xl border border-(--border-default) bg-(--bg-elevated) px-4 py-3 text-sm font-medium text-(--text-tertiary)">
                 <Loader2 size={16} className="animate-spin text-(--accent)" />{" "}
-                Memuat model...
+                Loading models...
               </div>
             ) : activeModels.length === 0 ? (
               <div className="rounded-xl border border-(--warning-muted)/50 bg-(--warning-muted)/10 px-4 py-3 text-sm font-bold text-(--warning)">
-                Tidak ada model yang aktif saat ini.
+                No active models currently.
               </div>
             ) : (
               <div className="relative">
@@ -167,7 +176,7 @@ export default function ClassifyForm() {
                     </div>
                   ) : (
                     <span className="text-sm font-medium text-(--text-tertiary)">
-                      Pilih model...
+                      Select a model...
                     </span>
                   )}
                   <ChevronDown
@@ -224,7 +233,7 @@ export default function ClassifyForm() {
                           <p className="mt-1 text-[11px] font-medium text-(--text-tertiary)">
                             {model.accuracy !== null &&
                               `Acc: ${(model.accuracy * 100).toFixed(1)}% · `}
-                            {model.num_labels} kelas
+                            {model.num_labels} classes
                           </p>
                         </button>
                       ))}
@@ -240,7 +249,7 @@ export default function ClassifyForm() {
             {/* Mode toggle */}
             <div className="mb-4 flex overflow-hidden rounded-lg border border-(--border-strong) bg-(--bg-elevated) p-1">
               {[
-                { key: "single", label: "Teks Tunggal" },
+                { key: "single", label: "Single Text" },
                 { key: "csv", label: "Upload File" },
               ].map(({ key, label }) => (
                 <button
@@ -251,7 +260,7 @@ export default function ClassifyForm() {
                   }}
                   className={`flex-1 rounded-md py-1.5 text-xs font-bold transition-all duration-200 ${
                     inputMode === key
-                      ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                      ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                       : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                   }`}
                 >
@@ -269,13 +278,13 @@ export default function ClassifyForm() {
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyDown={handleKeyDown}
                   rows={6}
-                  placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
-                  className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-3 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
-                  maxLength={5000}
+                  placeholder="Enter text here... (Ctrl+Enter to classify)"
+                  className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-4 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+                  maxLength={1000}
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-[11px] font-medium text-(--text-tertiary)">
-                    {inputText.length}/5000
+                    {inputText.length}/1000
                   </p>
                   {inputText && (
                     <button
@@ -296,7 +305,7 @@ export default function ClassifyForm() {
                 {!csvFileName ? (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-6 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--bg-overlay)"
+                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-7 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--bg-overlay)"
                   >
                     <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-surface) shadow-(--shadow-sm) transition-colors group-hover:bg-(--accent-muted)/10">
                       <UploadCloud
@@ -305,11 +314,11 @@ export default function ClassifyForm() {
                       />
                     </div>
                     <p className="text-sm font-bold text-(--text-secondary)">
-                      Klik untuk upload{" "}
+                      Click to upload{" "}
                       <span className="text-(--accent)">CSV / Excel</span>
                     </p>
                     <p className="mt-1 text-xs font-medium text-(--text-tertiary)">
-                      Maks 500 baris · .csv .xlsx .xls
+                      Max 500 rows · .csv .xlsx .xls
                     </p>
                   </div>
                 ) : (
@@ -317,14 +326,14 @@ export default function ClassifyForm() {
                     <div className="flex items-center justify-between rounded-xl border border-(--success-muted)/50 bg-(--success-muted)/10 px-4 py-3 shadow-(--shadow-sm)">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--success) shadow-(--shadow-sm)">
-                          <FileText size={16} className="text-white" />
+                          <FileText size={16} className="text-(--bg-base)" />
                         </div>
                         <div>
                           <p className="text-sm font-bold text-(--success)">
                             {csvFileName}
                           </p>
                           <p className="text-[11px] font-bold tracking-wide text-(--success)/70 uppercase">
-                            {csvTexts.length} teks ditemukan
+                            {csvTexts.length} texts found
                           </p>
                         </div>
                       </div>
@@ -345,7 +354,7 @@ export default function ClassifyForm() {
                     {csvHeaders.length > 0 && (
                       <div className="rounded-xl border border-(--border-subtle) bg-(--bg-elevated) p-4 shadow-inner">
                         <label className="mb-2.5 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                          Pilih Kolom Teks Utama
+                          Select Main Text Column
                         </label>
                         <div className="flex flex-wrap gap-2">
                           {csvHeaders.map((header, idx) => (
@@ -354,11 +363,11 @@ export default function ClassifyForm() {
                               onClick={() => setSelectedTextColumn(idx)}
                               className={`rounded-lg border px-3 py-1.5 text-[11px] font-bold transition-all duration-150 ${
                                 selectedTextColumn === idx
-                                  ? "border-(--accent) bg-(--accent) text-white shadow-(--shadow-sm)"
+                                  ? "border-(--accent) bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                                   : "border-(--border-strong) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                               }`}
                             >
-                              {header || `Kolom ${idx + 1}`}
+                              {header || `Column ${idx + 1}`}
                             </button>
                           ))}
                         </div>
@@ -385,7 +394,7 @@ export default function ClassifyForm() {
                   onClick={() => {
                     clearResult();
                   }}
-                  className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-white focus:outline-none"
+                  className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-(--bg-base) focus:outline-none"
                 >
                   <X size={16} />
                 </button>
@@ -397,12 +406,11 @@ export default function ClassifyForm() {
           <button
             onClick={classify}
             disabled={!canClassify}
-            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isClassifying ? (
               <>
-                <Loader2 size={18} className="animate-spin" />{" "}
-                Mengklasifikasikan...
+                <Loader2 size={18} className="animate-spin" /> Classifying...
               </>
             ) : (
               <>
@@ -410,7 +418,7 @@ export default function ClassifyForm() {
                   size={18}
                   className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
                 />{" "}
-                Klasifikasikan Sekarang
+                Classify Now
               </>
             )}
           </button>
@@ -424,10 +432,10 @@ export default function ClassifyForm() {
                 <BrainCircuit size={32} className="text-(--text-tertiary)" />
               </div>
               <p className="text-sm font-bold text-(--text-secondary)">
-                Belum ada hasil
+                No results yet
               </p>
               <p className="mx-auto mt-1.5 max-w-[200px] text-xs font-medium text-(--text-tertiary)">
-                Hasil klasifikasi teks Anda akan muncul di sini
+                Your text classification results will appear here
               </p>
             </div>
           )}
@@ -439,8 +447,8 @@ export default function ClassifyForm() {
               </div>
               <p className="text-sm font-bold tracking-wide text-(--accent)">
                 {inputMode === "csv"
-                  ? `Memproses ${csvTexts.length} data...`
-                  : "Menganalisis teks..."}
+                  ? `Processing ${csvTexts.length} data...`
+                  : "Analyzing text..."}
               </p>
             </div>
           )}
@@ -463,8 +471,34 @@ export default function ClassifyForm() {
         </div>
       </div>
 
-      {/* History */}
-      {selectedModelId && <HistoryTable />}
+      {/* History Modal */}
+      {isHistoryModalOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 h-screen bg-black/50 backdrop-blur-sm"
+            onClick={() => setIsHistoryModalOpen(false)}
+          />
+          <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            <div className="animate-scale-in pointer-events-auto w-full max-w-4xl overflow-hidden rounded-2xl border border-(--border-default) bg-(--bg-surface) shadow-2xl">
+              <div className="flex items-center justify-between border-b border-(--border-default) bg-(--bg-elevated) p-5">
+                <h2 className="flex items-center gap-2 text-lg font-bold text-(--text-primary)">
+                  <History size={20} className="text-(--accent)" />
+                  Classification History
+                </h2>
+                <button
+                  onClick={() => setIsHistoryModalOpen(false)}
+                  className="rounded-lg p-2 text-(--text-tertiary) transition hover:bg-(--bg-overlay) hover:text-(--text-primary) focus:ring-2 focus:ring-(--accent-muted) focus:outline-none"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="scrollbar-thin scrollbar-thumb-(--border-strong) max-h-[70vh] overflow-y-auto p-5">
+                <HistoryTable />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

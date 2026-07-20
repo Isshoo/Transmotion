@@ -27,10 +27,10 @@ def jwt_required_custom(fn):
 
         user = db.session.get(User, user_id)
         if not user:
-            raise UnauthorizedError("Akun tidak ditemukan")
+            raise UnauthorizedError("Account not found")
 
         if not user.is_active:
-            raise ForbiddenError("Akun telah dinonaktifkan")
+            raise ForbiddenError("Account has been disabled")
 
         request.current_user = user
         return fn(*args, **kwargs)
@@ -46,13 +46,13 @@ def admin_required(fn):
 
         user = db.session.get(User, user_id)
         if not user:
-            raise UnauthorizedError("Akun tidak ditemukan")
+            raise UnauthorizedError("Account not found")
 
         if not user.is_active:
-            raise ForbiddenError("Akun telah dinonaktifkan")
+            raise ForbiddenError("Account has been disabled")
 
         if user.role != UserRole.ADMIN:
-            raise ForbiddenError("Hanya admin yang dapat mengakses")
+            raise ForbiddenError("Only admin can access")
 
         request.current_user = user
         return fn(*args, **kwargs)
@@ -68,13 +68,13 @@ def verified_required(fn):
 
         user = db.session.get(User, user_id)
         if not user:
-            raise UnauthorizedError("Akun tidak ditemukan")
+            raise UnauthorizedError("Account not found")
 
         if not user.is_active:
-            raise ForbiddenError("Akun telah dinonaktifkan")
+            raise ForbiddenError("Account has been disabled")
 
         if not user.is_verified:
-            raise ForbiddenError("Verifikasi email diperlukan")
+            raise ForbiddenError("Email verification required")
 
         request.current_user = user
         return fn(*args, **kwargs)

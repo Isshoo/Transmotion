@@ -47,7 +47,7 @@ class ValidationError(HTTPException):
     status_code = 422
     message = "Validation Error"
 
-    def __init__(self, errors, message="Validasi gagal"):
+    def __init__(self, errors, message="Validation failed"):
         super().__init__(message=message, errors=errors)
 
 

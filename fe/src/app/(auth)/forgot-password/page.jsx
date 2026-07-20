@@ -1,7 +1,7 @@
 import ForgotPasswordForm from "@/features/auth/components/ForgotPasswordForm";
 
 export const metadata = {
-  title: "Lupa Password",
+  title: "Forgot Password",
 };
 
 export default function ForgotPasswordPage() {

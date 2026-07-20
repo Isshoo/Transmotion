@@ -1,7 +1,7 @@
 import LoginForm from "@/features/auth/components/LoginForm";
 
 export const metadata = {
-  title: "Masuk",
+  title: "Login",
 };
 
 export default function LoginPage() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { BarChart2, Loader2 } from "lucide-react";
+import { BarChart2, Loader2, ChevronDown } from "lucide-react";
 import useEvaluationStore from "../store";
 import DatasetSection from "./sub/DatasetSection";
 
@@ -34,82 +34,86 @@ export default function EvaluationPage() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Header */}
+      {/* Header & Filter */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <BarChart2 size={20} className="text-(--accent)" />
-            Evaluasi Performa
+            Performance Evaluation
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Komparasi XLM-R vs mBERT berdasarkan dataset dan split ratio
+            Compare XLM-R vs mBERT by dataset and split ratio
           </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] font-bold tracking-wider text-(--text-secondary) uppercase">
+            Dataset:
+          </span>
+          {isLoadingDatasets ? (
+            <div className="flex items-center gap-2 text-xs font-medium text-(--text-tertiary)">
+              <Loader2 size={14} className="animate-spin text-(--accent)" />{" "}
+              Loading...
+            </div>
+          ) : (
+            <div className="relative w-48">
+              <select
+                value={selectedDatasetId}
+                onChange={(e) => setSelectedDataset(e.target.value)}
+                className="w-full cursor-pointer appearance-none rounded-lg border border-(--border-default) bg-(--bg-surface) py-1.5 pr-8 pl-3 text-xs font-semibold text-(--text-primary) shadow-(--shadow-sm) transition-all duration-200 outline-none hover:border-(--border-strong) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)/30"
+              >
+                <option value="">All Datasets</option>
+                {datasets.map((ds) => (
+                  <option key={ds.id} value={ds.id}>
+                    {ds.name}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-(--text-tertiary)">
+                <ChevronDown size={14} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Filter dataset */}
-      <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
-        <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-          Filter Dataset
-        </p>
-        {isLoadingDatasets ? (
-          <div className="flex items-center gap-2 text-sm font-medium text-(--text-tertiary)">
-            <Loader2 size={16} className="animate-spin text-(--accent)" />{" "}
-            Memuat dataset...
+      {/* Loading Skeleton */}
+      {isLoadingCompare && (
+        <div className="animate-pulse space-y-6">
+          {/* Skeleton Dataset Header */}
+          <div className="flex items-center gap-4">
+            <div className="h-px flex-1 bg-(--border-default)" />
+            <div className="h-8 w-32 rounded-full bg-(--bg-elevated)" />
+            <div className="h-px flex-1 bg-(--border-default)" />
           </div>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedDataset("")}
-              className={`rounded-full border px-4 py-1.5 text-xs font-bold tracking-wide transition-all duration-150 ${
-                selectedDatasetId === ""
-                  ? "border-(--accent-muted)/50 bg-(--accent-muted)/20 text-(--accent) shadow-(--shadow-sm)"
-                  : "border-(--border-default) bg-(--bg-elevated) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
-              }`}
-            >
-              Semua Dataset
-            </button>
-            {datasets.map((ds) => (
-              <button
-                key={ds.id}
-                onClick={() => setSelectedDataset(ds.id)}
-                className={`rounded-full border px-4 py-1.5 text-xs font-bold tracking-wide transition-all duration-150 ${
-                  selectedDatasetId === ds.id
-                    ? "border-(--accent-muted)/50 bg-(--accent-muted)/20 text-(--accent) shadow-(--shadow-sm)"
-                    : "border-(--border-default) bg-(--bg-elevated) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
-                }`}
-              >
-                {ds.name}
-              </button>
+          {/* Skeleton Mini Cards */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="h-[116px] rounded-2xl bg-(--bg-elevated)"
+              />
             ))}
           </div>
-        )}
-      </div>
-
-      {/* Loading */}
-      {isLoadingCompare && (
-        <div className="flex animate-pulse flex-col items-center justify-center py-16">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-(--bg-elevated) shadow-(--shadow-sm)">
-            <Loader2 size={24} className="animate-spin text-(--accent)" />
-          </div>
-          <span className="text-sm font-semibold text-(--text-tertiary)">
-            Memuat data evaluasi...
-          </span>
+          {/* Skeleton Tabs */}
+          <div className="h-[44px] w-full rounded-xl bg-(--bg-elevated)" />
+          {/* Skeleton Content Area */}
+          <div className="h-[400px] rounded-2xl bg-(--bg-elevated)" />
         </div>
       )}
 
-      {/* Tidak ada data */}
+      {/* No data */}
       {!isLoadingCompare && !hasData && (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-(--border-default) bg-(--bg-surface) py-20 text-center transition-colors hover:border-(--border-strong)">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
             <BarChart2 size={32} className="text-(--text-tertiary)" />
           </div>
           <p className="mb-2 text-base font-bold text-(--text-primary)">
-            Belum ada data komparasi
+            No comparison data yet
           </p>
           <p className="max-w-sm text-sm leading-relaxed font-medium text-(--text-secondary)">
-            Latih model XLM-R dan mBERT dengan dataset yang sama untuk melihat
-            perbandingan performa.
+            Train XLM-R and mBERT with the same dataset to see a performance
+            comparison.
           </p>
         </div>
       )}
@@ -121,9 +125,9 @@ export default function EvaluationPage() {
             {/* Header dataset */}
             <div className="flex items-center gap-4">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-(--border-strong) to-(--border-strong)" />
-              <h2 className="rounded-full border border-(--border-default) bg-(--bg-surface) px-5 py-2 text-xs font-black tracking-widest text-(--text-primary) uppercase shadow-(--shadow-sm)">
+              {/* <h2 className="rounded-full border border-(--border-default) bg-(--bg-surface) px-5 py-2 text-xs font-black tracking-widest text-(--text-primary) uppercase shadow-(--shadow-sm)">
                 {group.dataset_name}
-              </h2>
+              </h2> */}
               <div className="h-px flex-1 bg-linear-to-l from-transparent via-(--border-strong) to-(--border-strong)" />
             </div>
 

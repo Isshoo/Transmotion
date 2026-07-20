@@ -20,7 +20,7 @@ def _colab_key_required(fn):
         api_key = request.headers.get("X-Colab-Key", "")
         expected = current_app.config.get("COLAB_API_KEY", "")
         if not expected or api_key != expected:
-            return error_response("Akses tidak diizinkan", 401)
+            return error_response("Access denied", 401)
         return fn(*args, **kwargs)
 
     return wrapper
@@ -38,7 +38,7 @@ def _backend_key_required(fn):
         api_key = request.headers.get("X-Backend-Key", "")
         expected = current_app.config.get("COLAB_API_KEY", "")
         if not expected or api_key != expected:
-            return error_response("Akses tidak diizinkan", 401)
+            return error_response("Access denied", 401)
         return fn(*args, **kwargs)
 
     return wrapper

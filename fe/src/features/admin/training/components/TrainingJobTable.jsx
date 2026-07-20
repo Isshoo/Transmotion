@@ -68,7 +68,7 @@ export default function TrainingJobTable() {
               jobs: state.jobs.map((j) => (j.id === data.id ? data : j)),
             };
           }
-          // Job baru (baru saja dibuat) — tambahkan ke awal dan fetch ulang untuk total
+          // New job (just created) - add to the beginning and fetch again for total
           fetchJobs();
           return {};
         });
@@ -89,14 +89,14 @@ export default function TrainingJobTable() {
             Training Job
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Pantau dan kelola proses pelatihan model
+            Monitor and manage model training processes
           </p>
         </div>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 rounded-xl bg-(--accent) px-4 py-2.5 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-xl bg-(--accent) px-4 py-2.5 text-sm font-semibold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
         >
-          <Plus size={16} /> Buat Training Job
+          <Plus size={16} /> Create Training Job
         </button>
       </div>
 
@@ -107,19 +107,19 @@ export default function TrainingJobTable() {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="">Semua Status</option>
-          <option value="queued">Menunggu</option>
-          <option value="running">Berjalan</option>
-          <option value="completed">Selesai</option>
-          <option value="failed">Gagal</option>
-          <option value="cancelled">Dibatalkan</option>
+          <option value="">All Statuses</option>
+          <option value="queued">Queued</option>
+          <option value="running">Running</option>
+          <option value="completed">Completed</option>
+          <option value="failed">Failed</option>
+          <option value="cancelled">Cancelled</option>
         </select>
         <select
           value={modelTypeFilter}
           onChange={(e) => setModelTypeFilter(e.target.value)}
           className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="">Semua Model</option>
+          <option value="">All Models</option>
           <option value="mbert">mBERT</option>
           <option value="xlmr">XLM-R</option>
         </select>
@@ -132,13 +132,13 @@ export default function TrainingJobTable() {
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
                 {[
-                  "Nama Job",
+                  "Job Name",
                   "Model",
                   "Dataset",
                   "Split",
                   "Progress",
                   "Status",
-                  "Dibuat",
+                  "Created",
                   "",
                 ].map((h) => (
                   <th
@@ -174,10 +174,10 @@ export default function TrainingJobTable() {
                       />
                     </div>
                     <p className="text-sm font-semibold text-(--text-primary)">
-                      Belum ada training job
+                      No training jobs yet
                     </p>
                     <p className="mt-1 text-xs text-(--text-tertiary)">
-                      Klik &quot;Buat Training Job&quot; untuk mulai
+                      Click &quot;Create Training Job&quot; to get started
                     </p>
                   </td>
                 </tr>
@@ -275,7 +275,7 @@ export default function TrainingJobTable() {
                       <div className="flex items-center justify-end gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
                         <button
                           onClick={() => openDetailModal(job)}
-                          title="Lihat detail"
+                          title="View detail"
                           className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--accent-muted)/30 hover:text-(--accent) focus:ring-2 focus:ring-(--accent-muted) focus:outline-none"
                         >
                           <Eye size={16} />
@@ -283,7 +283,7 @@ export default function TrainingJobTable() {
                         {["queued", "running"].includes(job.status) && (
                           <button
                             onClick={() => openCancelModal(job)}
-                            title="Batalkan"
+                            title="Cancel"
                             className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--error-muted)/30 hover:text-(--error) focus:ring-2 focus:ring-(--error-muted) focus:outline-none"
                           >
                             <Ban size={16} />
@@ -301,9 +301,9 @@ export default function TrainingJobTable() {
         {!isLoading && total > 0 && (
           <div className="flex items-center justify-between border-t border-(--border-default) bg-(--bg-elevated) px-4 py-3">
             <p className="text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-              {from}–{to} dari{" "}
+              {from}–{to} of{" "}
               <span className="font-bold text-(--text-primary)">{total}</span>{" "}
-              job
+              jobs
             </p>
             <div className="flex items-center gap-1.5">
               <button

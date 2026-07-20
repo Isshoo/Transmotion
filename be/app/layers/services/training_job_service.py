@@ -13,14 +13,14 @@ from app.layers.services.sse_service import sse_manager
 from app.utils.exceptions import BadRequestError, NotFoundError
 from app.utils.logger import logger
 
-MIN_SAMPLES_PER_CLASS = 10
-MIN_TOTAL_TRAIN = 50
+MIN_SAMPLES_PER_CLASS = 100
+MIN_TOTAL_TRAIN = 700
 
 
 def get_by_id(job_id: str) -> TrainingJob:
     job = db.session.get(TrainingJob, job_id)
     if not job:
-        raise NotFoundError("Training job tidak ditemukan")
+        raise NotFoundError("Training job not found")
     return job
 
 
@@ -43,17 +43,17 @@ def compute_split_preview(
 ) -> dict:
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
-        raise NotFoundError("Dataset tidak ditemukan")
+        raise NotFoundError("Dataset not found")
     if dataset.preprocessing_status != PreprocessingStatus.COMPLETED:
-        raise BadRequestError("Dataset belum memiliki data preprocessed")
+        raise BadRequestError("Dataset does not have preprocessed data yet")
 
     total = dataset.num_rows_preprocessed or 0
     if total == 0:
-        raise BadRequestError("Dataset preprocessed kosong")
+        raise BadRequestError("Preprocessed dataset is empty")
 
     dist = dataset.class_distribution_preprocessed or {}
     if not dist:
-        raise BadRequestError("Informasi distribusi kelas tidak tersedia")
+        raise BadRequestError("Class distribution information is not available")
 
     train_per_class = {}
     val_per_class = {}
@@ -114,18 +114,33 @@ def create(
 ) -> TrainingJob:
     from flask import current_app
 
+    from app.layers.services import colab_service
+
+    api_key = current_app.config.get("COLAB_API_KEY", "")
+
+    if not colab_service.is_available():
+        raise BadRequestError(
+            "Colab is currently offline. Please start the Colab server before initiating training."
+        )
+
+    # Pengecekan aktif untuk memastikan worker masih hidup sebelum membuat job
+    if not colab_service.health_check(api_key):
+        raise BadRequestError(
+            "Colab server is not responding. Please check your Colab connection."
+        )
+
     dataset = db.session.get(Dataset, dataset_id)
     if not dataset:
-        raise NotFoundError("Dataset tidak ditemukan")
+        raise NotFoundError("Dataset not found")
     if dataset.preprocessing_status != PreprocessingStatus.COMPLETED:
-        raise BadRequestError("Dataset harus sudah melalui preprocessing")
+        raise BadRequestError("Dataset must have been preprocessed")
     if not dataset.columns_configured():
-        raise BadRequestError("Kolom teks dan label belum dikonfigurasi")
+        raise BadRequestError("Text and label columns have not been configured")
 
     split_info = compute_split_preview(dataset_id, test_size, val_size)
     if not split_info["is_valid"]:
         raise BadRequestError(
-            "Data tidak cukup: " + "; ".join(split_info["validation_errors"])
+            "Insufficient data: " + "; ".join(split_info["validation_errors"])
         )
 
     if not job_name:
@@ -149,22 +164,21 @@ def create(
     # ── Broadcast ke list view SSE ─────────────────────────────
     _broadcast_job(job)
 
-    # ── Coba panggil Colab langsung ────────────────────────────
-    from app.layers.services import colab_service
+    # ── Panggil Colab langsung ────────────────────────────
+    job_data = job.to_dict()
+    job_data["dataset_file_path"] = dataset.file_path
+    job_data["dataset_text_column"] = dataset.text_column
+    job_data["dataset_label_column"] = dataset.label_column
+    job_data["dataset_labels"] = dataset.class_distribution_preprocessed or {}
 
-    api_key = current_app.config.get("COLAB_API_KEY", "")
-    if colab_service.is_available():
-        job_data = job.to_dict()
-        job_data["dataset_file_path"] = dataset.file_path
-        job_data["dataset_text_column"] = dataset.text_column
-        job_data["dataset_label_column"] = dataset.label_column
-        job_data["dataset_labels"] = dataset.class_distribution_preprocessed or {}
-
-        success = colab_service.call_train(job_data, api_key)
-        if not success:
-            logger.warning(f"Colab tidak merespons, job {job.id[:8]} tetap queued")
-    else:
-        logger.info("Colab tidak terdaftar — job akan menunggu Colab online")
+    success = colab_service.call_train(job_data, api_key)
+    if not success:
+        job.status = JobStatus.FAILED
+        job.error_message = "Koneksi ke Colab terputus saat mencoba memulai training. Silakan periksa koneksi server Colab."
+        job.finished_at = datetime.now(timezone.utc)
+        db.session.commit()
+        _broadcast_job(job)
+        raise BadRequestError("Gagal memulai training di Colab. Koneksi terputus.")
 
     return job
 
@@ -172,7 +186,7 @@ def create(
 def cancel(job_id: str) -> TrainingJob:
     job = get_by_id(job_id)
     if job.status not in (JobStatus.QUEUED, JobStatus.RUNNING):
-        raise BadRequestError(f"Job tidak bisa dibatalkan: status {job.status.value}")
+        raise BadRequestError(f"Job cannot be cancelled: status {job.status.value}")
 
     job.status = JobStatus.CANCELLED
     job.finished_at = datetime.now(timezone.utc)
@@ -219,7 +233,7 @@ def mark_running(job_id: str, colab_session_id: str = None) -> TrainingJob:
 def update_progress(job_id: str, data: dict) -> TrainingJob:
     job = get_by_id(job_id)
     if job.status != JobStatus.RUNNING:
-        raise BadRequestError("Job tidak dalam status running")
+        raise BadRequestError("Job is not in running status")
 
     job.current_epoch = data["current_epoch"]
     job.total_epochs = data["total_epochs"]

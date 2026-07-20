@@ -57,13 +57,13 @@ export default function UserFormModal() {
 
   const validate = () => {
     const newErrors = {};
-    if (!form.name.trim()) newErrors.name = "Nama harus diisi";
-    if (!form.email.trim()) newErrors.email = "Email harus diisi";
+    if (!form.name.trim()) newErrors.name = "Name is required";
+    if (!form.email.trim()) newErrors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      newErrors.email = "Format email tidak valid";
-    if (!isEdit && !form.password) newErrors.password = "Password harus diisi";
+      newErrors.email = "Invalid email format";
+    if (!isEdit && !form.password) newErrors.password = "Password is required";
     if (!isEdit && form.password && form.password.length < 8)
-      newErrors.password = "Password minimal 8 karakter";
+      newErrors.password = "Password must be at least 8 characters";
     return newErrors;
   };
 
@@ -109,7 +109,7 @@ export default function UserFormModal() {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-(--border-subtle) px-6 py-4">
           <h2 className="text-base font-bold tracking-tight text-(--text-primary)">
-            {isEdit ? "Edit Pengguna" : "Tambah Pengguna Baru"}
+            {isEdit ? "Edit User" : "Add New User"}
           </h2>
         </div>
 
@@ -124,14 +124,14 @@ export default function UserFormModal() {
           {/* Nama */}
           <div>
             <label className="mb-2 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Nama Lengkap
+              Full Name
             </label>
             <input
               type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder="Nama pengguna"
+              placeholder="User name"
               className={`w-full rounded-xl border bg-(--bg-surface) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) ${
                 errors.name
                   ? "border-(--error) focus:ring-2 focus:ring-(--error-muted)"
@@ -155,7 +155,7 @@ export default function UserFormModal() {
               name="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="pengguna@email.com"
+              placeholder="user@email.com"
               className={`w-full rounded-xl border bg-(--bg-surface) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-all duration-200 outline-none placeholder:text-(--text-disabled) ${
                 errors.email
                   ? "border-(--error) focus:ring-2 focus:ring-(--error-muted)"
@@ -175,7 +175,7 @@ export default function UserFormModal() {
               Password{" "}
               {isEdit && (
                 <span className="font-normal text-(--text-tertiary) normal-case">
-                  (kosongkan jika tidak ingin mengubah)
+                  (leave blank to keep unchanged)
                 </span>
               )}
             </label>
@@ -225,7 +225,7 @@ export default function UserFormModal() {
                   onChange={handleChange}
                   className="h-4 w-4 rounded border-(--border-strong) accent-(--accent)"
                 />
-                Email Terverifikasi
+                Email Verified
               </label>
 
               <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-(--text-secondary)">
@@ -236,7 +236,7 @@ export default function UserFormModal() {
                   onChange={handleChange}
                   className="h-4 w-4 rounded border-(--border-strong) accent-(--accent)"
                 />
-                Akun Aktif
+                Account Active
               </label>
             </div>
           )}
@@ -249,18 +249,18 @@ export default function UserFormModal() {
               disabled={isSubmitting}
               className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-2.5 text-sm font-bold text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
-              Batal
+              Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-bold text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-bold text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting
-                ? "Menyimpan..."
+                ? "Saving..."
                 : isEdit
-                  ? "Simpan Perubahan"
-                  : "Tambah Pengguna"}
+                  ? "Save Changes"
+                  : "Add User"}
             </button>
           </div>
         </form>

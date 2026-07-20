@@ -6,6 +6,6 @@ export function getErrorMessage(error) {
     error?.response?.data?.message ||
     error?.response?.data?.error ||
     error?.message ||
-    "Terjadi kesalahan, coba lagi."
+    "An error occurred, try again."
   );
 }

@@ -34,7 +34,7 @@ export default function ProgressView() {
             <div className="mb-1.5 flex items-center gap-2">
               <Loader2 size={18} className="animate-spin text-(--accent)" />
               <p className="text-base font-semibold tracking-tight text-(--text-primary)">
-                Training Berjalan...
+                Training Running...
               </p>
             </div>
             <p className="text-sm font-medium text-(--accent) opacity-90">
@@ -65,6 +65,12 @@ export default function ProgressView() {
             <span className="text-(--text-tertiary)">Dataset</span>
             <strong className="text-(--text-primary)">
               {job.dataset_name}
+              {job.split_info &&
+                " (" +
+                  ((1 - job.split_info.test_size) * 100).toFixed(0) +
+                  ":" +
+                  (job.split_info.test_size * 100).toFixed(0) +
+                  ")"}
             </strong>
           </span>
           <span className="text-(--border-strong)">|</span>
@@ -81,19 +87,27 @@ export default function ProgressView() {
                 <span className="text-(--accent)">
                   Train{" "}
                   <strong className="text-(--text-primary)">
-                    {job.split_info.train_total?.toLocaleString("id")}
+                    {job.split_info.train_total?.toLocaleString("id")} (
+                    {(
+                      (1 -
+                        (job.split_info.test_size + job.split_info.val_size)) *
+                      100
+                    ).toFixed(0)}
+                    %)
                   </strong>
                 </span>
                 <span className="text-(--data-2)">
                   Val{" "}
                   <strong className="text-(--text-primary)">
-                    {job.split_info.val_total?.toLocaleString("id")}
+                    {job.split_info.val_total?.toLocaleString("id")} (
+                    {(job.split_info.val_size * 100).toFixed(0)}%)
                   </strong>
                 </span>
                 <span className="text-(--warning)">
                   Test{" "}
                   <strong className="text-(--text-primary)">
-                    {job.split_info.test_total?.toLocaleString("id")}
+                    {job.split_info.test_total?.toLocaleString("id")} (
+                    {(job.split_info.test_size * 100).toFixed(0)}%)
                   </strong>
                 </span>
               </span>
@@ -106,21 +120,26 @@ export default function ProgressView() {
       {job.epoch_logs?.length > 0 &&
         (() => {
           const last = job.epoch_logs[job.epoch_logs.length - 1];
+          const bestAcc = job.epoch_logs.reduce((prev, curr) =>
+            prev.val_accuracy > curr.val_accuracy ? prev : curr
+          );
+          const bestF1 = job.epoch_logs.reduce((prev, curr) =>
+            prev.val_f1 > curr.val_f1 ? prev : curr
+          );
           return (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {[
-                ["Train Loss", last.train_loss?.toFixed(4)],
-                ["Val Loss", last.val_loss?.toFixed(4)],
+                ["Loss", last.val_loss?.toFixed(4)],
                 [
-                  "Accuracy",
-                  last.val_accuracy !== null
-                    ? `${(last.val_accuracy * 100).toFixed(2)}%`
+                  "Best Accuracy",
+                  bestAcc.val_accuracy !== null
+                    ? `${(bestAcc.val_accuracy * 100).toFixed(2)}%`
                     : null,
                 ],
                 [
-                  "F1-Score",
-                  last.val_f1 !== null
-                    ? `${(last.val_f1 * 100).toFixed(2)}%`
+                  "Best F1-Score",
+                  bestF1.val_f1 !== null
+                    ? `${(bestF1.val_f1 * 100).toFixed(2)}%`
                     : null,
                 ],
               ].map(([label, value]) => (
@@ -145,7 +164,7 @@ export default function ProgressView() {
         <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
           <div className="border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3">
             <p className="text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-              Log Per Epoch
+              Per-Epoch Logs
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -154,8 +173,7 @@ export default function ProgressView() {
                 <tr className="border-b border-(--border-default) bg-(--bg-surface)">
                   {[
                     "Epoch",
-                    "Train Loss",
-                    "Val Loss",
+                    "Loss",
                     "Accuracy",
                     "Precision",
                     "Recall",
@@ -183,9 +201,7 @@ export default function ProgressView() {
                     <td className="px-4 py-3 font-semibold text-(--text-primary)">
                       {log.epoch}
                     </td>
-                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
-                      {log.train_loss?.toFixed(4) ?? "—"}
-                    </td>
+
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_loss?.toFixed(4) ?? "—"}
                     </td>
@@ -212,6 +228,51 @@ export default function ProgressView() {
                   </tr>
                 ))}
               </tbody>
+              {/* {(() => {
+                const calcAvg = (key) => {
+                  const valid = job.epoch_logs.filter(
+                    (log) => log[key] != null
+                  );
+                  if (valid.length === 0) return null;
+                  return (
+                    valid.reduce((acc, log) => acc + log[key], 0) / valid.length
+                  );
+                };
+                const avgAcc = calcAvg("val_accuracy");
+                const avgPrec = calcAvg("val_precision");
+                const avgRec = calcAvg("val_recall");
+                const avgF1 = calcAvg("val_f1");
+                return (
+                  <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                        Average
+                      </td>
+                      <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                        —
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgAcc !== null
+                          ? `${(avgAcc * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgPrec !== null
+                          ? `${(avgPrec * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgRec !== null
+                          ? `${(avgRec * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgF1 !== null ? `${(avgF1 * 100).toFixed(2)}%` : "—"}
+                      </td>
+                    </tr>
+                  </tfoot>
+                );
+              })()} */}
             </table>
           </div>
         </div>
@@ -221,18 +282,19 @@ export default function ProgressView() {
       {job.hyperparams && (
         <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) px-5 py-4 shadow-(--shadow-sm)">
           <p className="mb-3 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Konfigurasi Training
+            Training Configuration
           </p>
           <div className="flex flex-wrap gap-2">
             {[
-              ["LR", job.hyperparams.learning_rate],
+              ["Learning Rate", job.hyperparams.learning_rate],
               ["Epochs", job.hyperparams.epochs],
-              ["Batch", job.hyperparams.batch_size],
-              ["MaxLen", job.hyperparams.max_length],
+              ["Batch Size", job.hyperparams.batch_size],
+              ["Max Length", job.hyperparams.max_length],
               ["Dropout", job.hyperparams.dropout],
               ["Optimizer", job.hyperparams.optimizer],
-              ["Warmup", job.hyperparams.warmup_steps],
-              ["Decay", job.hyperparams.weight_decay],
+              ["Warmup Steps", job.hyperparams.warmup_steps],
+              ["Weight Decay", job.hyperparams.weight_decay],
+              ["Seed", job.hyperparams.seed],
             ].map(([l, v]) => (
               <span
                 key={l}
@@ -246,34 +308,34 @@ export default function ProgressView() {
         </div>
       )}
 
-      {/* Tombol batal */}
+      {/* Cancel button */}
       {!showCancelConfirm ? (
         <div className="flex justify-end">
           <button
             onClick={() => setShowCancelConfirm(true)}
             className="inline-flex items-center gap-2 rounded-lg border border-(--error)/30 px-4 py-2 text-sm font-medium text-(--error) transition-all duration-150 hover:bg-(--error-muted)"
           >
-            <Ban size={15} /> Batalkan Training
+            <Ban size={15} /> Cancel Training
           </button>
         </div>
       ) : (
         <div className="animate-scale-in rounded-xl border border-(--error)/30 bg-(--error-muted)/50 p-4">
           <p className="mb-3 text-sm font-medium text-(--error)">
-            Yakin ingin membatalkan training?
+            Are you sure you want to cancel training?
           </p>
           <div className="flex gap-2">
             <button
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="rounded-lg bg-(--error) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
+              className="rounded-lg bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
             >
-              {isSubmitting ? "Membatalkan..." : "Ya, Batalkan"}
+              {isSubmitting ? "Cancelling..." : "Yes, Cancel"}
             </button>
             <button
               onClick={() => setShowCancelConfirm(false)}
               className="rounded-lg border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
             >
-              Tidak
+              No
             </button>
           </div>
         </div>

@@ -12,32 +12,30 @@ def _validate_password_strength(value: str) -> None:
     if value is None:
         return
     if len(value) < _PASSWORD_MIN_LEN:
-        raise ValidationError(f"Password minimal {_PASSWORD_MIN_LEN} karakter")
+        raise ValidationError(f"Minimum Password is {_PASSWORD_MIN_LEN} characters")
     if not _PASSWORD_REGEX.match(value):
-        raise ValidationError(
-            "Password harus mengandung huruf besar, huruf kecil, dan angka"
-        )
+        raise ValidationError("Password must contain uppercase, lowercase, and numbers")
 
 
 class RegisterSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     email = fields.Email(
         required=True,
         error_messages={
-            "required": "Email harus diisi",
-            "invalid": "Format email tidak valid",
+            "required": "Email is required",
+            "invalid": "Invalid email format",
         },
     )
     password = fields.String(
         required=True,
         load_only=True,
-        error_messages={"required": "Password harus diisi"},
+        error_messages={"required": "Password is required"},
     )
     name = fields.String(
         required=True,
-        validate=validate.Length(max=100, error="Nama maksimal 100 karakter"),
-        error_messages={"required": "Nama harus diisi"},
+        validate=validate.Length(max=100, error="Maximum name is 100 characters"),
+        error_messages={"required": "Name is required"},
     )
 
     @validates("password")
@@ -46,56 +44,56 @@ class RegisterSchema(Schema):
 
 
 class LoginSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     email = fields.Email(
         required=True,
         error_messages={
-            "required": "Email harus diisi",
-            "invalid": "Format email tidak valid",
+            "required": "Email is required",
+            "invalid": "Invalid email format",
         },
     )
     password = fields.String(
         required=True,
         load_only=True,
-        error_messages={"required": "Password harus diisi"},
+        error_messages={"required": "Password is required"},
     )
 
 
 class RefreshTokenSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     refresh_token = fields.String(
-        required=True, error_messages={"required": "Refresh token harus diisi"}
+        required=True, error_messages={"required": "Refresh token is required"}
     )
 
 
 class ForgotPasswordSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     email = fields.Email(
         required=True,
         error_messages={
-            "required": "Email harus diisi",
-            "invalid": "Format email tidak valid",
+            "required": "Email is required",
+            "invalid": "Invalid email format",
         },
     )
 
 
 class ResetPasswordSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     token = fields.String(
-        required=True, error_messages={"required": "Token harus diisi"}
+        required=True, error_messages={"required": "Token is required"}
     )
     password = fields.String(
         required=True,
         validate=validate.Length(
             min=_PASSWORD_MIN_LEN,
-            error=f"Password minimal {_PASSWORD_MIN_LEN} karakter",
+            error=f"Minimum Password is {_PASSWORD_MIN_LEN} characters",
         ),
         load_only=True,
-        error_messages={"required": "Password harus diisi"},
+        error_messages={"required": "Password is required"},
     )
 
     @validates("password")
@@ -104,21 +102,21 @@ class ResetPasswordSchema(Schema):
 
 
 class ChangePasswordSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
 
     current_password = fields.String(
         required=True,
         load_only=True,
-        error_messages={"required": "Password saat ini harus diisi"},
+        error_messages={"required": "Current password is required"},
     )
     new_password = fields.String(
         required=True,
         validate=validate.Length(
             min=_PASSWORD_MIN_LEN,
-            error=f"Password baru minimal {_PASSWORD_MIN_LEN} karakter",
+            error=f"New password must be at least {_PASSWORD_MIN_LEN} characters",
         ),
         load_only=True,
-        error_messages={"required": "Password baru harus diisi"},
+        error_messages={"required": "New password is required"},
     )
 
     @validates("new_password")

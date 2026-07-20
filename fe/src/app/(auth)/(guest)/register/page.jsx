@@ -1,7 +1,7 @@
 import RegisterForm from "@/features/auth/components/RegisterForm";
 
 export const metadata = {
-  title: "Daftar",
+  title: "Register",
 };
 
 export default function RegisterPage() {

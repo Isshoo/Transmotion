@@ -17,7 +17,7 @@ from app.utils.response import error_response, paginated_response, success_respo
 
 def _parse_err(err: ValidationError):
     return error_response(
-        message=f"Validasi gagal: {', '.join([v[0] for v in err.messages.values()])}",
+        message=f"Validation failed: {', '.join([v[0] for v in err.messages.values()])}",
         errors=[{"field": k, "message": v[0]} for k, v in err.messages.items()],
         status_code=422,
     )
@@ -41,7 +41,7 @@ def list_jobs():
         total=total,
         page=params["page"],
         per_page=params["per_page"],
-        message="Daftar training job berhasil diambil",
+        message="Training jobs list retrieved successfully",
     )
 
 
@@ -49,7 +49,7 @@ def get_job(job_id):
     job = training_job_service.get_by_id(job_id)
     return success_response(
         data=job.to_dict(include_model=True),
-        message="Detail job berhasil diambil",
+        message="Job detail retrieved successfully",
     )
 
 
@@ -73,7 +73,7 @@ def get_active_job():
     if active:
         return success_response(
             data=active.to_dict(include_model=True),
-            message="Job aktif ditemukan",
+            message="Active job found",
         )
 
     # Cari job terakhir
@@ -97,7 +97,7 @@ def split_preview():
         test_size=data["test_size"],
         val_size=data.get("val_size", 0.1),
     )
-    return success_response(data=preview, message="Preview split berhasil dihitung")
+    return success_response(data=preview, message="Split preview calculated successfully")
 
 
 def create_job():
@@ -125,6 +125,7 @@ def create_job():
         "weight_decay": data["weight_decay"],
         "dropout": data["dropout"],
         "optimizer": data["optimizer"],
+        "seed": data["seed"],
     }
 
     job = training_job_service.create(
@@ -137,14 +138,14 @@ def create_job():
         user_id=request.current_user.id,
     )
     return success_response(
-        data=job.to_dict(), message="Training job berhasil dibuat", status_code=201
+        data=job.to_dict(), message="Training job created successfully", status_code=201
     )
 
 
 def cancel_job(job_id):
     job = training_job_service.cancel(job_id)
     return success_response(
-        data=job.to_dict(), message="Training job berhasil dibatalkan"
+        data=job.to_dict(), message="Training job cancelled successfully"
     )
 
 
@@ -154,7 +155,7 @@ def cancel_job(job_id):
 def colab_get_next_job():
     job = training_job_service.get_next_queued_job()
     if not job:
-        return success_response(data=None, message="Tidak ada job yang menunggu")
+        return success_response(data=None, message="No pending jobs")
 
     job_data = job.to_dict()
 
@@ -165,7 +166,7 @@ def colab_get_next_job():
         job_data["dataset_label_column"] = job.dataset.label_column
         job_data["dataset_labels"] = job.dataset.class_distribution_preprocessed or {}
 
-    return success_response(data=job_data, message="Job ditemukan")
+    return success_response(data=job_data, message="Job found")
 
 
 def colab_update_progress(job_id):
@@ -175,7 +176,7 @@ def colab_update_progress(job_id):
         return _parse_err(err)
 
     job = training_job_service.update_progress(job_id, data)
-    return success_response(data=job.to_dict(), message="Progress diperbarui")
+    return success_response(data=job.to_dict(), message="Progress updated")
 
 
 def colab_complete_job(job_id):
@@ -189,7 +190,7 @@ def colab_complete_job(job_id):
         job_id=job_id, model_file=model_file, data=form_data
     )
     return success_response(
-        data=result.to_dict(), message="Training selesai, model berhasil disimpan"
+        data=result.to_dict(), message="Training completed, model saved successfully"
     )
 
 

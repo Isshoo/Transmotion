@@ -27,14 +27,14 @@ export default function DeleteConfirmModal() {
           <Trash2 size={20} className="text-(--error)" />
         </div>
         <h2 className="mb-1.5 text-base font-semibold tracking-tight text-(--text-primary)">
-          Hapus Dataset?
+          Delete Dataset?
         </h2>
         <p className="mb-6 text-sm leading-relaxed text-(--text-secondary)">
           Dataset{" "}
           <span className="font-medium text-(--text-primary)">
             {deleteTarget.name}
           </span>{" "}
-          akan dihapus permanen beserta semua data preprocessed-nya.
+          will be permanently deleted along with all its preprocessed data.
         </p>
         <div className="flex justify-end gap-2.5">
           <button
@@ -42,14 +42,14 @@ export default function DeleteConfirmModal() {
             disabled={isSubmitting}
             className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
           >
-            Batal
+            Cancel
           </button>
           <button
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
+            className="rounded-md bg-(--error) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--error-hover) disabled:opacity-50"
           >
-            {isSubmitting ? "Menghapus..." : "Ya, Hapus"}
+            {isSubmitting ? "Deleting..." : "Yes, Delete"}
           </button>
         </div>
       </div>

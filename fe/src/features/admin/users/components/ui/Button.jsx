@@ -31,7 +31,7 @@ export function PaginationButton({
       title={title}
       className={`flex h-7 min-w-7 items-center justify-center rounded-md px-2 text-[11px] font-bold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
         active
-          ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+          ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
           : "border border-(--border-default) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
       }`}
     >

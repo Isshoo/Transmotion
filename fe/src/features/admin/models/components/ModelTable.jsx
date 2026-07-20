@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BrainCircuit,
   Pencil,
@@ -10,10 +10,13 @@ import {
   CheckCircle,
   XCircle,
   Cpu,
+  Search,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/helpers/formatter";
 import useModelStore from "../store";
+import modelsApi from "../api";
 import ModelDetailModal from "./modal/ModelDetailModal";
 import EditModelModal from "./modal/EditModelModal";
 import DeleteConfirmModal from "./modal/EditConfirmModal";
@@ -31,9 +34,13 @@ export default function ModelTable() {
     modelTypeFilter,
     isActiveFilter,
     sortBy,
+    search,
+    datasetFilter,
     isLoading,
     fetchModels,
     setPage,
+    setSearch,
+    setDatasetFilter,
     setModelTypeFilter,
     setIsActiveFilter,
     setSortBy,
@@ -43,14 +50,35 @@ export default function ModelTable() {
   } = useModelStore();
 
   const [pendingToggleId, setPendingToggleId] = useState(null);
+  const [localSearch, setLocalSearch] = useState(search);
+  const [datasetOptions, setDatasetOptions] = useState([]);
+  const searchTimeout = useRef(null);
 
   useEffect(() => {
     fetchModels();
+    const loadDatasets = async () => {
+      try {
+        const { data } = await modelsApi.getEvaluationDatasets();
+        if (data.success) {
+          setDatasetOptions(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to load datasets:", err);
+      }
+    };
+    loadDatasets();
     return () => {
       useModelStore.setState({ isLoading: true });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleSearchChange = (e) => {
+    const v = e.target.value;
+    setLocalSearch(v);
+    clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => setSearch(v), 400);
+  };
 
   const from = total === 0 ? 0 : (page - 1) * perPage + 1;
   const to = Math.min(page * perPage, total);
@@ -76,22 +104,60 @@ export default function ModelTable() {
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
             <Cpu size={20} className="text-(--accent)" />
-            Model Terlatih
+            Trained Models
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Kelola model hasil fine-tuning
+            Manage fine-tuned models
           </p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
+        <div className="relative min-w-[240px] flex-1 sm:max-w-xs">
+          <Search
+            size={14}
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-(--text-tertiary)"
+          />
+          <input
+            type="text"
+            value={localSearch}
+            onChange={handleSearchChange}
+            placeholder="Search models..."
+            className="w-full rounded-lg border border-(--border-default) bg-(--bg-elevated) py-2 pr-8 pl-9 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+          />
+          {localSearch && (
+            <button
+              onClick={() => {
+                setLocalSearch("");
+                setSearch("");
+              }}
+              className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 text-(--text-tertiary) transition-colors hover:text-(--text-primary)"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
+
+        <select
+          value={datasetFilter}
+          onChange={(e) => setDatasetFilter(e.target.value)}
+          className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+        >
+          <option value="">All Datasets</option>
+          {datasetOptions.map((ds) => (
+            <option key={ds.id} value={ds.id}>
+              {ds.name}
+            </option>
+          ))}
+        </select>
+
         <select
           value={modelTypeFilter}
           onChange={(e) => setModelTypeFilter(e.target.value)}
           className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="">Semua Arsitektur</option>
+          <option value="">All Architectures</option>
           <option value="mbert">mBERT</option>
           <option value="xlmr">XLM-R</option>
         </select>
@@ -100,19 +166,19 @@ export default function ModelTable() {
           onChange={(e) => setIsActiveFilter(e.target.value)}
           className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="">Semua Status</option>
-          <option value="true">Aktif</option>
-          <option value="false">Nonaktif</option>
+          <option value="">All Statuses</option>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
         </select>
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
           className="rounded-lg border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
         >
-          <option value="created_at">Terbaru</option>
+          <option value="created_at">Latest</option>
           <option value="accuracy">Accuracy</option>
           <option value="f1_score">F1 Score</option>
-          <option value="name">Nama</option>
+          <option value="name">Name</option>
         </select>
       </div>
 
@@ -123,14 +189,14 @@ export default function ModelTable() {
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
                 {[
-                  "Nama Model",
-                  "Arsitektur",
+                  "Model Name",
+                  "Architecture",
                   "Dataset",
-                  "Kelas",
+                  "Classes",
                   "Accuracy",
                   "Status",
-                  "Dibuat",
-                  "Aksi",
+                  "Created",
+                  "Action",
                 ].map((h) => (
                   <th
                     key={h}
@@ -162,10 +228,10 @@ export default function ModelTable() {
                       />
                     </div>
                     <p className="text-sm font-semibold text-(--text-primary)">
-                      Belum ada model
+                      No models yet
                     </p>
                     <p className="mt-1 text-xs text-(--text-tertiary)">
-                      Model akan muncul setelah training selesai
+                      Models will appear after training is complete
                     </p>
                   </td>
                 </tr>
@@ -222,11 +288,11 @@ export default function ModelTable() {
                     <td className="px-4 py-4">
                       {model.is_active ? (
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-(--success-muted)/50 bg-(--success-muted)/20 px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--success) uppercase">
-                          <CheckCircle size={10} /> Aktif
+                          <CheckCircle size={10} /> Active
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-(--border-strong) bg-(--bg-elevated) px-2.5 py-1 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                          <XCircle size={10} /> Nonaktif
+                          <XCircle size={10} /> Inactive
                         </span>
                       )}
                     </td>
@@ -253,7 +319,7 @@ export default function ModelTable() {
                             handleToggleActive(model);
                           }}
                           disabled={pendingToggleId === model.id}
-                          title={model.is_active ? "Nonaktifkan" : "Aktifkan"}
+                          title={model.is_active ? "Deactivate" : "Activate"}
                           className={`rounded-md p-1.5 transition-colors focus:ring-2 focus:outline-none disabled:opacity-50 ${
                             model.is_active
                               ? "text-(--text-tertiary) hover:bg-(--warning-muted)/30 hover:text-(--warning) focus:ring-(--warning-muted)"
@@ -271,7 +337,7 @@ export default function ModelTable() {
                             e.stopPropagation();
                             openDeleteModal(model);
                           }}
-                          title="Hapus"
+                          title="Delete"
                           className="rounded-md p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--error-muted)/30 hover:text-(--error) focus:ring-2 focus:ring-(--error-muted) focus:outline-none"
                         >
                           <Trash2 size={16} />
@@ -288,9 +354,9 @@ export default function ModelTable() {
         {!isLoading && total > 0 && (
           <div className="flex items-center justify-between border-t border-(--border-default) bg-(--bg-elevated) px-4 py-3">
             <p className="text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-              {from}–{to} dari{" "}
+              {from}–{to} of{" "}
               <span className="font-bold text-(--text-primary)">{total}</span>{" "}
-              model
+              models
             </p>
             <div className="flex items-center gap-1.5">
               <button

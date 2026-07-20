@@ -68,11 +68,11 @@ export default function TestingPage() {
     if (!file) return;
     const ext = file.name.split(".").pop().toLowerCase();
     if (!["csv", "tsv", "txt", "xlsx", "xls"].includes(ext)) {
-      toast.error("Format harus CSV, TSV, TXT, XLSX, atau XLS");
+      toast.error("Format must be CSV, TSV, TXT, XLSX, or XLS");
       return;
     }
     await setCsvFile(file);
-    toast.success(`${file.name} dimuat`);
+    toast.success(`${file.name} loaded`);
   };
 
   const canClassify =
@@ -91,7 +91,7 @@ export default function TestingPage() {
           Testing
         </h1>
         <p className="mt-1 text-sm text-(--text-secondary)">
-          Uji model dengan teks tunggal atau batch dari file CSV / Excel
+          Test the model with a single text or a batch from a CSV / Excel file
         </p>
       </div>
 
@@ -102,7 +102,7 @@ export default function TestingPage() {
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
             <div className="mb-3 flex items-center justify-between">
               <label className="text-sm font-bold text-(--text-secondary) uppercase">
-                Pilih Model
+                Select Model
               </label>
               {/* Filter arsitektur */}
               <div className="flex items-center gap-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-1">
@@ -113,11 +113,11 @@ export default function TestingPage() {
                     onClick={() => setModelTypeFilter(v)}
                     className={`rounded-md px-2 py-1 text-[10px] font-bold tracking-wider uppercase transition-all duration-150 ${
                       modelTypeFilter === v
-                        ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                        ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                         : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                     }`}
                   >
-                    {v === "" ? "Semua" : v}
+                    {v === "" ? "All" : v}
                   </button>
                 ))}
               </div>
@@ -129,11 +129,11 @@ export default function TestingPage() {
                   size={16}
                   className="animate-spin text-(--text-secondary)"
                 />{" "}
-                Memuat model...
+                Loading models...
               </div>
             ) : activeModels.length === 0 ? (
               <div className="rounded-xl border border-(--warning-muted)/50 bg-(--warning-muted)/10 px-4 py-3.5 text-sm font-medium text-(--warning)">
-                Tidak ada model aktif dengan filter ini.
+                No active models for this filter.
               </div>
             ) : (
               <div className="relative">
@@ -163,7 +163,7 @@ export default function TestingPage() {
                     </div>
                   ) : (
                     <span className="text-sm font-medium text-(--text-tertiary)">
-                      Pilih model untuk mulai testing...
+                      Select a model to start testing...
                     </span>
                   )}
                   <ChevronDown
@@ -222,7 +222,7 @@ export default function TestingPage() {
                             <p className="mt-1 text-[11px] font-medium text-(--text-tertiary)">
                               {model.accuracy !== null &&
                                 `Acc: ${(model.accuracy * 100).toFixed(1)}% · `}
-                              {model.num_labels} kelas
+                              {model.num_labels} classes
                             </p>
                           </button>
                         ))}
@@ -237,7 +237,7 @@ export default function TestingPage() {
           {/* Mode toggle */}
           <div className="mb-4 flex overflow-hidden rounded-lg border border-(--border-strong) bg-(--bg-elevated) p-1">
             {[
-              { key: "single", label: "Teks Tunggal" },
+              { key: "single", label: "Single Text" },
               { key: "csv", label: "Upload File" },
             ].map(({ key, label }) => (
               <button
@@ -248,7 +248,7 @@ export default function TestingPage() {
                 }}
                 className={`flex-1 rounded-md py-1.5 text-xs font-bold transition-all duration-200 ${
                   inputMode === key
-                    ? "bg-(--accent) text-white shadow-(--shadow-sm)"
+                    ? "bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                     : "text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                 }`}
               >
@@ -265,9 +265,9 @@ export default function TestingPage() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   rows={6}
-                  placeholder="Masukkan teks di sini... (Ctrl+Enter untuk klasifikasi)"
+                  placeholder="Enter text here... (Ctrl+Enter to classify)"
                   className="w-full resize-none rounded-xl border border-(--border-strong) bg-(--bg-elevated) px-4 py-3 text-sm leading-relaxed text-(--text-primary) transition-all duration-200 outline-none placeholder:font-sans placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
-                  maxLength={5000}
+                  maxLength={1000}
                   onKeyDown={(e) => {
                     if (
                       e.key === "Enter" &&
@@ -280,7 +280,7 @@ export default function TestingPage() {
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-[10px] font-bold tracking-wider text-(--text-tertiary)">
-                    {inputText.length}/5000
+                    {inputText.length}/1000
                   </p>
                   {inputText && (
                     <button
@@ -300,7 +300,7 @@ export default function TestingPage() {
                 {!csvFileName ? (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-10 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--accent-muted)/5"
+                    className="group cursor-pointer rounded-xl border-2 border-dashed border-(--border-strong) bg-(--bg-elevated) px-6 py-9.5 text-center transition-all duration-200 hover:border-(--accent) hover:bg-(--accent-muted)/5"
                   >
                     <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-overlay) transition-colors group-hover:bg-(--accent-muted)/20">
                       <UploadCloud
@@ -309,13 +309,13 @@ export default function TestingPage() {
                       />
                     </div>
                     <p className="text-sm font-medium text-(--text-secondary)">
-                      Klik untuk upload{" "}
+                      Click to upload{" "}
                       <span className="font-bold text-(--accent)">
                         CSV / Excel
                       </span>
                     </p>
                     <p className="mt-1.5 text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-                      Maks 500 baris · .csv .xlsx .xls
+                      Max 500 rows · .csv .xlsx .xls
                     </p>
                   </div>
                 ) : (
@@ -333,7 +333,7 @@ export default function TestingPage() {
                             <strong className="text-(--success)">
                               {csvTexts.length}
                             </strong>{" "}
-                            baris teks valid ditemukan
+                            valid text rows found
                           </p>
                         </div>
                       </div>
@@ -354,7 +354,7 @@ export default function TestingPage() {
                     {csvHeaders.length > 0 && (
                       <div className="rounded-xl border border-(--border-default) bg-(--bg-elevated) p-5">
                         <label className="mb-3 block text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                          Pilih Kolom Teks
+                          Select Text Column
                         </label>
                         <div className="flex flex-wrap gap-2">
                           {csvHeaders.map((header, idx) => (
@@ -363,11 +363,11 @@ export default function TestingPage() {
                               onClick={() => setSelectedTextColumn(idx)}
                               className={`rounded-lg border px-3.5 py-2 text-xs font-bold tracking-wide transition-all duration-150 ${
                                 selectedTextColumn === idx
-                                  ? "border-(--accent) bg-(--accent) text-white shadow-(--shadow-sm)"
+                                  ? "border-(--accent) bg-(--accent) text-(--bg-base) shadow-(--shadow-sm)"
                                   : "border-(--border-strong) bg-(--bg-surface) text-(--text-secondary) hover:bg-(--bg-overlay) hover:text-(--text-primary)"
                               }`}
                             >
-                              {header || `Kolom ${idx + 1}`}
+                              {header || `Column ${idx + 1}`}
                             </button>
                           ))}
                         </div>
@@ -396,7 +396,7 @@ export default function TestingPage() {
                       onClick={() => {
                         clearResults();
                       }}
-                      className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-white focus:outline-none"
+                      className="rounded-lg bg-(--error-muted) p-1 text-(--error) transition hover:bg-(--error) hover:text-(--bg-base) focus:outline-none"
                     >
                       <X size={16} />
                     </button>
@@ -406,16 +406,16 @@ export default function TestingPage() {
               <button
                 onClick={classify}
                 disabled={!canClassify}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none disabled:active:scale-100"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-3.5 text-sm font-bold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none disabled:active:scale-100"
               >
                 {isClassifying ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />{" "}
-                    Mengklasifikasikan...
+                    Classifying...
                   </>
                 ) : (
                   <>
-                    <Send size={18} /> Klasifikasikan
+                    <Send size={18} /> Classify
                   </>
                 )}
               </button>
@@ -434,10 +434,10 @@ export default function TestingPage() {
                 />
               </div>
               <p className="text-sm font-bold text-(--text-secondary)">
-                Belum ada hasil
+                No results yet
               </p>
               <p className="mx-auto mt-1.5 max-w-[200px] text-xs font-medium text-(--text-tertiary)">
-                Hasil klasifikasi teks Anda akan muncul di sini
+                Your classification results will appear here
               </p>
             </div>
           )}
@@ -449,11 +449,11 @@ export default function TestingPage() {
               />
               <p className="text-sm font-bold text-(--accent)">
                 {inputMode === "csv"
-                  ? `Mengklasifikasikan ${csvTexts.length} teks...`
-                  : "Menganalisis teks..."}
+                  ? `Classifying ${csvTexts.length} texts...`
+                  : "Analysing text..."}
               </p>
               <p className="mt-2 text-xs font-medium text-(--text-secondary)">
-                Mohon tunggu sebentar
+                Please wait a moment
               </p>
             </div>
           )}

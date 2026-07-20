@@ -31,8 +31,8 @@ export default function DatasetUploadModal() {
 
   const processFile = useCallback(async (f) => {
     const ext = f.name.split(".").pop().toLowerCase();
-    if (!["csv", "tsv", "txt", "xls", "xlsx"].includes(ext)) {
-      setPreviewError("Format harus CSV, TSV, TXT, XLS, atau XLSX");
+    if (!["csv", "xls", "xlsx"].includes(ext)) {
+      setPreviewError("Format must be CSV, XLS, or XLSX");
       setFile(null);
       setPreview(null);
       return;
@@ -48,15 +48,17 @@ export default function DatasetUploadModal() {
       // Validasi client-side
       if (result.columnCount < 2) {
         setPreviewError(
-          `Dataset harus memiliki minimal 2 kolom (ditemukan ${result.columnCount} kolom)`
+          `Dataset must have at least 2 columns (found ${result.columnCount} columns)`
         );
-      } else if (result.rowCount < 100) {
+      } else if (result.rowCount < 1500) {
         setPreviewError(
-          `Dataset harus memiliki minimal 100 baris (ditemukan ${result.rowCount} baris). Catatan: file besar mungkin dibaca sebagian untuk preview.`
+          `Dataset must have at least 1500 rows (found ${result.rowCount} rows). Note: large files might be partially read for preview.`
         );
       }
     } catch {
-      setPreviewError("Gagal membaca file. Pastikan format file benar.");
+      setPreviewError(
+        "Failed to read file. Make sure the file format is correct."
+      );
     } finally {
       setIsParsing(false);
     }
@@ -88,13 +90,13 @@ export default function DatasetUploadModal() {
 
   const validate = () => {
     const e = {};
-    if (!name.trim()) e.name = "Nama dataset harus diisi";
+    if (!name.trim()) e.name = "Dataset name is required";
     else if (name.trim().length > 255) {
-      e.name = "Nama dataset maksimal 255 karakter";
+      e.name = "Dataset name max 255 characters";
     }
-    if (!file) e.file = "File harus dipilih";
+    if (!file) e.file = "File must be selected";
     if (description.trim().length > 1000) {
-      e.description = "Deskripsi maksimal 1000 karakter";
+      e.description = "Description max 1000 characters";
     }
     if (previewError) e.file = previewError;
     return e;
@@ -122,7 +124,7 @@ export default function DatasetUploadModal() {
         toast.error(result.message);
       }
     } catch {
-      toast.error("Upload gagal. Silakan coba lagi.");
+      toast.error("Upload failed. Please try again.");
     }
   };
 
@@ -138,7 +140,7 @@ export default function DatasetUploadModal() {
           </h2>
           <button
             onClick={handleClose}
-            aria-label="Tutup modal upload dataset"
+            aria-label="Close upload dataset modal"
             className="rounded-md p-1.5 text-(--text-tertiary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary)"
           >
             <X size={18} />
@@ -150,7 +152,7 @@ export default function DatasetUploadModal() {
           {/* Nama */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-              Nama Dataset
+              Dataset Name
             </label>
             <input
               type="text"
@@ -159,7 +161,7 @@ export default function DatasetUploadModal() {
                 setName(e.target.value);
                 setErrors((p) => ({ ...p, name: undefined }));
               }}
-              placeholder="cth. Sentiment Twitter Indonesia 2024"
+              placeholder="e.g., Indonesian Twitter Sentiment 2024"
               className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
                 errors.name
                   ? "border-(--error) focus:ring-(--error-muted)"
@@ -174,15 +176,15 @@ export default function DatasetUploadModal() {
           {/* Deskripsi */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-              Deskripsi{" "}
+              Description{" "}
               <span className="font-normal text-(--text-tertiary)">
-                (opsional)
+                (optional)
               </span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Deskripsi singkat tentang dataset ini..."
+              placeholder="Brief description of this dataset..."
               rows={2}
               className="w-full resize-none rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             />
@@ -191,7 +193,7 @@ export default function DatasetUploadModal() {
           {/* Upload area */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-              File Dataset
+              Dataset File
             </label>
             {!file ? (
               <div
@@ -222,13 +224,14 @@ export default function DatasetUploadModal() {
                   <UploadCloud size={24} className="text-(--text-tertiary)" />
                 </div>
                 <p className="text-sm text-(--text-secondary)">
-                  Drag & drop atau{" "}
+                  Drag & drop or{" "}
                   <span className="font-medium text-(--accent)">
-                    klik untuk pilih file
+                    click to select file
                   </span>
                 </p>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
-                  CSV, TSV, TXT, XLS, atau XLSX — minimal 100 baris, 2 kolom
+                  CSV, XLS, or XLSX — min 1500 rows, 2 columns. Dataset name
+                  must be unique.
                 </p>
               </div>
             ) : (
@@ -274,7 +277,7 @@ export default function DatasetUploadModal() {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv,.tsv,.txt,.xls,.xlsx"
+              accept=".csv,.xls,.xlsx"
               className="hidden"
               onChange={handleFileInput}
             />
@@ -288,7 +291,7 @@ export default function DatasetUploadModal() {
             <div className="flex items-center gap-3 rounded-xl border border-(--border-default) bg-(--bg-elevated) p-4">
               <Loader2 size={18} className="animate-spin text-(--accent)" />
               <span className="text-sm font-medium text-(--text-secondary)">
-                Membaca file...
+                Reading file...
               </span>
             </div>
           )}
@@ -314,16 +317,16 @@ export default function DatasetUploadModal() {
                     previewError ? "text-(--error)" : "text-(--success)"
                   }`}
                 >
-                  {previewError ? "Validasi gagal" : "File valid"}
+                  {previewError ? "Validation failed" : "Valid file"}
                 </span>
               </div>
 
               {/* Statistik */}
               <div className="grid grid-cols-2 gap-px bg-(--border-subtle) sm:grid-cols-4">
                 {[
-                  ["Baris Data", preview.rowCount.toLocaleString("id")],
-                  ["Jumlah Kolom", preview.columnCount],
-                  ["Ukuran File", formatSize(file?.size)],
+                  ["Data Rows", preview.rowCount.toLocaleString("id")],
+                  ["Column Count", preview.columnCount],
+                  ["File Size", formatSize(file?.size)],
                   ["Format", file?.name.split(".").pop().toUpperCase()],
                 ].map(([label, value]) => (
                   <div key={label} className="bg-(--bg-surface) px-4 py-3">
@@ -341,7 +344,7 @@ export default function DatasetUploadModal() {
               {preview.columns.length > 0 && (
                 <div className="border-t border-(--border-default) px-4 py-3">
                   <p className="mb-2 text-xs font-medium text-(--text-secondary)">
-                    Kolom yang ditemukan
+                    Columns found
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {preview.columns.map((col) => (
@@ -360,7 +363,7 @@ export default function DatasetUploadModal() {
               {preview.previewRows.length > 0 && !previewError && (
                 <div className="border-t border-(--border-default)">
                   <p className="border-b border-(--border-default) bg-(--bg-elevated) px-4 py-2 text-[10px] font-semibold tracking-wider text-(--text-tertiary) uppercase">
-                    Preview 5 baris pertama
+                    Preview first 5 rows
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
@@ -409,8 +412,8 @@ export default function DatasetUploadModal() {
           {isValid && (
             <div className="rounded-md border border-(--border-default) bg-(--accent-muted) px-3 py-2.5 text-xs leading-relaxed text-(--text-secondary)">
               <span className="mr-1 font-medium text-(--accent)">Info:</span>
-              Setelah diupload, server akan menghapus baris kosong dan duplikat
-              secara otomatis, kemudian memvalidasi ulang sebelum menyimpan.
+              After upload, the server will automatically remove empty rows and
+              duplicates, then re-validate before saving.
             </div>
           )}
         </div>
@@ -423,14 +426,14 @@ export default function DatasetUploadModal() {
             disabled={isSubmitting}
             className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
           >
-            Batal
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !isValid}
-            className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isSubmitting ? "Mengupload..." : "Upload Dataset"}
+            {isSubmitting ? "Uploading..." : "Upload Dataset"}
           </button>
         </div>
       </div>

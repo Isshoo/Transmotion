@@ -35,10 +35,10 @@ export default function AdminSidebar({ onClose }) {
   return (
     <aside className="flex h-full w-64 flex-col border-r border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm) md:shadow-none">
       {/* Brand */}
-      <div className="flex h-16 shrink-0 items-center justify-between border-b border-(--border-subtle) px-5">
+      <div className="mt-2 flex h-16 shrink-0 items-center justify-between border-b border-(--border-subtle) px-5">
         <div className="flex items-center gap-3">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-(--accent) shadow-(--shadow-glow-accent)">
-            <BrainCircuit size={14} className="text-white" />
+            <BrainCircuit size={14} className="text-(--bg-base)" />
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-sm font-bold tracking-tight text-(--text-primary)">
@@ -97,7 +97,7 @@ export default function AdminSidebar({ onClose }) {
       </nav>
 
       {/* Colab Status */}
-      <div className="px-4 pb-3">
+      <div className="px-4 pb-1">
         <ColabStatusBadge />
       </div>
 

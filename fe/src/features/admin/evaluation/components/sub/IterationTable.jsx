@@ -1,5 +1,5 @@
 import { MetricCell } from "../ui/Cell";
-import { findModelsBySplit, fmtPct } from "../ui/Helpers";
+import { findModelsBySplit, fmt } from "../ui/Helpers";
 import { useRouter } from "next/navigation";
 
 const SPLITS = [
@@ -9,7 +9,12 @@ const SPLITS = [
   { label: "90:10", testSize: 0.1 },
 ];
 
-export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
+export default function IterationTable({
+  mbert,
+  xlmr,
+  metric = "accuracy",
+  raw = false,
+}) {
   const router = useRouter();
   const maxIter = SPLITS.reduce((acc, s) => {
     const xlmrCount = findModelsBySplit(xlmr, s.testSize).length;
@@ -17,10 +22,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
     return Math.max(acc, xlmrCount, mbertCount);
   }, 0);
 
-  const iterations = Array.from(
-    { length: Math.min(Math.max(maxIter, 1), 5) },
-    (_, i) => i
-  );
+  const iterations = Array.from({ length: Math.max(maxIter, 1) }, (_, i) => i);
 
   // Hitung rata-rata per split per model type
   const average = (models, testSize) => {
@@ -39,9 +41,9 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
             <tr>
               <th
                 rowSpan={2}
-                className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
+                className="sticky left-0 z-20 border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase shadow-[2px_0_4px_rgba(0,0,0,0.05)]"
               >
-                ITERASI
+                ITERATION
               </th>
               <th
                 colSpan={4}
@@ -60,7 +62,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
               {SPLITS.map((s) => (
                 <th
                   key={`xlmr-${s.label}`}
-                  className="border-r border-b border-(--border-default) bg-(--bg-surface) px-4 py-2 text-center text-[9px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase"
+                  className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-4 py-2 text-center text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase"
                 >
                   {s.label}
                 </th>
@@ -68,7 +70,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
               {SPLITS.map((s, i) => (
                 <th
                   key={`mbert-${s.label}`}
-                  className={`border-b ${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--bg-surface) px-4 py-2 text-center text-[9px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase`}
+                  className={`border-b ${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--bg-elevated) px-4 py-2 text-center text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-tertiary) uppercase`}
                 >
                   {s.label}
                 </th>
@@ -77,11 +79,8 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
           </thead>
           <tbody className="bg-(--bg-surface)">
             {iterations.map((iter) => (
-              <tr
-                key={iter}
-                className="transition-colors duration-150 hover:bg-(--bg-overlay)"
-              >
-                <td className="border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-center font-black text-(--text-primary)">
+              <tr key={iter} className="transition-colors duration-150">
+                <td className="sticky left-0 z-10 border-r border-b border-(--border-default) bg-(--bg-elevated) px-5 py-3 text-center font-black text-(--text-primary) shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                   {iter + 1}
                 </td>
                 {SPLITS.map((s) => {
@@ -101,6 +100,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                       }
                       onClick={handleClick}
                       cursor={m ? "pointer" : "default"}
+                      raw={raw}
                     />
                   );
                 })}
@@ -120,6 +120,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                       }
                       onClick={handleClick}
                       cursor={m ? "pointer" : "default"}
+                      raw={raw}
                     />
                   );
                 })}
@@ -128,7 +129,7 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
 
             {/* Baris rata-rata */}
             <tr className="bg-(--bg-elevated)">
-              <td className="border-r border-(--border-default) px-5 py-3.5 text-center text-[10px] font-black tracking-wider text-(--text-secondary) uppercase">
+              <td className="sticky left-0 z-10 border-r border-(--border-default) bg-(--bg-elevated) px-5 py-3.5 text-center text-[10px] font-black tracking-wider text-(--text-secondary) uppercase shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                 Average
               </td>
               {SPLITS.map((s) => {
@@ -136,9 +137,9 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                 return (
                   <td
                     key={`xlmr-avg-${s.label}`}
-                    className="border-r border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[11px] font-bold text-(--accent)"
+                    className="border-r border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[12px] font-bold text-(--accent)"
                   >
-                    {fmtPct(avg)}
+                    {fmt(avg, raw)}
                   </td>
                 );
               })}
@@ -147,9 +148,9 @@ export default function IterationTable({ mbert, xlmr, metric = "accuracy" }) {
                 return (
                   <td
                     key={`mbert-avg-${s.label}`}
-                    className={`${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[11px] font-bold text-(--accent)`}
+                    className={`${i !== 3 ? "border-r" : ""} border-(--border-default) bg-(--accent-muted)/10 px-4 py-3 text-center text-[12px] font-bold text-(--accent)`}
                   >
-                    {fmtPct(avg)}
+                    {fmt(avg, raw)}
                   </td>
                 );
               })}

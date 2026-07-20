@@ -9,7 +9,7 @@ const datasetsApi = {
     }),
   delete: (id) => api.delete(`/datasets/${id}`),
 
-  // Pengaturan kolom
+  // Column settings
   setColumns: (id, data) => api.put(`/datasets/${id}/columns`, data),
 
   // Raw data

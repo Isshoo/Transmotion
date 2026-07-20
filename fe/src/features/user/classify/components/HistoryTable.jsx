@@ -1,6 +1,6 @@
 // ── History table ──────────────────────────────────────────────
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, History } from "lucide-react";
 import useClassifyStore from "../store";
 
 export default function HistoryTable() {
@@ -11,25 +11,54 @@ export default function HistoryTable() {
     historyPerPage,
     isLoadingHistory,
     setHistoryPage,
+    selectedModelId,
   } = useClassifyStore();
 
   const totalPages = Math.ceil(historyTotal / historyPerPage);
   const from = historyTotal === 0 ? 0 : (historyPage - 1) * historyPerPage + 1;
   const to = Math.min(historyPage * historyPerPage, historyTotal);
 
-  if (historyTotal === 0) return null;
+  // If no model is selected, show empty state
+  if (selectedModelId === "") {
+    return (
+      <div className="animate-fade-in flex flex-col items-center justify-center py-12 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
+          <History size={32} className="text-(--text-tertiary)" />
+        </div>
+        <p className="text-base font-bold text-(--text-secondary)">
+          No model selected
+        </p>
+        <p className="mt-1.5 text-sm text-(--text-tertiary)">
+          Please select a model to view classification history
+        </p>
+      </div>
+    );
+  }
+
+  if (!isLoadingHistory && historyTotal === 0 && selectedModelId) {
+    return (
+      <div className="animate-fade-in flex flex-col items-center justify-center py-12 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--bg-elevated)">
+          <History size={32} className="text-(--text-tertiary)" />
+        </div>
+        <p className="text-base font-bold text-(--text-secondary)">
+          No history yet
+        </p>
+        <p className="mt-1.5 text-sm text-(--text-tertiary)">
+          Your model classification history will appear here.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-slide-up">
-      <h3 className="mb-4 text-sm font-bold tracking-tight text-(--text-primary)">
-        Riwayat Klasifikasi
-      </h3>
+    <div className="animate-fade-in">
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["No", "Teks", "Prediksi", "Confidence", "Waktu"].map((h) => (
+                {["No", "Text", "Prediction", "Confidence", "Time"].map((h) => (
                   <th
                     key={h}
                     className="px-5 py-3.5 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
@@ -60,7 +89,10 @@ export default function HistoryTable() {
                           {(historyPage - 1) * historyPerPage + index + 1}
                         </span>
                       </td>
-                      <td className="max-w-[280px] px-5 py-3.5">
+                      <td
+                        className="max-w-[280px] px-5 py-3.5"
+                        title={item.input_text}
+                      >
                         <span className="line-clamp-2 text-[13px] leading-relaxed font-medium text-(--text-primary)">
                           {item.input_text}
                         </span>
@@ -105,7 +137,7 @@ export default function HistoryTable() {
         {historyTotal > historyPerPage && (
           <div className="flex items-center justify-between border-t border-(--border-default) bg-(--bg-elevated) px-5 py-3">
             <p className="text-[11px] font-medium tracking-wide text-(--text-tertiary)">
-              {from}–{to} dari {historyTotal}
+              {from}–{to} of {historyTotal}
             </p>
             <div className="flex items-center gap-1.5">
               <button

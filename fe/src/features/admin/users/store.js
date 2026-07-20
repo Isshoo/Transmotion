@@ -105,7 +105,7 @@ const useUsersStore = create((set, get) => ({
     set({ isSubmitting: true });
     try {
       const { data: res } = await usersApi.delete(id);
-      // Kalau hapus user terakhir di halaman ini, mundur satu halaman
+      // If deleting the last user on this page, go back one page
       const { page, users } = get();
       const nextPage = users.length === 1 && page > 1 ? page - 1 : page;
       set({ page: nextPage });

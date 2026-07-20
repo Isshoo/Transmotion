@@ -10,13 +10,13 @@ import {
   ChevronRight,
   Plus,
   Play,
-  Loader2,
   Server,
   MessageSquareText,
   Trophy,
   Star,
   BarChart3,
   LayoutDashboard,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import dashboardApi from "./api";
@@ -32,7 +32,7 @@ export default function DashboardPage() {
         const res = await dashboardApi.getStats();
         setData(res.data.data);
       } catch (error) {
-        toast.error("Gagal memuat statistik dashboard");
+        toast.error("Failed to load dashboard statistics");
         console.error(error);
       } finally {
         setLoading(false);
@@ -43,16 +43,82 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-(--border-default) bg-(--bg-surface)">
-        <div className="flex flex-col items-center gap-3 text-(--text-tertiary)">
-          <Loader2 className="h-8 w-8 animate-spin text-(--accent)" />
-          <p className="text-sm font-medium">Memuat Dashboard...</p>
+      <div className="animate-pulse space-y-6 pb-5">
+        {/* Header Skeleton */}
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <div className="mb-2 h-7 w-48 rounded-md bg-(--bg-elevated)" />
+            <div className="h-4 w-72 rounded-md bg-(--bg-elevated)" />
+          </div>
+          <div className="h-10 w-48 rounded-full bg-(--bg-elevated)" />
+        </div>
+
+        {/* Stats Grid Skeleton */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-28 rounded-xl bg-(--bg-elevated)" />
+          ))}
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Left Column Skeleton */}
+          <div className="space-y-6 lg:col-span-2">
+            <div className="h-48 rounded-xl bg-(--bg-elevated)" />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="h-36 rounded-xl bg-(--bg-elevated)" />
+              <div className="h-36 rounded-xl bg-(--bg-elevated)" />
+            </div>
+          </div>
+          {/* Right Column Skeleton */}
+          <div className="space-y-6">
+            <div className="h-48 rounded-xl bg-(--bg-elevated)" />
+            <div className="h-64 rounded-xl bg-(--bg-elevated)" />
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="animate-fade-in space-y-6 pb-5">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-(--text-primary)">
+              <LayoutDashboard size={20} className="text-(--accent)" />
+              Overview
+            </h1>
+            <p className="mt-1 text-sm text-(--text-secondary)">
+              Summary of Transmotion system activities and metrics.
+            </p>
+          </div>
+          <div className="flex w-48 items-center gap-3">
+            <ColabStatusBadge />
+          </div>
+        </div>
+
+        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-red-500/20 bg-red-500/5 p-8 text-center">
+          <div className="mb-4 rounded-full bg-red-500/10 p-4 text-red-500">
+            <AlertCircle size={40} />
+          </div>
+          <h3 className="mb-2 text-xl font-semibold text-(--text-primary)">
+            Failed to Load Dashboard
+          </h3>
+          <p className="max-w-md text-sm text-(--text-secondary)">
+            Unable to load statistical data. This might happen because the
+            backend is not responding or there is a network issue.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="hover:bg-opacity-90 mt-6 flex items-center gap-2 rounded-lg bg-(--accent) px-5 py-2.5 text-sm font-medium text-white transition-all active:scale-95"
+          >
+            Try Reloading
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const {
     model_comparison,
@@ -75,7 +141,7 @@ export default function DashboardPage() {
             Overview
           </h1>
           <p className="mt-1 text-sm text-(--text-secondary)">
-            Ringkasan aktivitas dan metrik sistem Transmotion.
+            Summary of Transmotion system activities and metrics.
           </p>
         </div>
         <div className="flex w-48 items-center gap-3">
@@ -86,28 +152,28 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         <StatCard
-          title="Total Pengguna"
+          title="Total Users"
           value={data.totals.users}
           icon={Users}
           color="text-(--data-2)"
           bg="bg-(--data-2)/10"
         />
         <StatCard
-          title="Total Dataset"
+          title="Total Datasets"
           value={data.totals.datasets}
           icon={Database}
           color="text-(--data-1)"
           bg="bg-(--data-1)/10"
         />
         <StatCard
-          title="Model Dilatih"
+          title="Trained Models"
           value={data.totals.models}
           icon={BrainCircuit}
           color="text-(--data-7)"
           bg="bg-(--data-7)/10"
         />
         <StatCard
-          title="Total Prediksi"
+          title="Total Predictions"
           value={data.totals.predictions}
           icon={MessageSquareText}
           color="text-(--data-5)"
@@ -127,46 +193,41 @@ export default function DashboardPage() {
         {/* Left Column */}
         <div className="space-y-6 lg:col-span-2">
           {/* mBERT vs XLM-R Comparison */}
-          {(mbertCount > 0 || xlmrCount > 0) && (
-            <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-sm">
-              <div className="flex items-center justify-between border-b border-(--border-default) px-5 py-4">
-                <h2 className="font-medium text-(--text-primary)">
-                  <BarChart3
-                    size={16}
-                    className="mr-2 inline text-(--accent)"
-                  />
-                  Perbandingan mBERT vs XLM-R
-                </h2>
-              </div>
-              <div className="grid grid-cols-2 divide-x divide-(--border-default)">
-                <ModelTypeColumn
-                  label="mBERT"
-                  count={mbertCount}
-                  avgF1={mbertF1}
-                  color="text-(--data-2)"
-                  bgBar="bg-(--data-2)"
-                  total={mbertCount + xlmrCount}
-                />
-                <ModelTypeColumn
-                  label="XLM-R"
-                  count={xlmrCount}
-                  avgF1={xlmrF1}
-                  color="text-(--data-7)"
-                  bgBar="bg-(--data-7)"
-                  total={mbertCount + xlmrCount}
-                />
-              </div>
+          <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-sm">
+            <div className="flex items-center justify-between border-b border-(--border-default) px-5 py-4">
+              <h2 className="font-medium text-(--text-primary)">
+                <BarChart3 size={16} className="mr-2 inline text-(--accent)" />
+                mBERT vs XLM-R Comparison
+              </h2>
             </div>
-          )}
+            <div className="grid grid-cols-2 divide-x divide-(--border-default)">
+              <ModelTypeColumn
+                label="mBERT"
+                count={mbertCount}
+                avgF1={mbertF1}
+                color="text-(--data-2)"
+                bgBar="bg-(--data-2)"
+                total={mbertCount + xlmrCount}
+              />
+              <ModelTypeColumn
+                label="XLM-R"
+                count={xlmrCount}
+                avgF1={xlmrF1}
+                color="text-(--data-7)"
+                bgBar="bg-(--data-7)"
+                total={mbertCount + xlmrCount}
+              />
+            </div>
+          </div>
 
           {/* Best Model & Most Used */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {best_model && (
+            {best_model ? (
               <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
                   <Trophy size={16} className="text-(--warning)" />
                   <p className="text-xs font-semibold tracking-wider uppercase">
-                    Model Terbaik (F1)
+                    Best Model (F1)
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-(--text-primary)">
@@ -181,17 +242,27 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
-                  {best_model.model_type.toUpperCase()} · Akurasi{" "}
+                  {best_model.model_type.toUpperCase()} · Accuracy{" "}
                   {(best_model.accuracy * 100).toFixed(1)}%
                 </p>
               </div>
+            ) : (
+              <div className="flex min-h-[140px] flex-col items-center justify-center rounded-xl border border-dashed border-(--border-default) bg-(--bg-surface)/50 p-5 text-center shadow-sm">
+                <Trophy size={24} className="mb-2 text-(--text-tertiary)" />
+                <p className="text-sm font-medium text-(--text-secondary)">
+                  No Best Model Yet
+                </p>
+                <p className="mt-1 text-xs text-(--text-tertiary)">
+                  Train a model to see statistics
+                </p>
+              </div>
             )}
-            {most_used_model && (
+            {most_used_model ? (
               <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
                 <div className="mb-3 flex items-center gap-2 text-(--text-secondary)">
                   <Star size={16} className="text-(--data-5)" />
                   <p className="text-xs font-semibold tracking-wider uppercase">
-                    Paling Banyak Digunakan
+                    Most Used
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-(--text-primary)">
@@ -202,11 +273,21 @@ export default function DashboardPage() {
                     {most_used_model.prediction_count.toLocaleString("id-ID")}
                   </span>
                   <span className="text-xs text-(--text-tertiary)">
-                    prediksi
+                    predictions
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-(--text-tertiary)">
                   {most_used_model.model_type.toUpperCase()}
+                </p>
+              </div>
+            ) : (
+              <div className="flex min-h-[140px] flex-col items-center justify-center rounded-xl border border-dashed border-(--border-default) bg-(--bg-surface)/50 p-5 text-center shadow-sm">
+                <Star size={24} className="mb-2 text-(--text-tertiary)" />
+                <p className="text-sm font-medium text-(--text-secondary)">
+                  No Most Used Model
+                </p>
+                <p className="mt-1 text-xs text-(--text-tertiary)">
+                  Make predictions to see statistics
                 </p>
               </div>
             )}
@@ -269,7 +350,7 @@ export default function DashboardPage() {
             <div className="p-0">
               {data.recent_models.length === 0 ? (
                 <div className="p-8 text-center text-sm text-(--text-tertiary)">
-                  Belum ada model yang dilatih.
+                  No models trained yet.
                 </div>
               ) : (
                 <div className="divide-y divide-(--border-default)">
@@ -325,7 +406,7 @@ export default function DashboardPage() {
             <div className="p-0">
               {data.recent_datasets.length === 0 ? (
                 <div className="p-8 text-center text-sm text-(--text-tertiary)">
-                  Belum ada dataset.
+                  No datasets yet.
                 </div>
               ) : (
                 <div className="divide-y divide-(--border-default)">
@@ -369,7 +450,7 @@ export default function DashboardPage() {
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-(--accent)"></span>
                 </div>
                 <h2 className="font-semibold text-(--accent)">
-                  Training Sedang Berjalan
+                  Training in Progress
                 </h2>
               </div>
               <div className="space-y-3">
@@ -390,7 +471,7 @@ export default function DashboardPage() {
                       href="/admin/training"
                       className="flex items-center justify-end gap-1 text-xs font-medium text-(--accent) hover:underline"
                     >
-                      Lihat Progress <ChevronRight size={14} />
+                      View Progress <ChevronRight size={14} />
                     </Link>
                   </div>
                 ))}
@@ -399,7 +480,7 @@ export default function DashboardPage() {
           )}
           <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-sm">
             <h2 className="mb-4 font-medium text-(--text-primary)">
-              Aksi Cepat
+              Quick Actions
             </h2>
             <div className="space-y-3">
               <Link href="/admin/datasets">
@@ -412,7 +493,7 @@ export default function DashboardPage() {
                       Upload Dataset
                     </p>
                     <p className="text-xs text-(--text-tertiary)">
-                      Tambahkan data baru
+                      Add new data
                     </p>
                   </div>
                 </div>
@@ -425,10 +506,10 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-(--text-primary) group-hover:text-(--accent)">
-                        Mulai Training
+                        Start Training
                       </p>
                       <p className="text-xs text-(--text-tertiary)">
-                        Latih model mBERT/XLM-R
+                        Train mBERT/XLM-R model
                       </p>
                     </div>
                   </div>
@@ -441,10 +522,10 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-(--text-primary) group-hover:text-(--accent)">
-                      Uji Model
+                      Test Model
                     </p>
                     <p className="text-xs text-(--text-tertiary)">
-                      Testing & Evaluasi
+                      Testing & Evaluation
                     </p>
                   </div>
                 </div>
@@ -491,10 +572,12 @@ function ModelTypeColumn({ label, count, avgF1, color, bgBar, total }) {
           model ({pct}%)
         </span>
       </p>
-      {avgF1 != null && (
+      {avgF1 != null ? (
         <p className="mt-1 text-xs text-(--text-secondary)">
-          Rata-rata F1: {(avgF1 * 100).toFixed(1)}%
+          Average F1: {(avgF1 * 100).toFixed(1)}%
         </p>
+      ) : (
+        <p className="mt-1 text-xs text-(--text-tertiary)">Average F1: —</p>
       )}
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-(--bg-elevated)">
         <div

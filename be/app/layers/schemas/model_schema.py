@@ -4,7 +4,7 @@ from marshmallow import Schema, fields, validate
 
 
 class UpdateTrainedModelSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     name = fields.String(validate=validate.Length(min=1, max=255))
     description = fields.String(validate=validate.Length(max=1000))
     is_active = fields.Boolean()
@@ -12,9 +12,11 @@ class UpdateTrainedModelSchema(Schema):
 
 
 class ModelListQuerySchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+    search = fields.String(load_default=None, validate=validate.Length(max=100))
+    dataset_id = fields.String(load_default=None)
     model_type = fields.String(validate=validate.OneOf(["mbert", "xlmr"]))
     is_active = fields.Boolean()
     is_public = fields.Boolean()
@@ -29,20 +31,20 @@ class ModelListQuerySchema(Schema):
 
 
 class ClassifyTextSchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     text = fields.String(
         required=True,
         validate=validate.Length(min=1, max=5000),
-        error_messages={"required": "Teks harus diisi"},
+        error_messages={"required": "Text is required"},
     )
     model_id = fields.String(
         required=True,
-        error_messages={"required": "Model harus dipilih"},
+        error_messages={"required": "Model must be selected"},
     )
 
 
 class PredictionListQuerySchema(Schema):
-    error_messages = {"unknown": "Kolom tidak dikenal"}
+    error_messages = {"unknown": "Unknown field"}
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
     model_id = fields.String()

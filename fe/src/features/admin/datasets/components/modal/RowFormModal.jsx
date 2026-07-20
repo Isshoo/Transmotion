@@ -1,4 +1,4 @@
-// ── Modal Tambah/Edit Row ──────────────────────────────────────
+// ── Add/Edit Row Modal ──────────────────────────────────────
 
 import { X } from "lucide-react";
 import useDatasetStore from "../../store";
@@ -18,18 +18,32 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
   });
   const [errors, setErrors] = useState({});
 
-  const validate = () => {
+  const addValidate = () => {
     const e = {};
-    if (!form.raw_text.trim()) e.raw_text = "Teks asli harus diisi";
+    if (!form.raw_text.trim()) e.raw_text = "Raw text is required";
+    if (form.raw_text.trim().split(" ").length < 5)
+      e.raw_text = "Raw text must be at least 5 words";
+    if (form.raw_text.trim().length < 10)
+      e.raw_text = "Raw text must be at least 10 characters";
+    if (!form.label) e.label = "Label is required";
+    return e;
+  };
+
+  const editValidate = () => {
+    const e = {};
     if (!form.preprocessed_text.trim())
-      e.preprocessed_text = "Teks preprocessed harus diisi";
-    if (!form.label) e.label = "Label harus dipilih";
+      e.preprocessed_text = "Preprocessed text is required";
+    if (form.preprocessed_text.trim().split(" ").length < 5)
+      e.preprocessed_text = "Preprocessed text must be at least 5 words";
+    if (form.preprocessed_text.trim().length < 10)
+      e.preprocessed_text = "Preprocessed text must be at least 10 characters";
+    if (!form.label) e.label = "Label is required";
     return e;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
+    const errs = isEdit ? editValidate() : addValidate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -42,7 +56,6 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
         })
       : await addPreprocessedRow(datasetId, {
           raw_text: form.raw_text.trim(),
-          preprocessed_text: form.preprocessed_text.trim(),
           label: form.label,
         });
 
@@ -59,7 +72,7 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
       <div className="animate-scale-in w-full max-w-lg rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-xl)">
         <div className="flex items-center justify-between rounded-t-xl border-b border-(--border-default) bg-(--bg-elevated) px-6 py-4">
           <h2 className="text-base font-semibold tracking-tight text-(--text-primary)">
-            {isEdit ? "Edit Data" : "Tambah Data"}
+            {isEdit ? "Edit Data" : "Add Data"}
           </h2>
           <button
             onClick={onClose}
@@ -70,11 +83,11 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
-          {/* Raw text (hanya saat tambah) */}
-          {!isEdit && (
+          {/* Raw text (only when adding) */}
+          {!isEdit ? (
             <div>
               <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-                Teks Asli
+                Raw Text
               </label>
               <textarea
                 value={form.raw_text}
@@ -83,7 +96,7 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                   setErrors((p) => ({ ...p, raw_text: undefined }));
                 }}
                 rows={2}
-                placeholder="Teks sebelum preprocessing..."
+                placeholder="Text before preprocessing..."
                 className={`min-h-[100px] w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
                   errors.raw_text
                     ? "border-(--error) focus:ring-(--error-muted)"
@@ -96,33 +109,32 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                 </p>
               )}
             </div>
+          ) : (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
+                Preprocessed Text
+              </label>
+              <textarea
+                value={form.preprocessed_text}
+                onChange={(e) => {
+                  setForm((p) => ({ ...p, preprocessed_text: e.target.value }));
+                  setErrors((p) => ({ ...p, preprocessed_text: undefined }));
+                }}
+                rows={2}
+                placeholder="Text after preprocessing..."
+                className={`min-h-[100px] w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
+                  errors.preprocessed_text
+                    ? "border-(--error) focus:ring-(--error-muted)"
+                    : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
+                }`}
+              />
+              {errors.preprocessed_text && (
+                <p className="mt-1.5 text-xs text-(--error)">
+                  {errors.preprocessed_text}
+                </p>
+              )}
+            </div>
           )}
-
-          {/* Preprocessed text */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-              Teks Preprocessed
-            </label>
-            <textarea
-              value={form.preprocessed_text}
-              onChange={(e) => {
-                setForm((p) => ({ ...p, preprocessed_text: e.target.value }));
-                setErrors((p) => ({ ...p, preprocessed_text: undefined }));
-              }}
-              rows={2}
-              placeholder="Teks setelah preprocessing..."
-              className={`min-h-[100px] w-full resize-none rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
-                errors.preprocessed_text
-                  ? "border-(--error) focus:ring-(--error-muted)"
-                  : "border-(--border-default) focus:border-(--accent) focus:ring-(--accent-muted)"
-              }`}
-            />
-            {errors.preprocessed_text && (
-              <p className="mt-1.5 text-xs text-(--error)">
-                {errors.preprocessed_text}
-              </p>
-            )}
-          </div>
 
           {/* Label */}
           <div>
@@ -156,7 +168,7 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
                   setForm((p) => ({ ...p, label: e.target.value }));
                   setErrors((p) => ({ ...p, label: undefined }));
                 }}
-                placeholder="Nama label..."
+                placeholder="Label name..."
                 className={`w-full rounded-md border bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:ring-2 ${
                   errors.label
                     ? "border-(--error) focus:ring-(--error-muted)"
@@ -176,18 +188,18 @@ export default function RowFormModal({ datasetId, dataset, editRow, onClose }) {
               disabled={isSubmitting}
               className="rounded-md border border-(--border-default) px-4 py-2 text-sm font-medium text-(--text-secondary) transition-all duration-150 hover:border-(--border-strong) hover:bg-(--bg-overlay) hover:text-(--text-primary) disabled:opacity-50"
             >
-              Batal
+              Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:opacity-50"
+              className="rounded-md bg-(--accent) px-4 py-2 text-sm font-medium text-(--bg-base) transition-all duration-150 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:opacity-50"
             >
               {isSubmitting
-                ? "Menyimpan..."
+                ? "Saving..."
                 : isEdit
-                  ? "Simpan Perubahan"
-                  : "Tambah Data"}
+                  ? "Save Changes"
+                  : "Add Data"}
             </button>
           </div>
         </form>

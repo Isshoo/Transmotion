@@ -29,17 +29,17 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="animate-scale-in mx-auto mt-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
+    <div className="animate-scale-in mx-auto my-10 w-full max-w-md rounded-2xl border border-(--border-default) bg-(--bg-elevated) p-8 shadow-(--shadow-md)">
       <h1 className="mb-2 text-3xl font-black tracking-tight text-(--text-primary)">
-        Masuk
+        Login
       </h1>
       <p className="mb-6 text-sm font-medium text-(--text-secondary)">
-        Belum punya akun?{" "}
+        Don&apos;t have an account?{" "}
         <Link
           href="/register"
           className="font-bold text-(--accent) hover:underline"
         >
-          Daftar di sini
+          Register here
         </Link>
       </p>
 
@@ -50,7 +50,7 @@ export default function LoginForm() {
       <div className="my-6 flex items-center gap-4">
         <div className="h-px flex-1 bg-(--border-subtle)" />
         <span className="text-[10px] font-bold tracking-wider text-(--text-tertiary) uppercase">
-          atau masuk dengan email
+          or login with email
         </span>
         <div className="h-px flex-1 bg-(--border-subtle)" />
       </div>
@@ -86,7 +86,7 @@ export default function LoginForm() {
               href="/forgot-password"
               className="text-[11px] font-bold text-(--accent) hover:underline"
             >
-              Lupa password?
+              Forgot password?
             </Link>
           </div>
           <input
@@ -103,9 +103,9 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-white shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-(--accent) py-3 text-sm font-bold tracking-wide text-(--bg-base) shadow-(--shadow-md) transition-all hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Memproses..." : "Masuk"}
+          {loading ? "Processing..." : "Login"}
         </button>
       </form>
     </div>

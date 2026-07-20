@@ -17,7 +17,7 @@ export default function ResultView() {
     const h = Math.floor(secs / 3600);
     const m = Math.floor((secs % 3600) / 60);
     const s = secs % 60;
-    return h > 0 ? `${h}j ${m}m ${s}s` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+    return h > 0 ? `${h}h ${m}m ${s}s` : m > 0 ? `${m}m ${s}s` : `${s}s`;
   };
 
   return (
@@ -52,10 +52,10 @@ export default function ResultView() {
                 }`}
               >
                 {isSuccess
-                  ? "Training Selesai!"
+                  ? "Training Complete!"
                   : isFailed
-                    ? "Training Gagal"
-                    : "Training Dibatalkan"}
+                    ? "Training Failed"
+                    : "Training Cancelled"}
               </p>
             </div>
             <p
@@ -83,6 +83,12 @@ export default function ResultView() {
                   Dataset{" "}
                   <strong className="text-(--text-primary)">
                     {job.dataset_name}
+                    {job.split_info &&
+                      " (" +
+                        ((1 - job.split_info.test_size) * 100).toFixed(0) +
+                        ":" +
+                        (job.split_info.test_size * 100).toFixed(0) +
+                        ")"}
                   </strong>
                 </span>
               )}
@@ -96,7 +102,7 @@ export default function ResultView() {
               )}
               {job.duration_seconds && (
                 <span className="flex items-center gap-1.5">
-                  Durasi{" "}
+                  Duration{" "}
                   <strong className="text-(--text-primary)">
                     {formatDur(job.duration_seconds)}
                   </strong>
@@ -113,25 +119,25 @@ export default function ResultView() {
             )}
           </div>
 
-          {/* Tombol train baru */}
+          {/* New train button */}
           <button
             onClick={resetToForm}
-            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-(--accent) px-5 py-2.5 text-sm font-semibold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.98]"
           >
             <RotateCcw size={16} />
-            Training Baru
+            New Training
           </button>
         </div>
       </div>
 
-      {/* Hasil evaluasi — hanya jika selesai */}
+      {/* Evaluation results — only if completed */}
       {isSuccess && <EvaluationResults job={job} />}
 
-      {/* Log epoch yang sempat masuk (untuk cancelled/failed) */}
+      {/* Partial Epoch Logs */}
       {!isSuccess && job.epoch_logs?.length > 0 && (
         <div className="animate-fade-in rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
           <p className="mb-4 text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-            Log Epoch (Parsial)
+            Partial Epoch Logs
           </p>
           <div className="overflow-x-auto rounded-lg border border-(--border-subtle)">
             <table className="w-full text-xs">
@@ -139,10 +145,11 @@ export default function ResultView() {
                 <tr className="border-b border-(--border-subtle) bg-(--bg-elevated)">
                   {[
                     "Epoch",
-                    "Train Loss",
-                    "Val Loss",
-                    "Val Accuracy",
-                    "Val F1",
+                    "Loss",
+                    "Accuracy",
+                    "Precision",
+                    "Recall",
+                    "F1-Score",
                   ].map((h) => (
                     <th
                       key={h}
@@ -163,14 +170,21 @@ export default function ResultView() {
                       {log.epoch}
                     </td>
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
-                      {log.train_loss?.toFixed(4) ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_loss?.toFixed(4) ?? "—"}
                     </td>
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
                       {log.val_accuracy !== null
                         ? `${(log.val_accuracy * 100).toFixed(2)}%`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                      {log.val_precision !== null
+                        ? `${(log.val_precision * 100).toFixed(2)}%`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                      {log.val_recall !== null
+                        ? `${(log.val_recall * 100).toFixed(2)}%`
                         : "—"}
                     </td>
                     <td className="px-4 py-3 font-mono text-(--text-secondary)">
@@ -181,6 +195,51 @@ export default function ResultView() {
                   </tr>
                 ))}
               </tbody>
+              {(() => {
+                const calcAvg = (key) => {
+                  const valid = job.epoch_logs.filter(
+                    (log) => log[key] != null
+                  );
+                  if (valid.length === 0) return null;
+                  return (
+                    valid.reduce((acc, log) => acc + log[key], 0) / valid.length
+                  );
+                };
+                const avgAcc = calcAvg("val_accuracy");
+                const avgPre = calcAvg("val_precision");
+                const avgRec = calcAvg("val_recall");
+                const avgF1 = calcAvg("val_f1");
+                return (
+                  <tfoot className="border-t border-(--border-subtle) bg-(--accent-muted)/10">
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-(--text-primary)">
+                        Average
+                      </td>
+                      <td className="px-4 py-3 font-mono text-(--text-secondary)">
+                        —
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgAcc !== null
+                          ? `${(avgAcc * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgPre !== null
+                          ? `${(avgPre * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgRec !== null
+                          ? `${(avgRec * 100).toFixed(2)}%`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono font-semibold text-(--text-primary)">
+                        {avgF1 !== null ? `${(avgF1 * 100).toFixed(2)}%` : "—"}
+                      </td>
+                    </tr>
+                  </tfoot>
+                );
+              })()}
             </table>
           </div>
         </div>

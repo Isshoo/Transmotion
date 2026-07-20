@@ -43,7 +43,7 @@ export default function GuestRoute({ children }) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-sm text-(--text-tertiary)">
-          Mengalihkan ke halaman utama...
+          Redirecting to the main page...
         </p>
       </div>
     );

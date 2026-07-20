@@ -37,8 +37,8 @@ let totalReplacements = 0;
 
 files.forEach((file) => {
   const content = fs.readFileSync(file, "utf8");
-  // Mencari pola seperti -(--nama-variabel)
-  // dan menggantinya menjadi -(--nama-variabel)
+  // Find patterns like -(--variable-name)
+  // and replace them with -(--variable-name)
   let count = 0;
   const newContent = content.replace(
     /-\[var\((--[a-zA-Z0-9_-]+)\)\]/g,
@@ -57,5 +57,5 @@ files.forEach((file) => {
 
 // eslint-disable-next-line no-console
 console.log(
-  `Berhasil memperbarui ${updatedFilesCount} file dengan total ${totalReplacements} penggantian.`
+  `Successfully updated ${updatedFilesCount} files with a total of ${totalReplacements} replacements.`
 );

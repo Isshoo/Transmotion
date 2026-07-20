@@ -18,3 +18,193 @@
   /* Shadow */
   --shadow-glow-accent: 0 0 12px rgba(16, 185, 129, 0.35);
 }
+
+/* ── InfoPopup dialog ──────────────────────────────── */
+.info-popup-dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: min(680px, calc(100vw - 2rem));
+  width: 100%;
+  border-radius: var(--radius-xl);
+  overflow: visible;
+  margin: auto;
+  position: fixed;
+  inset: 0;
+}
+
+.info-popup-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.info-popup-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: min(82vh, 640px);
+  overflow: hidden;
+}
+
+.info-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  flex-shrink: 0;
+}
+
+.info-popup-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-popup-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-muted);
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.info-popup-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.info-popup-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-base),
+    color var(--transition-base);
+}
+
+.info-popup-close:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+}
+
+.info-popup-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+}
+
+/* Info popup inner styles */
+.info-popup-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.info-popup-body th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.info-popup-body td {
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  line-height: 1.5;
+  font-size: 0.75rem;
+}
+
+.info-popup-body tr:last-child td {
+  border-bottom: none;
+}
+
+.info-popup-body tr:hover td {
+  background: var(--bg-overlay);
+}
+
+.info-popup-body .param-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.info-popup-body .param-desc {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.info-popup-body .param-default {
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: var(--accent);
+  background: var(--accent-muted);
+  border: 1px solid var(--accent-border);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  white-space: nowrap;
+}
+
+.info-popup-body .tip-box {
+  margin-top: 1rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-md);
+  background: var(--accent-muted);
+  border: 1px solid var(--border-default);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.info-popup-section-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Model comparison table coloring */
+.info-popup-body .col-mbert {
+  color: var(--data-1);
+  font-weight: 700;
+}
+.info-popup-body .col-xlmr {
+  color: var(--data-4);
+  font-weight: 700;
+}

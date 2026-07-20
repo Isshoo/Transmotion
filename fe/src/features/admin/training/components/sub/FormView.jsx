@@ -9,21 +9,31 @@ import {
   Send,
 } from "lucide-react";
 import SplitPreviewCard from "../SplitPreviewCard";
+import InfoPopup from "@/components/ui/InfoPopup";
+import { MODEL_ARCH_INFO, HYPERPARAM_INFO } from "@/components/ui/InfoContents";
 
 const MODEL_OPTIONS = [
   {
     value: "mbert",
     label: "mBERT",
     badge: "bg-(--data-1)/20 text-(--data-1) border border-(--data-1)/30",
-    desc: "bert-base-multilingual-cased — cocok untuk dataset multibahasa",
+    desc: "bert-base-multilingual-cased — suitable for multilingual datasets",
   },
   {
     value: "xlmr",
     label: "XLM-R",
     badge: "bg-(--data-4)/20 text-(--data-4) border border-(--data-4)/30",
-    desc: "xlm-roberta-base — performa lebih baik untuk Bahasa Indonesia",
+    desc: "xlm-roberta-base — better performance for Indonesian",
   },
 ];
+
+// const learningRates = [
+//   { value: 1e-5, label: "1e-5" },
+//   { value: 2e-5, label: "2e-5" },
+//   { value: 3e-5, label: "3e-5" },
+//   { value: 4e-5, label: "4e-5" },
+//   { value: 5e-5, label: "5e-5" },
+// ];
 
 export default function FormView() {
   const {
@@ -62,13 +72,13 @@ export default function FormView() {
 
   return (
     <div className="space-y-6">
-      {/* ── Step 1: Pilih Dataset ────────────────────────────── */}
+      {/* ── Step 1: Select Dataset ────────────────────────────── */}
       <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
         <p className="mb-1 text-sm font-semibold tracking-tight text-(--text-primary)">
-          Pilih Dataset
+          Select Dataset
         </p>
         <p className="mb-4 text-xs text-(--text-secondary)">
-          Hanya dataset yang sudah dipreprocess yang ditampilkan.
+          Only preprocessed datasets are shown.
         </p>
 
         {isLoadingDatasets ? (
@@ -77,8 +87,7 @@ export default function FormView() {
           </div>
         ) : datasets.length === 0 ? (
           <div className="rounded-lg border border-(--warning-muted) bg-(--warning-muted) px-4 py-3 text-sm text-(--warning) opacity-90">
-            Belum ada dataset yang siap. Lakukan preprocessing dataset terlebih
-            dahulu.
+            No datasets are ready yet. Please preprocess a dataset first.
           </div>
         ) : (
           <div className="relative">
@@ -102,7 +111,7 @@ export default function FormView() {
                         "id"
                       )}
                     </span>{" "}
-                    baris ·{" "}
+                    rows ·{" "}
                     <span className="font-medium text-(--text-primary)">
                       {
                         Object.keys(
@@ -110,7 +119,7 @@ export default function FormView() {
                         ).length
                       }
                     </span>{" "}
-                    kelas · {selectedDataset.text_column} →{" "}
+                    classes · {selectedDataset.text_column} →{" "}
                     <span className="font-medium text-(--accent)">
                       {selectedDataset.label_column}
                     </span>
@@ -118,7 +127,7 @@ export default function FormView() {
                 </div>
               ) : (
                 <span className="text-sm text-(--text-tertiary)">
-                  Pilih dataset...
+                  Select a dataset...
                 </span>
               )}
               <ChevronDown
@@ -164,7 +173,7 @@ export default function FormView() {
                           <span className="font-medium text-(--text-secondary)">
                             {ds.num_rows_preprocessed?.toLocaleString("id")}
                           </span>{" "}
-                          baris
+                          rows
                         </span>
                         <span>·</span>
                         <span>
@@ -175,7 +184,7 @@ export default function FormView() {
                               ).length
                             }
                           </span>{" "}
-                          kelas
+                          classes
                         </span>
                       </div>
                     </button>
@@ -191,14 +200,14 @@ export default function FormView() {
       {selectedDatasetId && (
         <div className="animate-fade-in rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
           <p className="mb-1 text-sm font-semibold tracking-tight text-(--text-primary)">
-            Pembagian Data{" "}
+            Data Split{" "}
             <span className="font-normal text-(--text-tertiary)">
               (Train / Validation / Test)
             </span>
           </p>
           <p className="mb-5 text-xs text-(--text-secondary)">
-            Data dibagi 3: train untuk pelatihan, validation untuk monitoring
-            per epoch, test untuk evaluasi akhir.
+            Data is split into 3: train for training, validation for per-epoch
+            monitoring, test for final evaluation.
           </p>
 
           <div className="mb-6 space-y-5 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
@@ -214,9 +223,9 @@ export default function FormView() {
               </div>
               <input
                 type="range"
-                min="5"
+                min="10"
                 max="40"
-                step="5"
+                step="10"
                 value={Math.round(testSize * 100)}
                 onChange={(e) => setTestSize(e.target.value / 100)}
                 className="w-full cursor-pointer accent-(--warning)"
@@ -236,7 +245,7 @@ export default function FormView() {
               <input
                 type="range"
                 min="5"
-                max="30"
+                max="10"
                 step="5"
                 value={Math.round(evalSize * 100)}
                 onChange={(e) => setEvalSize(e.target.value / 100)}
@@ -259,7 +268,7 @@ export default function FormView() {
                   ].map(([pct, color, label]) => (
                     <div
                       key={label}
-                      className={`${color} flex items-center justify-center text-[9px] font-bold text-white transition-all duration-300`}
+                      className={`${color} flex items-center justify-center text-[9px] font-bold text-(--bg-base) transition-all duration-300`}
                       style={{ width: `${pct}%` }}
                     >
                       {pct >= 5 && `${label} ${pct}%`}
@@ -300,13 +309,18 @@ export default function FormView() {
         </div>
       )}
 
-      {/* ── Step 3: Pilih Model ──────────────────────────────── */}
+      {/* ── Step 3: Select Model ──────────────────────────────── */}
       <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
-        <p className="mb-1 text-sm font-semibold tracking-tight text-(--text-primary)">
-          Arsitektur Model
-        </p>
+        <div className="mb-1 flex items-center gap-1.5">
+          <p className="text-sm font-semibold tracking-tight text-(--text-primary)">
+            Model Architecture
+          </p>
+          <InfoPopup title="Model Architecture — mBERT vs XLM-R">
+            {MODEL_ARCH_INFO}
+          </InfoPopup>
+        </div>
         <p className="mb-5 text-xs text-(--text-secondary)">
-          Pilih model transformer yang akan di-fine-tune.
+          Choose the transformer model to fine-tune.
         </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {MODEL_OPTIONS.map((opt) => (
@@ -343,26 +357,31 @@ export default function FormView() {
 
       {/* ── Step 4: Hyperparameter ───────────────────────────── */}
       <div className="rounded-xl border border-(--border-default) bg-(--bg-surface) p-5 shadow-(--shadow-sm)">
-        <p className="mb-1 text-sm font-semibold tracking-tight text-(--text-primary)">
-          Hyperparameter
-        </p>
+        <div className="mb-1 flex items-center gap-1.5">
+          <p className="text-sm font-semibold tracking-tight text-(--text-primary)">
+            Hyperparameter
+          </p>
+          <InfoPopup title="Training Hyperparameters — Parameter Guide">
+            {HYPERPARAM_INFO}
+          </InfoPopup>
+        </div>
         <p className="mb-5 text-xs text-(--text-secondary)">
-          Konfigurasi proses training. Default sudah dioptimalkan.
+          Training configuration. Defaults are already optimized.
         </p>
 
         {/* Nama job */}
         <div className="mb-5">
           <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
-            Nama Job{" "}
+            Job Name{" "}
             <span className="font-normal text-(--text-tertiary)">
-              (opsional)
+              (optional)
             </span>
           </label>
           <input
             type="text"
             value={jobName}
             onChange={(e) => setJobName(e.target.value)}
-            placeholder={`cth. ${modelType.toUpperCase()} Sentiment v1`}
+            placeholder={`e.g. ${modelType.toUpperCase()} Sentiment v1`}
             className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none placeholder:text-(--text-disabled) focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
           />
         </div>
@@ -378,7 +397,7 @@ export default function FormView() {
               onChange={(e) => setHyperparam("epochs", Number(e.target.value))}
               className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             >
-              {[1, 2, 3, 4, 5, 8, 10].map((v) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
@@ -419,7 +438,7 @@ export default function FormView() {
               }}
               className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             >
-              <option value="auto">Auto (deteksi otomatis)</option>
+              <option value="auto">Auto (auto-detect)</option>
               {[64, 128, 256, 512].map((v) => (
                 <option key={v} value={v}>
                   {v}
@@ -428,8 +447,8 @@ export default function FormView() {
             </select>
             {hyperparams.max_length === "auto" && (
               <p className="mt-1.5 text-[10px] leading-tight text-(--text-tertiary)">
-                Max length akan dihitung dari persentil ke-99 panjang token di
-                dataset.
+                Max length will be calculated from the 99th percentile token
+                length in the dataset.
               </p>
             )}
           </div>
@@ -444,7 +463,7 @@ export default function FormView() {
               }
               className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             >
-              {[1e-5, 2e-5, 3e-5, 5e-5].map((v) => (
+              {[1e-5, 2e-5, 3e-5, 4e-5, 5e-5].map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
@@ -460,7 +479,7 @@ export default function FormView() {
               onChange={(e) => setHyperparam("optimizer", e.target.value)}
               className="w-full rounded-md border border-(--border-default) bg-(--bg-elevated) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
             >
-              <option value="adamw">AdamW (rekomendasi)</option>
+              <option value="adamw">AdamW (recommended)</option>
               <option value="adam">Adam</option>
               <option value="sgd">SGD</option>
               <option value="adafactor">Adafactor</option>
@@ -491,11 +510,11 @@ export default function FormView() {
           className="mt-5 flex items-center gap-1.5 text-[11px] font-medium tracking-wide text-(--text-tertiary) uppercase transition-colors hover:text-(--text-primary)"
         >
           {showAdvanced ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          {showAdvanced ? "Sembunyikan" : "Tampilkan"} parameter lanjutan
+          {showAdvanced ? "Hide" : "Show"} advanced parameters
         </button>
 
         {showAdvanced && (
-          <div className="animate-fade-in mt-4 grid grid-cols-2 gap-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4">
+          <div className="animate-fade-in mt-4 grid grid-cols-2 gap-4 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-4 sm:grid-cols-3">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
                 Warmup Steps
@@ -528,6 +547,20 @@ export default function FormView() {
                 className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
               />
             </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-(--text-secondary)">
+                Seed
+              </label>
+              <input
+                type="number"
+                min={0}
+                max={99999}
+                step={1}
+                value={hyperparams.seed}
+                onChange={(e) => setHyperparam("seed", Number(e.target.value))}
+                className="w-full rounded-md border border-(--border-default) bg-(--bg-surface) px-3 py-2 text-sm text-(--text-primary) transition-all duration-150 outline-none focus:border-(--accent) focus:ring-2 focus:ring-(--accent-muted)"
+              />
+            </div>
           </div>
         )}
       </div>
@@ -536,25 +569,25 @@ export default function FormView() {
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-4 text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--accent) py-4 text-sm font-semibold tracking-wide text-(--bg-base) transition-all duration-200 hover:bg-(--accent-hover) hover:shadow-(--shadow-accent) active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none"
       >
         {isSubmitting ? (
           <>
-            <Loader2 size={18} className="animate-spin" /> Membuat job...
+            <Loader2 size={18} className="animate-spin" /> Creating job...
           </>
         ) : (
           <>
-            <Send size={18} /> Mulai Training
+            <Send size={18} /> Start Training
           </>
         )}
       </button>
       {!canSubmit && !isSubmitting && (
         <p className="text-center text-xs text-(--text-tertiary)">
           {!selectedDatasetId
-            ? "Pilih dataset terlebih dahulu"
+            ? "Select a dataset first"
             : !splitPreview?.is_valid
-              ? "Data tidak mencukupi untuk training"
-              : "Pilih arsitektur model"}
+              ? "Insufficient data for training"
+              : "Select a model architecture"}
         </p>
       )}
     </div>

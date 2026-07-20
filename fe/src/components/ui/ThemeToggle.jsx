@@ -23,7 +23,7 @@ export default function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="group flex h-9 w-9 items-center justify-center rounded-md border border-(--border-default) bg-(--bg-surface) text-(--text-secondary) transition-all duration-150 hover:bg-(--bg-overlay) hover:text-(--text-primary) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--accent-muted)"
-      title={`Beralih ke mode ${isDark ? "Terang" : "Gelap"}`}
+      title={`Switch to ${isDark ? "Light" : "Dark"}`}
     >
       {isDark ? (
         <Sun size={16} className="transition-transform group-hover:rotate-45" />

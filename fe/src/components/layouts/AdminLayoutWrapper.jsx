@@ -41,7 +41,7 @@ export default function AdminLayoutWrapper({ children }) {
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-(--border-default) bg-(--bg-surface) px-5 md:hidden">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--accent) shadow-(--shadow-glow-accent)">
-              <BrainCircuit size={16} className="text-white" />
+              <BrainCircuit size={16} className="text-(--bg-base)" />
             </div>
             <span className="text-base font-bold tracking-tight text-(--text-primary)">
               Transmotion

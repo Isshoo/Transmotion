@@ -3,7 +3,7 @@
 import os
 import threading
 
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, or_
 
 from app.config.extensions import db
 from app.layers.models.prediction import Prediction
@@ -79,7 +79,7 @@ def _load_model(model_record: TrainedModel):
 
     except Exception as e:
         logger.error(f"Failed to load model {model_id}: {e}")
-        raise BadRequestError(f"Gagal memuat model: {e}") from None
+        raise BadRequestError(f"Failed to load model: {e}") from None
 
 
 # ── Trained Model CRUD ─────────────────────────────────────────────────────────
@@ -88,13 +88,15 @@ def _load_model(model_record: TrainedModel):
 def get_model_by_id(model_id: str) -> TrainedModel:
     model = db.session.get(TrainedModel, model_id)
     if not model:
-        raise NotFoundError("Model tidak ditemukan")
+        raise NotFoundError("Model not found")
     return model
 
 
 def get_all_models(
     page=1,
     per_page=20,
+    search=None,
+    dataset_id=None,
     model_type=None,
     is_active=None,
     is_public=None,
@@ -103,6 +105,17 @@ def get_all_models(
 ):
     query = db.session.query(TrainedModel)
 
+    if search:
+        term = f"%{search}%"
+        query = query.filter(
+            or_(TrainedModel.name.ilike(term), TrainedModel.description.ilike(term))
+        )
+    if dataset_id:
+        from app.layers.models.training_job import TrainingJob
+
+        query = query.join(TrainingJob, TrainedModel.job_id == TrainingJob.id).filter(
+            TrainingJob.dataset_id == dataset_id
+        )
     if model_type:
         query = query.filter(TrainedModel.model_type == model_type)
     if is_active is not None:
@@ -206,9 +219,9 @@ def classify(model_id: str, text: str, user_id: str | None) -> Prediction:
     model_record = get_model_by_id(model_id)
 
     if not model_record.is_active:
-        raise BadRequestError("Model tidak aktif")
+        raise BadRequestError("Model is not active")
     if not model_record.file_path:
-        raise BadRequestError("File model tidak tersedia")
+        raise BadRequestError("Model file is not available")
 
     file_path = model_record.file_path
 
@@ -249,8 +262,17 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
     session = colab_service.get_active_session()
     if not session:
         raise BadRequestError(
-            "Colab tidak aktif. Model ini tersimpan di Google Drive dan "
-            "memerlukan Colab untuk inference. Hidupkan Colab terlebih dahulu."
+            "Colab is not active. This model is stored in Google Drive and "
+            "requires Colab for inference. Please start Colab first."
+        )
+
+    api_key = app.config.get("COLAB_API_KEY", "")
+
+    # Lakukan pengecekan aktif memastikan Colab benar-benar hidup
+    if not colab_service.health_check(api_key):
+        raise BadRequestError(
+            "Colab server is not responding. The connection might be lost. "
+            "Please check your Colab connection."
         )
 
     api_key = app.config.get("COLAB_API_KEY", "")
@@ -270,7 +292,24 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
             headers={"X-Backend-Key": api_key},
             timeout=120,
         )
-        res.raise_for_status()
+        if res.status_code in [502, 503, 504]:
+            colab_service.force_offline(session["session_id"])
+            raise BadRequestError(
+                "Colab tunnel is offline or not reachable. Please check your Colab server."
+            )
+
+        if res.status_code != 200:
+            try:
+                data = res.json()
+                error_msg = data.get(
+                    "error", f"Colab returned status {res.status_code}"
+                )
+            except Exception:
+                error_msg = (
+                    f"Colab returned status {res.status_code} - {res.text[:100]}"
+                )
+            raise BadRequestError(f"Colab inference failed: {error_msg}")
+
         data = res.json()
 
         logger.info(
@@ -280,16 +319,22 @@ def _classify_via_colab(model_record, text: str, app) -> dict:
         )
 
         if not data.get("success"):
-            raise BadRequestError(f"Colab inference gagal: {data.get('error')}")
+            raise BadRequestError(f"Colab inference failed: {data.get('error')}")
 
         return data["data"]
 
     except http_requests.exceptions.Timeout:
+        colab_service.force_offline(session["session_id"])
         raise BadRequestError(
-            "Inference timeout. Coba lagi — model mungkin sedang dimuat pertama kali."
-        )
+            "Inference timeout. Try again — the model might be loading for the first time."
+        ) from None
+    except http_requests.exceptions.ConnectionError:
+        colab_service.force_offline(session["session_id"])
+        raise BadRequestError(
+            "Failed to contact Colab (Connection Error). The server might be offline."
+        ) from None
     except http_requests.exceptions.RequestException as e:
-        raise BadRequestError(f"Gagal menghubungi Colab: {e}")
+        raise BadRequestError(f"Failed to contact Colab: {e}") from None
 
 
 def _classify_local(model_record, text: str) -> dict:
@@ -304,9 +349,7 @@ def _classify_local(model_record, text: str) -> dict:
 
     if model_id not in _model_cache:
         if not os.path.exists(model_record.file_path):
-            raise BadRequestError(
-                f"File model tidak ditemukan: {model_record.file_path}"
-            )
+            raise BadRequestError(f"Model file not found: {model_record.file_path}")
 
         base = model_record.base_model_name or (
             "bert-base-multilingual-cased"

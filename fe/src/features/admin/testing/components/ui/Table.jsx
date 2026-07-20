@@ -18,23 +18,21 @@ export function HistoryTable() {
   return (
     <div className="animate-fade-in mt-8 border-t border-(--border-default) pt-6">
       <h3 className="mb-4 text-sm font-bold tracking-tight text-(--text-primary)">
-        Riwayat Klasifikasi
+        Classification History
       </h3>
       <div className="overflow-hidden rounded-xl border border-(--border-default) bg-(--bg-surface) shadow-(--shadow-sm)">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-(--border-default) bg-(--bg-elevated)">
-                {["No", "Teks", "Prediksi", "Confidence", "Model", "Waktu"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-4 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
-                    >
-                      {h}
-                    </th>
-                  )
-                )}
+                {["No", "Text", "Prediction", "Confidence", "Time"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-left text-[10px] font-bold tracking-wider whitespace-nowrap text-(--text-secondary) uppercase"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-(--border-subtle)">
@@ -58,7 +56,10 @@ export function HistoryTable() {
                           {(historyPage - 1) * historyPerPage + index + 1}
                         </span>
                       </td>
-                      <td className="max-w-[280px] px-4 py-3">
+                      <td
+                        className="max-w-[280px] px-4 py-3"
+                        title={item.input_text}
+                      >
                         <span className="line-clamp-2 font-mono text-[11px] leading-relaxed text-(--text-secondary)">
                           {item.input_text}
                         </span>
@@ -73,12 +74,9 @@ export function HistoryTable() {
                           <ConfidenceBar value={item.confidence} />
                         )}
                       </td>
-                      <td className="px-4 py-3 text-[11px] font-medium whitespace-nowrap text-(--text-tertiary)">
-                        {item.model_name ?? "—"}
-                      </td>
                       <td className="px-4 py-3 text-[10px] font-medium whitespace-nowrap text-(--text-tertiary)">
                         {item.created_at
-                          ? new Date(item.created_at).toLocaleString("id-ID", {
+                          ? new Date(item.created_at).toLocaleString("en-EN", {
                               day: "2-digit",
                               month: "short",
                               hour: "2-digit",

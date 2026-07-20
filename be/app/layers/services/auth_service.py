@@ -19,7 +19,7 @@ from app.utils.password import hash_password, verify_password
 def register(email, password, name):
     # Check if email exists
     if db.session.query(User).filter_by(email=email.lower()).first():
-        raise ConflictError("Email sudah terdaftar")
+        raise ConflictError("Email is already registered")
 
     # Create verification token
     verification_token = secrets.token_urlsafe(32)
@@ -42,19 +42,19 @@ def register(email, password, name):
 def login(email, password):
     user = db.session.query(User).filter_by(email=email.lower()).first()
     if not user:
-        raise UnauthorizedError("Akun tidak ditemukan")
+        raise UnauthorizedError("Account not found")
     if user.auth_provider == "google" and not user.password_hash:
         raise UnauthorizedError(
-            "Akun ini terdaftar via Google. Silakan masuk dengan Google."
+            "This account is registered via Google. Please login with Google."
         )
 
     if not verify_password(password, user.password_hash):
-        raise UnauthorizedError("Email atau password salah")
+        raise UnauthorizedError("Incorrect email or password")
 
     if not user.is_active:
-        raise UnauthorizedError("Akun telah dinonaktifkan")
+        raise UnauthorizedError("Account has been disabled")
     if not user.is_verified:
-        raise UnauthorizedError("Akun belum diverifikasi. Silakan cek email kamu.")
+        raise UnauthorizedError("Account is not verified. Please check your email.")
 
     # Update last login
     user.last_login_at = datetime.now(timezone.utc)
@@ -71,10 +71,10 @@ def refresh_token(user_id):
     user = db.session.get(User, user_id)
 
     if not user:
-        raise UnauthorizedError("Akun tidak ditemukan")
+        raise UnauthorizedError("Account not found")
 
     if not user.is_active:
-        raise UnauthorizedError("Akun telah dinonaktifkan")
+        raise UnauthorizedError("Account has been disabled")
 
     return create_access_token(identity=user.id)
 
@@ -83,10 +83,10 @@ def verify_email(token):
     user = db.session.query(User).filter_by(verification_token=token).first()
 
     if not user:
-        raise BadRequestError("Token verifikasi tidak valid")
+        raise BadRequestError("Invalid verification token")
 
     if user.verification_token_expires < datetime.now(timezone.utc):
-        raise BadRequestError("Token verifikasi sudah kedaluwarsa")
+        raise BadRequestError("Verification token has expired")
 
     user.is_verified = True
     user.verification_token = None
@@ -100,10 +100,10 @@ def resend_verification(email):
     user = db.session.query(User).filter_by(email=email.lower()).first()
 
     if not user:
-        raise NotFoundError("Akun tidak ditemukan")
+        raise NotFoundError("Account not found")
 
     if user.is_verified:
-        raise BadRequestError("Email sudah terverifikasi")
+        raise BadRequestError("Email is already verified")
 
     user.verification_token = secrets.token_urlsafe(32)
     user.verification_token_expires = datetime.now(timezone.utc) + timedelta(hours=24)
@@ -129,10 +129,10 @@ def reset_password(token, new_password):
     user = db.session.query(User).filter_by(reset_token=token).first()
 
     if not user:
-        raise BadRequestError("Token reset tidak valid")
+        raise BadRequestError("Invalid reset token")
 
     if user.reset_token_expires < datetime.now(timezone.utc):
-        raise BadRequestError("Token reset sudah kedaluwarsa")
+        raise BadRequestError("Reset token has expired")
 
     user.password_hash = hash_password(new_password)
     user.reset_token = None
@@ -144,7 +144,7 @@ def reset_password(token, new_password):
 
 def change_password(user, current_password, new_password):
     if not verify_password(current_password, user.password_hash):
-        raise UnauthorizedError("Password saat ini salah")
+        raise UnauthorizedError("Current password is incorrect")
 
     user.password_hash = hash_password(new_password)
     db.session.commit()

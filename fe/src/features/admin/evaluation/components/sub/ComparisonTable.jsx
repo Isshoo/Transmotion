@@ -1,8 +1,8 @@
 import { bestModel, fmt } from "../ui/Helpers";
 
-export default function ComparisonTable({ mbert, xlmr }) {
-  const bMbert = bestModel(mbert);
-  const bXlmr = bestModel(xlmr);
+export default function ComparisonTable({ mbert, xlmr, metric, metricLabel }) {
+  const bMbert = bestModel(mbert, metric);
+  const bXlmr = bestModel(xlmr, metric);
 
   const rows = [
     { label: "Accuracy", xlmrVal: bXlmr?.accuracy, mbertVal: bMbert?.accuracy },
@@ -46,8 +46,8 @@ export default function ComparisonTable({ mbert, xlmr }) {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr>
-                <th className="w-34 border-r border-b border-(--border-default) bg-(--bg-elevated) px-6 py-3.5 text-left text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
-                  Metrik
+                <th className="sticky left-0 z-20 w-34 border-r border-b border-(--border-default) bg-(--bg-elevated) px-6 py-3.5 text-left text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
+                  Metric
                 </th>
                 <th className="border-r border-b border-(--border-default) bg-(--data-4)/10 px-6 py-3.5 text-center text-[10px] font-black tracking-wider text-(--data-4) uppercase">
                   XLM-R
@@ -77,12 +77,12 @@ export default function ComparisonTable({ mbert, xlmr }) {
                       className="transition-colors duration-150 hover:bg-(--bg-overlay)"
                     >
                       <td
-                        className={`border-r border-(--border-default) ${!isLast ? "border-b" : ""} bg-(--bg-elevated) px-5 py-3 text-[13px] font-bold text-(--text-primary)`}
+                        className={`sticky left-0 z-10 border-r border-(--border-default) ${!isLast ? "border-b" : ""} bg-(--bg-elevated) px-5 py-3 text-[13px] font-bold text-(--text-primary) shadow-[2px_0_4px_rgba(0,0,0,0.05)]`}
                       >
                         {label}
                         {lowerBetter && (
                           <span className="ml-2 inline-flex items-center rounded-md border border-(--border-subtle) bg-(--bg-overlay) px-1.5 py-0.5 text-[9px] font-medium text-(--text-tertiary)">
-                            ↓ lebih baik
+                            ↓ lower is better
                           </span>
                         )}
                       </td>
@@ -96,7 +96,7 @@ export default function ComparisonTable({ mbert, xlmr }) {
                         {fmt(xlmrVal, raw)}
                         {xlmrWins && (
                           <span className="ml-1.5 text-[10px] text-(--success)">
-                            ▲
+                            {lowerBetter ? "✓" : "▲"}
                           </span>
                         )}
                       </td>
@@ -110,7 +110,7 @@ export default function ComparisonTable({ mbert, xlmr }) {
                         {fmt(mbertVal, raw)}
                         {mbertWins && (
                           <span className="ml-1.5 text-[10px] text-(--success)">
-                            ▲
+                            {lowerBetter ? "✓" : "▲"}
                           </span>
                         )}
                       </td>
@@ -125,14 +125,12 @@ export default function ComparisonTable({ mbert, xlmr }) {
       <div className="mt-3 flex items-start gap-2 rounded-lg border border-(--border-subtle) bg-(--bg-elevated) p-3">
         <span className="text-sm">💡</span>
         <p className="text-[11px] leading-relaxed text-(--text-tertiary)">
-          <strong className="text-(--success)">▲</strong> menandakan nilai lebih
-          baik. Best model dipilih berdasarkan{" "}
-          <strong className="text-(--text-secondary)">Accuracy</strong>{" "}
-          tertinggi.
+          <strong className="text-(--success)">▲ / ✓</strong> indicates a better
+          value. The best model is selected based on the highest{" "}
+          <strong className="text-(--text-secondary)">{metricLabel}</strong>.
           <br />
-          <strong className="text-(--text-secondary)">Mean Std:</strong>{" "}
-          rata-rata standar deviasi confidence score (lebih rendah = lebih
-          confident).
+          <strong className="text-(--text-secondary)">Mean Std:</strong> average
+          standard deviation of confidence scores (lower = more confident).
         </p>
       </div>
     </div>

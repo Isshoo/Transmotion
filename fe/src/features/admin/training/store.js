@@ -18,13 +18,14 @@ const useTrainingStore = create((set, get) => ({
   jobName: "",
   hyperparams: {
     learning_rate: 2e-5,
-    epochs: 3,
-    batch_size: 16,
-    max_length: "auto",
+    epochs: 5,
+    batch_size: 32,
+    max_length: 128,
     warmup_steps: 0.1,
     weight_decay: 0.01,
     dropout: 0.1,
     optimizer: "adamw",
+    seed: 42,
   },
 
   // ── Split preview ──────────────────────────────────────────
@@ -34,12 +35,13 @@ const useTrainingStore = create((set, get) => ({
   // ── Active job (progress / result) ─────────────────────────
   activeJob: null,
   isLoadingActive: false,
+  dismissedJobId: null,
 
   // ── UI ─────────────────────────────────────────────────────
   isSubmitting: false,
   isCheckingActive: true,
 
-  // ── Init: cek apakah ada job aktif saat masuk halaman ──────
+  // ── Init: check if there is an active job when entering the page ──────
   init: async () => {
     set({ isCheckingActive: true });
 
@@ -52,25 +54,32 @@ const useTrainingStore = create((set, get) => ({
       const job = res.data;
       if (job && ["queued", "running"].includes(job.status)) {
         set({ activeJob: job, view: "progress", isCheckingActive: false });
-      } else if (job && job.status === "completed") {
-        // Ada job selesai — bisa tampilkan result jika mau
-        // set({ activeJob: job, view: "result", isCheckingActive: false });
-        get().resetToForm();
-        set({ isCheckingActive: false });
+      } else if (
+        job &&
+        ["completed", "failed", "cancelled"].includes(job.status)
+      ) {
+        if (get().dismissedJobId === job.id) {
+          get().resetToForm();
+          set({ isCheckingActive: false });
+        } else {
+          set({ activeJob: job, view: "result", isCheckingActive: false });
+        }
       } else {
         get().resetToForm();
         set({ isCheckingActive: false });
       }
     } catch {
-      // Tidak ada job aktif, reset ke form
+      // No active job, reset to form
       get().resetToForm();
       set({ isCheckingActive: false });
     }
   },
 
   resetToForm: () => {
+    const active = get().activeJob;
     set({
       view: "form",
+      dismissedJobId: active ? active.id : get().dismissedJobId,
       activeJob: null,
       selectedDatasetId: "",
       testSize: 0.2,
@@ -80,13 +89,14 @@ const useTrainingStore = create((set, get) => ({
       splitPreview: null,
       hyperparams: {
         learning_rate: 2e-5,
-        epochs: 3,
-        batch_size: 16,
-        max_length: "auto",
+        epochs: 5,
+        batch_size: 32,
+        max_length: 128,
         warmup_steps: 0.1,
         weight_decay: 0.01,
         dropout: 0.1,
         optimizer: "adamw",
+        seed: 42,
       },
     });
   },

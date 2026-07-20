@@ -25,8 +25,8 @@ _colab_sessions: dict = {}
 _lock = threading.Lock()
 
 # Threshold yang lebih agresif
-WARN_THRESHOLD_SECONDS = 90  # degraded jika belum ping 90s
-OFFLINE_THRESHOLD_SECONDS = 180  # offline jika belum ping 180s
+WARN_THRESHOLD_SECONDS = 65  # degraded jika belum ping 65s (worker ping tiap 60s)
+OFFLINE_THRESHOLD_SECONDS = 90  # offline jika belum ping 90s
 
 
 def register(url: str, session_id: str) -> dict:
@@ -161,11 +161,14 @@ def health_check(api_key: str) -> bool:
             logger.info(f"Health check OK: {url}")
             return True
         else:
-            _mark_health_check_failed(session["session_id"])
+            logger.warning(
+                f"Health check rejected with status {res.status_code}: {url}"
+            )
+            force_offline(session["session_id"])
             return False
     except Exception as e:
-        logger.warning(f"Health check failed: {url} — {e}")
-        _mark_health_check_failed(session["session_id"])
+        logger.warning(f"Health check failed (Exception): {url} — {e}")
+        force_offline(session["session_id"])
         return False
 
 
@@ -175,12 +178,25 @@ def _mark_health_check_failed(session_id: str):
             _colab_sessions[session_id]["health_check_failed"] = (
                 _colab_sessions[session_id].get("health_check_failed", 0) + 1
             )
-            # Jika gagal 3x berturut-turut → paksa offline dengan set last_ping ke masa lalu
-            if _colab_sessions[session_id]["health_check_failed"] >= 3:
+            # Jika gagal 2x berturut-turut → paksa offline
+            if _colab_sessions[session_id]["health_check_failed"] >= 2:
                 _colab_sessions[session_id]["last_ping"] = 0
                 logger.warning(
-                    f"Session {session_id} marked offline after 3 failed health checks"
+                    f"Session {session_id} marked offline after 2 failed health checks"
                 )
+    _broadcast_status()
+
+
+def force_offline(session_id: str):
+    """Secara paksa menandai session offline, misalnya saat dapat 503 dari ngrok."""
+    with _lock:
+        if session_id in _colab_sessions:
+            _colab_sessions[session_id]["last_ping"] = 0
+            _colab_sessions[session_id]["health_check_failed"] = 3
+            logger.warning(
+                f"Session {session_id} forced offline due to explicit connection failure"
+            )
+    _broadcast_status()
 
 
 def _broadcast_status():
@@ -214,5 +230,5 @@ def call_train(job_data: dict, api_key: str) -> bool:
             return False
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to call Colab /train: {e}")
-        _mark_health_check_failed(session["session_id"])
+        force_offline(session["session_id"])
         return False
